@@ -215,3 +215,68 @@ model AuditLog {
   metadata    Json?
   createdAt   DateTime @default(now())
 }
+
+model Batch {
+  id                String    @id @default(uuid())
+  academicSessionId String
+  curriculumTrackId String
+  name              String
+  capacity          Int?
+  isPublic          Boolean   @default(false)
+  showFeePublicly   Boolean   @default(false)
+  isActive          Boolean   @default(true)
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+  createdBy         String?
+  updatedBy         String?
+  archivedAt        DateTime?
+  archivedBy        String?
+
+  academicSession    AcademicSession     @relation(fields: [academicSessionId], references: [id])
+  curriculumTrack    CurriculumTrack     @relation(fields: [curriculumTrackId], references: [id])
+  schedules          BatchSchedule[]
+  enrolments         Enrolment[]
+  teacherAssignments TeacherAssignment[]
+
+  // Note: We do NOT use @@unique here.
+  // We use a custom migration to create: UNIQUE (academicSessionId, curriculumTrackId, name) WHERE archivedAt IS NULL
+}
+
+model BatchSchedule {
+  id             String   @id @default(uuid())
+  batchId        String
+  dayOfWeek      Int
+  startTime      String
+  endTime        String
+  roomOrLocation String?
+  liveClassUrl   String?
+  isActive       Boolean  @default(true)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  batch Batch @relation(fields: [batchId], references: [id], onDelete: Cascade)
+}
+
+model Enrolment {
+  id                String    @id @default(uuid())
+  studentId         String
+  academicSessionId String
+  curriculumTrackId String
+  batchId           String?
+  joiningDate       DateTime
+  status            String    @default("active") // active, withdrawn, completed, suspended
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+  createdBy         String?
+  updatedBy         String?
+  archivedAt        DateTime?
+  archivedBy        String?
+
+  student         Student         @relation(fields: [studentId], references: [id])
+  academicSession AcademicSession @relation(fields: [academicSessionId], references: [id])
+  curriculumTrack CurriculumTrack @relation(fields: [curriculumTrackId], references: [id])
+  batch           Batch?          @relation(fields: [batchId], references: [id])
+
+  // Note: We do NOT use @@unique here.
+  // We use a custom migration to create: UNIQUE (studentId, academicSessionId, curriculumTrackId) WHERE archivedAt IS NULL
+}
