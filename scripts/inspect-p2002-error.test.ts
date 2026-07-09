@@ -24,7 +24,14 @@ describe.skipIf(!isTestConfigured)("Inspect P2002", () => {
     if (!isTestConfigured) return;
     const testDb = await initializeTestDb();
     if (!testDb) return;
+    await testDb.homework.deleteMany({});
+    await testDb.fileAsset.deleteMany({});
     await testDb.enrolment.deleteMany({});
+    await testDb.batchSchedule.deleteMany({});
+    await testDb.teacherAssignment.deleteMany({});
+    await testDb.batch.deleteMany({});
+    await testDb.topic.deleteMany({});
+    await testDb.chapter.deleteMany({});
     await testDb.curriculumTrack.deleteMany({});
     await testDb.subject.deleteMany({ where: { code: "TEST_S" } });
     await testDb.board.deleteMany({ where: { code: "TEST_B" } });
@@ -33,7 +40,14 @@ describe.skipIf(!isTestConfigured)("Inspect P2002", () => {
   afterAll(async () => {
     const testDb = (globalThis as any).__testDb as PrismaClient | null;
     if (testDb) {
+      await testDb.homework.deleteMany({});
+      await testDb.fileAsset.deleteMany({});
       await testDb.enrolment.deleteMany({});
+      await testDb.batchSchedule.deleteMany({});
+      await testDb.teacherAssignment.deleteMany({});
+      await testDb.batch.deleteMany({});
+      await testDb.topic.deleteMany({});
+      await testDb.chapter.deleteMany({});
       await testDb.curriculumTrack.deleteMany({});
       await testDb.subject.deleteMany({ where: { code: "TEST_S" } });
       await testDb.board.deleteMany({ where: { code: "TEST_B" } });

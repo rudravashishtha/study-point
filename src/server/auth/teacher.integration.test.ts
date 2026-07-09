@@ -37,13 +37,17 @@ beforeAll(async () => {
 
   // Cleanup
   await testDb.teacherAssignment.deleteMany({});
+  await testDb.homework.deleteMany({});
   await testDb.batch.deleteMany({});
   await testDb.teacher.deleteMany({});
   await testDb.enrolment.deleteMany({});
+  await testDb.topic.deleteMany({});
+  await testDb.chapter.deleteMany({});
   await testDb.curriculumTrack.deleteMany({});
   await testDb.subject.deleteMany({});
   await testDb.board.deleteMany({});
   await testDb.academicSession.deleteMany({});
+  await testDb.fileAsset.deleteMany({});
   await testDb.appUser.deleteMany({});
 });
 
@@ -51,13 +55,17 @@ afterAll(async () => {
   const testDb = (globalThis as any).__testDb;
   if (testDb) {
     await testDb.teacherAssignment.deleteMany({});
+    await testDb.homework.deleteMany({});
     await testDb.batch.deleteMany({});
     await testDb.teacher.deleteMany({});
     await testDb.enrolment.deleteMany({});
+    await testDb.topic.deleteMany({});
+    await testDb.chapter.deleteMany({});
     await testDb.curriculumTrack.deleteMany({});
     await testDb.subject.deleteMany({});
     await testDb.board.deleteMany({});
     await testDb.academicSession.deleteMany({});
+    await testDb.fileAsset.deleteMany({});
     await testDb.appUser.deleteMany({});
   }
   await teardownTestDb();

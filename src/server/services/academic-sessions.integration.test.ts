@@ -38,6 +38,10 @@ beforeAll(async () => {
 
   // Clean up any left over state
   await testDb.auditLog.deleteMany({});
+  await testDb.batchSchedule.deleteMany({});
+  await testDb.homework.deleteMany({});
+  await testDb.fileAsset.deleteMany({});
+  await testDb.batch.deleteMany({});
   await testDb.academicSession.deleteMany({});
   await testDb.appUser.deleteMany({});
 
@@ -66,6 +70,12 @@ afterAll(async () => {
   const testDb = (globalThis as any).__testDb;
   if (testDb) {
     await testDb.auditLog.deleteMany({});
+    await testDb.enrolment.deleteMany({});
+    await testDb.student.deleteMany({});
+    await testDb.batchSchedule.deleteMany({});
+    await testDb.homework.deleteMany({});
+    await testDb.fileAsset.deleteMany({});
+    await testDb.batch.deleteMany({});
     await testDb.academicSession.deleteMany({});
     await testDb.appUser.deleteMany({});
   }

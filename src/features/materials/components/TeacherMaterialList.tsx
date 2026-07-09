@@ -1,0 +1,267 @@
+"use client";
+
+import { useState } from "react";
+import { StudyMaterialLifecycleState, StudyMaterialResourceType } from "@prisma/client";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Badge } from "@/components/ui/badge";
+import { format } from "date-fns";
+import { Download, Edit, Archive, CheckCircle } from "lucide-react";
+import { Button, buttonVariants } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { toast } from "sonner";
+import {
+  publishTeacherMaterialAction,
+  archiveTeacherMaterialAction,
+} from "@/app/teacher/batches/[batchId]/actions";
+import { TeacherMaterialFormDialog } from "./TeacherMaterialFormDialog";
+import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+
+export function TeacherMaterialList({
+  materials,
+  chapters,
+  batchId,
+  canManage,
+}: {
+  materials: any[];
+  chapters: any[];
+  batchId: string;
+  canManage: boolean;
+}) {
+  const [editingMaterial, setEditingMaterial] = useState<any>(null);
+  const [isFormOpen, setIsFormOpen] = useState(false);
+  const [search, setSearch] = useState("");
+  const [filterState, setFilterState] = useState<string>("ALL");
+
+  const filtered = materials.filter((m) => {
+    if (search && !m.title.toLowerCase().includes(search.toLowerCase())) return false;
+    if (filterState !== "ALL" && m.lifecycleState !== filterState) return false;
+    return true;
+  });
+
+  const handleAction = async (action: () => Promise<any>, successMsg: string) => {
+    try {
+      const res = await action();
+      if (!res.success) {
+        toast.error("Error", { description: res.error.message });
+        return;
+      }
+      toast.success("Success", { description: successMsg });
+    } catch (e: any) {
+      toast.error("Error", { description: e.message });
+    }
+  };
+
+  return (
+    <div className="space-y-4">
+      <div className="flex flex-col sm:flex-row gap-4 items-center justify-between">
+        <div className="flex flex-1 gap-4 items-center w-full sm:w-auto">
+          <Input
+            placeholder="Search materials..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="max-w-xs"
+          />
+          <Select value={filterState} onValueChange={(v) => v && setFilterState(v)}>
+            <SelectTrigger className="w-[150px]">
+              <SelectValue placeholder="Status" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="ALL">All States</SelectItem>
+              <SelectItem value="DRAFT">Draft</SelectItem>
+              <SelectItem value="PUBLISHED">Published</SelectItem>
+              <SelectItem value="ARCHIVED">Archived</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+        {canManage && (
+          <Button
+            onClick={() => {
+              setEditingMaterial(null);
+              setIsFormOpen(true);
+            }}
+          >
+            Create Material
+          </Button>
+        )}
+      </div>
+
+      <div className="border rounded-md relative w-full overflow-x-auto">
+        <Table className="min-w-[600px]">
+          <TableHeader>
+            <TableRow>
+              <TableHead>Title</TableHead>
+              <TableHead>Type</TableHead>
+              <TableHead>Status</TableHead>
+              <TableHead>Created</TableHead>
+              <TableHead className="text-right">Actions</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {filtered.length === 0 ? (
+              <TableRow>
+                <TableCell colSpan={5} className="text-center h-24 text-muted-foreground">
+                  No materials found.
+                </TableCell>
+              </TableRow>
+            ) : (
+              filtered.map((m) => {
+                // Determine if this material can be mutated by the current teacher
+                // If it's BATCH scope and teacher has canManage, they can mutate.
+                // However, if the material is ARCHIVED, mutations are disabled per requirements.
+                const isArchived = m.lifecycleState === "ARCHIVED";
+                const isTrackScope = m.visibility === "CURRICULUM_TRACK";
+                const canMutate = canManage && !isArchived && !isTrackScope;
+
+                return (
+                  <TableRow key={m.id}>
+                    <TableCell className="font-medium">
+                      <div>{m.title}</div>
+                      {m.description && (
+                        <div className="text-sm text-muted-foreground truncate max-w-[200px]">
+                          {m.description}
+                        </div>
+                      )}
+                    </TableCell>
+                    <TableCell>
+                      <Badge variant="outline" className="text-[10px]">
+                        {m.resourceType}
+                      </Badge>
+                      {isTrackScope && (
+                        <Badge variant="secondary" className="ml-2 text-[10px]">
+                          Track
+                        </Badge>
+                      )}
+                    </TableCell>
+                    <TableCell>
+                      <Badge
+                        variant={
+                          m.lifecycleState === "PUBLISHED"
+                            ? "default"
+                            : m.lifecycleState === "ARCHIVED"
+                              ? "destructive"
+                              : "secondary"
+                        }
+                      >
+                        {m.lifecycleState}
+                      </Badge>
+                    </TableCell>
+                    <TableCell className="text-sm text-muted-foreground">
+                      {format(new Date(m.createdAt), "PP")}
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <div className="flex justify-end gap-2">
+                        {(m.resourceType === "DOCUMENT" ||
+                          m.resourceType === "PRESENTATION" ||
+                          m.resourceType === "IMAGE") &&
+                          m.fileAssetId && (
+                            <a
+                              href={`/api/materials/${m.id}/download`}
+                              target="_blank"
+                              rel="noreferrer"
+                              title="Download"
+                              className={buttonVariants({
+                                variant: "ghost",
+                                size: "icon",
+                              })}
+                            >
+                              <Download className="size-4" />
+                            </a>
+                          )}
+                        {m.resourceType === "LINK" && m.externalLinkUrl && (
+                          <a
+                            href={m.externalLinkUrl}
+                            target="_blank"
+                            rel="noreferrer"
+                            className={buttonVariants({ variant: "ghost", size: "sm" })}
+                            title="Open Link"
+                          >
+                            Open
+                          </a>
+                        )}
+
+                        {canMutate && (
+                          <DropdownMenu>
+                            <DropdownMenuTrigger
+                              className={buttonVariants({ variant: "ghost", size: "sm" })}
+                            >
+                              Actions
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end">
+                              <DropdownMenuItem
+                                onClick={() => {
+                                  setEditingMaterial(m);
+                                  setIsFormOpen(true);
+                                }}
+                              >
+                                <Edit className="size-4 mr-2" />
+                                Edit
+                              </DropdownMenuItem>
+
+                              {m.lifecycleState === "DRAFT" && (
+                                <DropdownMenuItem
+                                  onClick={() =>
+                                    handleAction(
+                                      () => publishTeacherMaterialAction(batchId, m.id),
+                                      "Material published successfully",
+                                    )
+                                  }
+                                >
+                                  <CheckCircle className="size-4 mr-2 text-green-600" />
+                                  Publish
+                                </DropdownMenuItem>
+                              )}
+
+                              <DropdownMenuItem
+                                onClick={() =>
+                                  handleAction(
+                                    () => archiveTeacherMaterialAction(batchId, m.id),
+                                    "Material archived successfully",
+                                  )
+                                }
+                                className="text-destructive focus:text-destructive"
+                              >
+                                <Archive className="size-4 mr-2" />
+                                Archive
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        )}
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                );
+              })
+            )}
+          </TableBody>
+        </Table>
+      </div>
+
+      <TeacherMaterialFormDialog
+        open={isFormOpen}
+        onOpenChange={setIsFormOpen}
+        material={editingMaterial}
+        batchId={batchId}
+        chapters={chapters}
+      />
+    </div>
+  );
+}

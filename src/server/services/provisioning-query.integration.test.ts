@@ -1,8 +1,23 @@
-import { describe, it, expect, beforeEach, afterAll, beforeAll, vi } from "vitest";
-import { db } from "../../lib/db";
-import { listStudentActivationCandidates, inviteStudent } from "./provisioning";
+import { describe, it, expect, beforeAll, afterAll, vi } from "vitest";
+import { PrismaClient } from "@prisma/client";
+import { listStudentActivationCandidates } from "./provisioning";
 import { Role } from "@prisma/client";
 import { ActorContext } from "../../lib/domain/actor";
+
+const { testDbProxy } = vi.hoisted(() => {
+  return {
+    testDbProxy: new Proxy({} as PrismaClient, {
+      get(target, prop) {
+        if (!(globalThis as any).__testDb) throw new Error("testDb is not initialized");
+        return ((globalThis as any).__testDb as any)[prop];
+      },
+    }),
+  };
+});
+
+vi.mock("../../lib/db", () => ({
+  db: testDbProxy,
+}));
 
 vi.mock("../../lib/env", () => ({
   publicEnv: {
@@ -20,19 +35,25 @@ const adminActor: ActorContext = {
   metadata: { role: Role.ADMIN, status: "ACTIVE" },
 };
 
+import {
+  isTestConfigured,
+  initializeTestDb,
+  teardownTestDb,
+} from "../../lib/test/db-isolation";
+
 describe("listStudentActivationCandidates", () => {
   beforeAll(async () => {
-    // Clean up
-    await db.appUser.deleteMany();
-    await db.student.deleteMany();
+    if (isTestConfigured) await initializeTestDb();
   });
 
   afterAll(async () => {
-    await db.appUser.deleteMany();
-    await db.student.deleteMany();
+    if (isTestConfigured) await teardownTestDb();
   });
 
   it("excludes students who already have an AppUser linked", async () => {
+    if (!isTestConfigured) return;
+    const db = testDbProxy as PrismaClient;
+
     const student1 = await db.student.create({
       data: {
         studentCode: "CAND-1",
@@ -77,6 +98,9 @@ describe("listStudentActivationCandidates", () => {
   });
 
   it("includes students without emails but marks them ineligible", async () => {
+    if (!isTestConfigured) return;
+    const db = testDbProxy as PrismaClient;
+
     const studentNoEmail = await db.student.create({
       data: {
         studentCode: "NO-EMAIL",

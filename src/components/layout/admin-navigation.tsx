@@ -25,6 +25,8 @@ export const adminNavigationGroups = [
     links: [
       { href: "/admin/curriculum", label: "Curriculum", icon: BookOpen },
       { href: "/admin/batches", label: "Batches", icon: Calendar },
+      { href: "/admin/materials", label: "Study Materials", icon: FileText },
+      { href: "/admin/homework", label: "Homework", icon: FileText },
     ],
   },
   {

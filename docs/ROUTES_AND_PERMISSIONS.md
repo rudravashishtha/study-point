@@ -102,10 +102,9 @@ All admin routes require authenticated `ADMIN` role.
 | `/admin/timetable`                 | `ADMIN`         | Batch schedule management.                                                                                          |
 | `/admin/materials`                 | `ADMIN`         | Study material list filtered by session, curriculum, chapter, topic, publication, archive state.                    |
 | `/admin/materials/new`             | `ADMIN`         | Upload/create material.                                                                                             |
-| `/admin/homework`                  | `ADMIN`         | Homework list filtered by session, curriculum, batch, chapter, topic.                                               |
-| `/admin/homework/new`              | `ADMIN`         | Create homework.                                                                                                    |
 | `/admin/tests`                     | `ADMIN`         | Test list filtered by session, curriculum, batch, chapter, topic.                                                   |
 | `/admin/tests/new`                 | `ADMIN`         | Create test.                                                                                                        |
+| `/admin/homework`                  | `ADMIN`         | Homework list filtered by session, curriculum, batch, chapter, topic. (Creation and editing handled via Dialogs).   |
 | `/admin/questions`                 | `ADMIN`         | Question bank filtered by board, programme, class, subject, chapter, topic, type, difficulty, marks, archive state. |
 | `/admin/questions/new`             | `ADMIN`         | Create question.                                                                                                    |
 | `/admin/fees`                      | `ADMIN`         | Fee overview and dues filtered by student, session, curriculum, batch, due status.                                  |
@@ -180,16 +179,30 @@ Teacher portal is deferred. The `TEACHER` role remains in schema and permission 
 
 All student routes require authenticated `STUDENT` role, linked active student profile, and an active enrolment. Historical session views are deferred as read-only later work.
 
-| Route                    | Access  | Scope Checks                                                                                                |
-| ------------------------ | ------- | ----------------------------------------------------------------------------------------------------------- |
-| `/student`               | Student | Linked student, active account, active enrolment, current academic session.                                 |
-| `/student/course`        | Student | Own active enrolment, curriculum track, and batch.                                                          |
-| `/student/timetable`     | Student | Own batch schedules only.                                                                                   |
-| `/student/materials`     | Student | Published material matching own session and curriculum track; batch-restricted material requires own batch. |
-| `/student/homework`      | Student | Published homework for own session, curriculum track, and batch.                                            |
-| `/student/tests`         | Student | Published tests for own session, curriculum track, and batch where restricted.                              |
-| `/student/fees`          | Student | Own enrolment fee assignment, dues, payments, and allocations only.                                         |
-| `/student/announcements` | Student | Public/all/curriculum/batch announcements matching own active enrolment.                                    |
+| Route                    | Access  | Scope Checks                                                                                                                   |
+| ------------------------ | ------- | ------------------------------------------------------------------------------------------------------------------------------ |
+| `/student`               | Student | Linked student, active account, active enrolment, current academic session.                                                    |
+| `/student/course`        | Student | Own active enrolment, curriculum track, and batch.                                                                             |
+| `/student/timetable`     | Student | Own batch schedules only.                                                                                                      |
+| `/student/materials`     | Student | Published material matching own session and curriculum track; batch-restricted material requires own batch.                    |
+| `/student/homework`      | Student | Published homework for own active enrolment batches. Overdue homework remains visible as overdue. Archived homework is hidden. |
+| `/student/tests`         | Student | Published tests for own session, curriculum track, and batch where restricted.                                                 |
+| `/student/fees`          | Student | Own enrolment fee assignment, dues, payments, and allocations only.                                                            |
+| `/student/announcements` | Student | Public/all/curriculum/batch announcements matching own active enrolment.                                                       |
+
+**Exact Student Query Constraints:**
+
+- Materials are deduplicated naturally via `OR` query logic without joining/`distinct`: `WHERE { OR: [ { visibility: BATCH, batchId: in: eligibleBatchIds }, { visibility: CURRICULUM_TRACK, OR: [eligible session+track pairs] } ] }`.
+- **Failure States**:
+  - `AppUser.studentId == null` → Redirect to `/unauthorized`.
+  - Linked `Student` row missing → Redirect to `/unauthorized`.
+  - Zero eligible enrolments (`active`, `archivedAt = null`) → Render EmptyState indicating no active courses.
+
+**Batch Lifecycle Matrix:**
+
+- **Archived Batch**: Admin/Teacher material management is read-only. Students cannot read `BATCH`-scoped materials from it.
+- **Inactive but non-archived Batch**: Admin/Teacher management remains allowed. Students may read eligible published `BATCH`-scoped materials.
+- **CURRICULUM_TRACK Material**: Unaffected by unrelated Batch lifecycle.
 
 Students cannot edit fee records, materials, homework, tests, timetable, profile role, or enrolment.
 
@@ -200,7 +213,10 @@ Use route handlers for HTTP-oriented operations:
 | Route                            | Method | Access             | Purpose                                                                                 |
 | -------------------------------- | ------ | ------------------ | --------------------------------------------------------------------------------------- |
 | `/api/storage/upload`            | `POST` | Admin              | Validated uploads where route handler is clearer than Server Action.                    |
+| `/api/storage/intent`            | `POST` | Authorized user    | Creates upload reservation/intent, returning a signed upload URL.                       |
+| `/api/storage/finalize`          | `POST` | Authorized user    | Finalizes intent by verifying existence and `Content-Length` via `HEAD` on signed URL.  |
 | `/api/storage/[fileId]/download` | `GET`  | Authorized user    | Verify file ownership, curriculum/session/batch scope, and return signed URL or stream. |
+| `/api/homework/[id]/download`    | `GET`  | Authorized user    | Verify Homework Batch access, then return signed URL for the attached asset.            |
 | `/api/imports/[type]/template`   | `GET`  | Admin              | Download import template.                                                               |
 | `/api/imports/[jobId]/upload`    | `POST` | Admin              | Upload source file with 30-day retention.                                               |
 | `/api/imports/[jobId]/validate`  | `POST` | Admin              | Parse and validate without importing.                                                   |
@@ -236,7 +252,7 @@ Server Actions must:
 - Check permission, ownership, and curriculum scope.
 - Validate input with Zod.
 - Return safe errors.
-- Write audit logs for important actions.
+- Write audit logs for important actions (e.g. `StudyMaterial` CREATE/UPDATE/PUBLISH/ARCHIVE, `FileAsset` intent/finalized/abandoned).
 
 ## Permission Matrix
 
@@ -278,6 +294,7 @@ Restricted files:
 - Import source files and error reports.
 
 Restricted files should be served through a route handler that checks authorization before generating a short-lived signed URL or streaming the file. Archived files are retained. Temporary import source files are retained for 30 days.
+Uploads must enforce a strict `intent -> signed URL -> finalization` flow. Byte-sniffing is out of scope; finalization verifies object existence and size using a standard HTTP `HEAD` request on a server-generated signed URL.
 
 ## Import Permission Rules
 

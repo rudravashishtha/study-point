@@ -226,14 +226,29 @@ Validation gate:
 
 Scope:
 
-- Attendance
-- Batch Curriculum Progress
-- Assignments / Homework
-- Tests & Results
-- Teacher-facing operational workflows
-- Study materials with secure storage.
-- Question bank.
-- LaTeX rendering with source text preserved.
+- Slice 5A (Active): File Storage & Study Materials
+  - Storage bucket operational setup and intent -> signed URL -> finalization flow.
+  - StudyMaterial and FileAsset schema with strict discriminator scoping (BATCH vs CURRICULUM_TRACK).
+  - Deterministic cleanup and orphan tracking.
+  - Strict Student identity and enrolment deduplication queries.
+  - Deferred Teacher photo updates.
+- Attendance (Deferred)
+- Batch Curriculum Progress (Deferred)
+- Slice 5B (Active): Assignments / Homework
+  - Strictly Batch-scoped Homework assignments.
+  - Server-side derivation of session and track from authoritative Batch.
+  - Schema additions for `Homework` and `HomeworkLifecycleState`.
+  - Reusing existing `FileAsset` upload mechanics with strict usage category binding (`HOMEWORK`) and targetBatch matching.
+  - Required title (3-100 chars) and optional description (max 2000 chars) and attachment.
+  - Lifecycle: `DRAFT`, `PUBLISHED`, `ARCHIVED` (terminal).
+  - Admin/Teacher (Batch-scoped) CRUD via Dialogs.
+  - Student read-only UI for published assignments across active enrolments.
+  - Overdue assignments remain visible and marked as overdue.
+  - Submissions, grading, reminders, tests, and question bank are explicitly deferred.
+- Tests & Results (Deferred)
+- Teacher-facing operational workflows (Deferred)
+- Question bank (Deferred)
+- LaTeX rendering with source text preserved (Deferred)
 
 Validation gate:
 
@@ -438,6 +453,9 @@ E2E tests:
   - Slice 4B (Admin Session Management): Completed.
   - Slice 4C (Admin Batch Foundation): Completed.
   - Slice 4D (Teacher Management & Assignments): Completed.
+  - Slice 4E (Student Provisioning): Completed.
+- Phase 5: Active.
+  - Slice 5A (File Storage & Study Materials): Documentation Updated. Awaiting Schema Checkpoint -> Migration Proofs -> Operational Bucket Check -> Backend -> UI.
 
 ## Phase 0 Stop
 

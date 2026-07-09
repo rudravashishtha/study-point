@@ -39,13 +39,17 @@ beforeAll(async () => {
 
   await testDb.auditLog.deleteMany({});
   await testDb.teacherAssignment.deleteMany({});
+  await testDb.homework.deleteMany({});
   await testDb.batch.deleteMany({});
   await testDb.teacher.deleteMany({});
   await testDb.enrolment.deleteMany({});
+  await testDb.topic.deleteMany({});
+  await testDb.chapter.deleteMany({});
   await testDb.curriculumTrack.deleteMany({});
   await testDb.subject.deleteMany({});
   await testDb.board.deleteMany({});
   await testDb.academicSession.deleteMany({});
+  await testDb.fileAsset.deleteMany({});
   await testDb.appUser.deleteMany({});
 
   const appUser = await testDb.appUser.create({
@@ -64,6 +68,7 @@ afterAll(async () => {
   if (testDb) {
     await testDb.auditLog.deleteMany({});
     await testDb.teacherAssignment.deleteMany({});
+    await testDb.homework.deleteMany({});
     await testDb.batch.deleteMany({});
     await testDb.teacher.deleteMany({});
     await testDb.enrolment.deleteMany({});
@@ -71,6 +76,7 @@ afterAll(async () => {
     await testDb.subject.deleteMany({});
     await testDb.board.deleteMany({});
     await testDb.academicSession.deleteMany({});
+    await testDb.fileAsset.deleteMany({});
     await testDb.appUser.deleteMany({});
   }
   await teardownTestDb();

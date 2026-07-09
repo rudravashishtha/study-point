@@ -9,6 +9,7 @@ generator client {
 datasource db {
   provider = "postgresql"
 }
+
 enum Role {
   ADMIN
   TEACHER
@@ -44,6 +45,8 @@ model AppUser {
   updatedAt DateTime @updatedAt
   createdBy String?
   updatedBy String?
+
+  uploadedFiles FileAsset[] @relation("FileAssetUploader")
 }
 
 model Student {
@@ -75,6 +78,34 @@ model Teacher {
 
   appUser            AppUser?
   teacherAssignments TeacherAssignment[]
+}
+
+enum PermissionCapability {
+  BATCH_VIEW
+  BATCH_MANAGE
+  MEMBERS_VIEW
+  MEMBERS_MANAGE
+  ATTENDANCE_VIEW
+  ATTENDANCE_MANAGE
+  CURRICULUM_PROGRESS_VIEW
+  CURRICULUM_PROGRESS_MANAGE
+  MATERIALS_VIEW
+  MATERIALS_MANAGE
+  HOMEWORK_VIEW
+  HOMEWORK_MANAGE
+  QUESTION_BANK_VIEW
+  QUESTION_BANK_MANAGE
+  TESTS_VIEW
+  TESTS_MANAGE
+  RESULTS_VIEW
+  RESULTS_MANAGE
+  FEES_VIEW
+  FEES_MANAGE
+  PAYMENTS_RECORD
+  SCHEDULE_VIEW
+  SCHEDULE_MANAGE
+  ANNOUNCEMENTS_VIEW
+  ANNOUNCEMENTS_MANAGE
 }
 
 model TeacherAssignment {
@@ -171,6 +202,10 @@ model CurriculumTrack {
   // 2. UNIQUE ("boardId", "programmeId", "classLevel", "subjectId") WHERE "programmeId" IS NOT NULL
 
   // Only one CBSE track may exist for a given board/class/subject combination when programmeId is NULL.
+
+  uploadReservations FileAsset[]     @relation("FileAssetTrack")
+  studyMaterials     StudyMaterial[]
+  homeworks          Homework[]
 }
 
 model Chapter {
@@ -187,6 +222,8 @@ model Chapter {
 
   curriculumTrack CurriculumTrack @relation(fields: [curriculumTrackId], references: [id])
   topics          Topic[]
+  studyMaterials  StudyMaterial[]
+  homeworks       Homework[]
 
   @@index([curriculumTrackId])
 }
@@ -203,7 +240,9 @@ model Topic {
   archivedAt   DateTime?
   archivedBy   String?
 
-  chapter Chapter @relation(fields: [chapterId], references: [id])
+  chapter        Chapter         @relation(fields: [chapterId], references: [id])
+  studyMaterials StudyMaterial[]
+  homeworks      Homework[]
 
   @@index([chapterId])
 }
@@ -221,8 +260,11 @@ model AcademicSession {
   archivedAt DateTime?
   archivedBy String?
 
-  batches    Batch[]
-  enrolments Enrolment[]
+  batches            Batch[]
+  enrolments         Enrolment[]
+  uploadReservations FileAsset[]     @relation("FileAssetSession")
+  studyMaterials     StudyMaterial[]
+  homeworks          Homework[]
 }
 
 model AuditLog {
@@ -260,6 +302,10 @@ model Batch {
 
   // Note: We do NOT use @@unique here.
   // We use a custom migration to create: UNIQUE (academicSessionId, curriculumTrackId, name) WHERE archivedAt IS NULL
+
+  uploadReservations FileAsset[]     @relation("FileAssetBatch")
+  studyMaterials     StudyMaterial[]
+  homeworks          Homework[]
 }
 
 model BatchSchedule {
@@ -299,4 +345,162 @@ model Enrolment {
 
   // Note: We do NOT use @@unique here.
   // We use a custom migration to create: UNIQUE (studentId, academicSessionId, curriculumTrackId) WHERE archivedAt IS NULL
+}
+
+enum FileAssetStorageAccessClass {
+  PUBLIC
+  PRIVATE
+}
+
+enum FileAssetLifecycleState {
+  PENDING
+  ACTIVE
+  ARCHIVED
+  ABANDONED
+}
+
+enum FileUploadUsageCategory {
+  STUDY_MATERIAL
+  HOMEWORK
+}
+
+enum FileUploadScope {
+  BATCH
+  CURRICULUM_TRACK
+}
+
+enum StudyMaterialResourceType {
+  DOCUMENT
+  PRESENTATION
+  IMAGE
+  LINK
+  TEXT
+}
+
+enum StudyMaterialVisibility {
+  CURRICULUM_TRACK
+  BATCH
+}
+
+enum StudyMaterialLifecycleState {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}
+
+enum HomeworkLifecycleState {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}
+
+model FileAsset {
+  id                 String                      @id @default(uuid())
+  bucket             String
+  storageKey         String                      @unique
+  originalFilename   String
+  mimeType           String
+  sizeBytes          Int
+  storageAccessClass FileAssetStorageAccessClass
+  lifecycleState     FileAssetLifecycleState
+  usageCategory      FileUploadUsageCategory
+  uploadScope        FileUploadScope
+
+  targetBatchId   String?
+  targetSessionId String?
+  targetTrackId   String?
+
+  storageDeletedAt DateTime?
+  uploadedById     String
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+
+  targetBatch   Batch?           @relation("FileAssetBatch", fields: [targetBatchId], references: [id])
+  targetSession AcademicSession? @relation("FileAssetSession", fields: [targetSessionId], references: [id])
+  targetTrack   CurriculumTrack? @relation("FileAssetTrack", fields: [targetTrackId], references: [id])
+  uploadedBy    AppUser          @relation("FileAssetUploader", fields: [uploadedById], references: [id])
+
+  studyMaterials StudyMaterial[]
+  homeworks      Homework[]      @relation("FileAssetHomework")
+}
+
+model StudyMaterial {
+  id                String  @id @default(uuid())
+  academicSessionId String
+  curriculumTrackId String
+  batchId           String?
+  chapterId         String?
+  topicId           String?
+
+  title           String
+  description     String?
+  resourceType    StudyMaterialResourceType
+  fileAssetId     String?
+  externalLinkUrl String?
+  textContent     String?
+
+  visibility     StudyMaterialVisibility
+  lifecycleState StudyMaterialLifecycleState
+
+  publishedAt DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  archivedAt  DateTime?
+
+  createdBy  String?
+  updatedBy  String?
+  archivedBy String?
+
+  academicSession AcademicSession @relation(fields: [academicSessionId], references: [id])
+  curriculumTrack CurriculumTrack @relation(fields: [curriculumTrackId], references: [id])
+  batch           Batch?          @relation(fields: [batchId], references: [id])
+  chapter         Chapter?        @relation(fields: [chapterId], references: [id])
+  topic           Topic?          @relation(fields: [topicId], references: [id])
+  fileAsset       FileAsset?      @relation(fields: [fileAssetId], references: [id])
+
+  @@index([academicSessionId, curriculumTrackId, visibility, lifecycleState])
+  @@index([batchId, lifecycleState])
+}
+
+model SystemSequence {
+  id        String   @id
+  lastValue Int
+  updatedAt DateTime @updatedAt
+}
+
+model Homework {
+  id                String  @id @default(uuid())
+  academicSessionId String
+  curriculumTrackId String
+  batchId           String
+  chapterId         String?
+  topicId           String?
+
+  title       String
+  description String?
+  fileAssetId String?
+
+  assignedDate DateTime
+  dueDate      DateTime
+
+  lifecycleState HomeworkLifecycleState @default(DRAFT)
+
+  publishedAt DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  archivedAt  DateTime?
+
+  createdBy  String?
+  updatedBy  String?
+  archivedBy String?
+
+  academicSession AcademicSession @relation(fields: [academicSessionId], references: [id])
+  curriculumTrack CurriculumTrack @relation(fields: [curriculumTrackId], references: [id])
+  batch           Batch           @relation(fields: [batchId], references: [id])
+  chapter         Chapter?        @relation(fields: [chapterId], references: [id])
+  topic           Topic?          @relation(fields: [topicId], references: [id])
+  fileAsset       FileAsset?      @relation("FileAssetHomework", fields: [fileAssetId], references: [id])
+
+  @@index([academicSessionId, curriculumTrackId, lifecycleState])
+  @@index([batchId, lifecycleState])
 }

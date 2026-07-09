@@ -336,22 +336,32 @@ Important fields:
 
 - `id`.
 - `bucket`.
-- `path`.
+- `storageKey`, unique.
 - `originalFilename`.
 - `mimeType`.
 - `sizeBytes`.
-- `visibility`: public, authenticated, restricted.
-- `uploadedBy`.
+- `storageAccessClass`: PUBLIC, PRIVATE.
+- `lifecycleState`: PENDING, ACTIVE, ARCHIVED, ABANDONED.
+- `usageCategory`: STUDY_MATERIAL.
+- `uploadScope`: BATCH, CURRICULUM_TRACK.
+- `targetBatchId`, nullable.
+- `targetSessionId`, nullable.
+- `targetTrackId`, nullable.
+- `storageDeletedAt`, nullable for cleanup tracking.
+- `uploadedById`.
 - `createdAt`.
-- `retainedUntil`, nullable for temporary files.
-- `archivedAt`, nullable.
+- `updatedAt`.
+
+Upload-Scope XOR Invariant:
+
+- `BATCH` Scope: `targetBatchId != null`, `targetSessionId == null`, `targetTrackId == null`.
+- `CURRICULUM_TRACK` Scope: `targetBatchId == null`, `targetSessionId != null`, `targetTrackId != null`.
 
 Notes:
 
-- Use this for materials, homework attachments, test papers, question images, gallery images, teacher photos, import source files, error reports, and public assets.
-- Authorization belongs to the owning entity, not only the file record.
-- Archived files are retained.
-- Temporary import source files are retained for 30 days.
+- Use this for materials initially. `Teacher.photoFileId` is explicitly deferred to a future slice and not updated.
+- Finalization verifies existence and `Content-Length` via `HEAD` on signed URL.
+- Stale `PENDING` records are claimed as `ABANDONED`. If blob deletion fails, `storageDeletedAt` remains null for later reconciliation.
 
 ## Academic Content
 
@@ -366,22 +376,31 @@ Important fields:
 - `chapterId`, nullable.
 - `topicId`, nullable.
 - `title`.
-- `description`.
-- `resourceType`: notes, pdf, formula_sheet, important_questions, sample_paper, previous_year_paper, solution, answer_key, other.
-- `fileAssetId`.
-- `visibility`: public, curriculum_track, batch.
+- `description`, nullable.
+- `resourceType`: DOCUMENT, PRESENTATION, IMAGE, LINK, TEXT.
+- `fileAssetId`, nullable.
+- `externalLinkUrl`, nullable.
+- `textContent`, nullable.
+- `visibility`: CURRICULUM_TRACK, BATCH.
+- `lifecycleState`: DRAFT, PUBLISHED, ARCHIVED.
 - `publishedAt`, nullable.
-- `archivedAt`, `archivedBy`.
-- Metadata fields.
+- `createdAt`, `updatedAt`, `archivedAt`.
+- `createdBy`, `updatedBy`, `archivedBy` (String audit IDs, loose references without Foreign Keys).
 
 Constraints:
 
+- Content mapping: `DOCUMENT/PRESENTATION/IMAGE` require exactly `fileAssetId`. `LINK` requires exactly `externalLinkUrl` starting with `https://`. `TEXT` requires exactly `textContent`.
+- Draft MUST have exactly one valid primary content source.
 - `chapterId` and `topicId` must belong to the same curriculum track.
 - If `batchId` is present, batch curriculum track and academic session must match.
+- Attachment compatibility rule:
+  - BATCH-scoped assets: `asset.targetBatchId === material.batchId`.
+  - CURRICULUM_TRACK-scoped assets: `asset.targetSessionId === material.academicSessionId AND asset.targetTrackId === material.curriculumTrackId`.
 
 Indexes:
 
-- Academic session, curriculum track, batch, chapter, topic, type, published state, archived state.
+- `[academicSessionId, curriculumTrackId, visibility, lifecycleState]`
+- `[batchId, lifecycleState]`
 
 ### Homework
 
@@ -393,14 +412,26 @@ Important fields:
 - `batchId`.
 - `chapterId`, nullable.
 - `topicId`, nullable.
-- `title`.
-- `description`.
-- `assignedDate`.
-- `dueDate`.
+- `title` (required, trimmed, 3-100 characters).
+- `description`, nullable (trimmed, max 2000 characters).
 - `fileAssetId`, nullable.
-- `publishedAt`, nullable.
-- `archivedAt`, `archivedBy`.
-- Metadata fields.
+- `assignedDate` (Date validation: past/present/future allowed).
+- `dueDate` (Date validation: must be >= `assignedDate`).
+- `lifecycleState`: DRAFT, PUBLISHED, ARCHIVED.
+- `publishedAt`, nullable (Set on first publish, unchanged on later edits).
+- `createdAt`, `updatedAt`, `archivedAt`.
+- `createdBy`, `updatedBy`, `archivedBy` (String audit IDs matching existing project convention, required unless conventions dictate otherwise).
+
+Constraints:
+
+- Homework is strictly Batch-scoped.
+- `academicSessionId` and `curriculumTrackId` are stored for query efficiency but MUST be derived by the server from the authoritative Batch, not from client input.
+- Topic cannot exist without Chapter at the service boundary.
+- `fileAssetId` relationship does not grant download access on its own.
+- Attachment compatibility rule:
+  - Only an `ACTIVE` asset with `usageCategory = HOMEWORK` and exact matching `targetBatchId` may be attached.
+  - Detached replacement assets remain unchanged and are not automatically archived/deleted.
+- Archived state is terminal (for Slice 5B).
 
 Future extension:
 
@@ -757,7 +788,7 @@ Normal listings filter out archived records by default. Historical relationships
 
 ## Future Migration Protocol (Partial Indexes)
 
-Prisma's migration engine cannot internally model custom `WHERE` clause partial unique indexes (e.g., `AcademicSession_isActive_key`, `CurriculumTrack_board_class_subject_null_prog_key`). It views them as database drift and will automatically attempt to inject destructive `DROP INDEX` statements into every new migration.
+Prisma's migration engine cannot internally model custom `WHERE` clause partial unique indexes. It views them as database drift and will automatically attempt to inject destructive `DROP INDEX` statements into every new migration. There are 6 such indexes: `AcademicSession_isActive_key`, `CurriculumTrack_board_class_subject_null_prog_key`, `CurriculumTrack_board_prog_class_subject_key`, `Batch_session_track_name_key`, `Enrolment_student_session_track_key`, and `TeacherAssignment_teacher_batch_key`.
 
 To guarantee that these critical invariants are never accidentally wiped, this strict protocol **MUST** be followed for all future migrations:
 

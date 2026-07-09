@@ -1,7 +1,23 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
-import { db } from "../../lib/db";
+import { describe, it, expect, vi, beforeAll, afterAll, beforeEach } from "vitest";
+import { PrismaClient } from "@prisma/client";
 import { inviteStudent, inviteTeacher } from "./provisioning";
 import { ActorContext } from "../../lib/domain/actor";
+import { db } from "../../lib/db";
+
+const { testDbProxy } = vi.hoisted(() => {
+  return {
+    testDbProxy: new Proxy({} as PrismaClient, {
+      get(target, prop) {
+        if (!(globalThis as any).__testDb) throw new Error("testDb is not initialized");
+        return ((globalThis as any).__testDb as any)[prop];
+      },
+    }),
+  };
+});
+
+vi.mock("../../lib/db", () => ({
+  db: testDbProxy,
+}));
 
 // Mock env to prevent admin.ts from throwing
 vi.mock("../../lib/env", () => ({
@@ -27,8 +43,19 @@ vi.mock("../../lib/supabase/admin", async (importOriginal) => {
 });
 
 import { createAdminClient, findAuthUserByEmail } from "../../lib/supabase/admin";
+import {
+  isTestConfigured,
+  initializeTestDb,
+  teardownTestDb,
+} from "../../lib/test/db-isolation";
 
 describe("Provisioning Service Integration Tests", () => {
+  beforeAll(async () => {
+    if (isTestConfigured) await initializeTestDb();
+  });
+  afterAll(async () => {
+    if (isTestConfigured) await teardownTestDb();
+  });
   const unauthorizedActor: ActorContext = {
     userId: "none",
     role: "STUDENT",
@@ -67,6 +94,7 @@ describe("Provisioning Service Integration Tests", () => {
 
   describe("inviteStudent", () => {
     it("1. non-Admin ActorContext cannot provision a Student", async () => {
+      if (!isTestConfigured) return;
       const student = await db.student.create({
         data: {
           studentCode: `ST-${Date.now()}`,
@@ -83,6 +111,7 @@ describe("Provisioning Service Integration Tests", () => {
     });
 
     it("2. supabaseAuthUserId linked to an existing AppUser is rejected during recovery", async () => {
+      if (!isTestConfigured) return;
       const student1 = await db.student.create({
         data: {
           studentCode: `ST-${Date.now()}`,
@@ -126,6 +155,7 @@ describe("Provisioning Service Integration Tests", () => {
     });
 
     it("3. missing email rejected", async () => {
+      if (!isTestConfigured) return;
       const student = await db.student.create({
         data: { studentCode: `ST-${Date.now()}`, fullName: "No Email" },
       });
@@ -135,6 +165,7 @@ describe("Provisioning Service Integration Tests", () => {
     });
 
     it("4. archived/ineligible profile rejected", async () => {
+      if (!isTestConfigured) return;
       const student = await db.student.create({
         data: {
           studentCode: `ST-${Date.now()}`,
@@ -149,6 +180,7 @@ describe("Provisioning Service Integration Tests", () => {
     });
 
     it("5. already invited rejected safely", async () => {
+      if (!isTestConfigured) return;
       const student = await db.student.create({
         data: {
           studentCode: `ST-${Date.now()}`,
@@ -170,6 +202,7 @@ describe("Provisioning Service Integration Tests", () => {
     });
 
     it("6. already active rejected safely", async () => {
+      if (!isTestConfigured) return;
       const student = await db.student.create({
         data: {
           studentCode: `ST-${Date.now()}`,
@@ -191,6 +224,7 @@ describe("Provisioning Service Integration Tests", () => {
     });
 
     it("7. disabled account is not treated as uninvited", async () => {
+      if (!isTestConfigured) return;
       const student = await db.student.create({
         data: {
           studentCode: `ST-${Date.now()}`,
@@ -212,6 +246,7 @@ describe("Provisioning Service Integration Tests", () => {
     });
 
     it("8. duplicate profile provisioning cannot create another AppUser", async () => {
+      if (!isTestConfigured) return;
       const student = await db.student.create({
         data: {
           studentCode: `ST-${Date.now()}`,
@@ -233,6 +268,7 @@ describe("Provisioning Service Integration Tests", () => {
     });
 
     it("9. duplicate normalized email cannot create another identity mapping", async () => {
+      if (!isTestConfigured) return;
       const email = `dupmail-${Date.now()}@test.com`;
       const s1 = await db.student.create({
         data: { studentCode: `ST-${Date.now()}-1`, fullName: "S1", email },
@@ -258,6 +294,7 @@ describe("Provisioning Service Integration Tests", () => {
     });
 
     it("10. role is always derived server-side", async () => {
+      if (!isTestConfigured) return;
       const student = await db.student.create({
         data: {
           studentCode: `ST-${Date.now()}`,
@@ -276,6 +313,7 @@ describe("Provisioning Service Integration Tests", () => {
     });
 
     it("11. Supabase Auth user ID is persisted from the Admin API response", async () => {
+      if (!isTestConfigured) return;
       const student = await db.student.create({
         data: {
           studentCode: `ST-${Date.now()}`,
@@ -295,6 +333,7 @@ describe("Provisioning Service Integration Tests", () => {
     });
 
     it("12. Supabase failure causes no false INVITED database state (Rate Limit)", async () => {
+      if (!isTestConfigured) return;
       const student = await db.student.create({
         data: {
           studentCode: `ST-${Date.now()}`,
@@ -321,6 +360,7 @@ describe("Provisioning Service Integration Tests", () => {
     });
 
     it("12b. unrelated 422 does not trigger reconciliation and creates no success state", async () => {
+      if (!isTestConfigured) return;
       const student = await db.student.create({
         data: {
           studentCode: `ST-${Date.now()}`,
@@ -354,6 +394,7 @@ describe("Provisioning Service Integration Tests", () => {
     });
 
     it("12c. unknown Supabase errors do not trigger reconciliation", async () => {
+      if (!isTestConfigured) return;
       const student = await db.student.create({
         data: {
           studentCode: `ST-${Date.now()}`,
@@ -373,6 +414,7 @@ describe("Provisioning Service Integration Tests", () => {
     });
 
     it("13. database failure after Supabase success has a tested recovery/reconciliation path", async () => {
+      if (!isTestConfigured) return;
       const student = await db.student.create({
         data: {
           studentCode: `ST-${Date.now()}`,
@@ -403,6 +445,7 @@ describe("Provisioning Service Integration Tests", () => {
 
   describe("inviteTeacher", () => {
     it("1. non-Admin ActorContext cannot provision a Teacher", async () => {
+      if (!isTestConfigured) return;
       const teacher = await db.teacher.create({
         data: { displayName: "Test", email: "test-t@example.com" },
       });
@@ -414,6 +457,7 @@ describe("Provisioning Service Integration Tests", () => {
     // We can assume the rest of the validations share the same exact logic path,
     // but we add one test specifically for teacher inactive check
     it("4. archived/ineligible profile rejected (Teacher)", async () => {
+      if (!isTestConfigured) return;
       const teacher = await db.teacher.create({
         data: { displayName: "Inactive", email: "i-t@example.com", active: false },
       });
@@ -423,6 +467,7 @@ describe("Provisioning Service Integration Tests", () => {
     });
 
     it("14. unauthorized callers cannot provision accounts", async () => {
+      if (!isTestConfigured) return;
       const teacher = await db.teacher.create({
         data: { displayName: "Unauth", email: "unauth-t@example.com" },
       });
@@ -432,6 +477,7 @@ describe("Provisioning Service Integration Tests", () => {
     });
 
     it("15. Student invitation links only to the requested Student", async () => {
+      if (!isTestConfigured) return;
       const s = await db.student.create({
         data: {
           studentCode: `ST-${Date.now()}`,
@@ -450,6 +496,7 @@ describe("Provisioning Service Integration Tests", () => {
     });
 
     it("16. Teacher invitation links only to the requested Teacher", async () => {
+      if (!isTestConfigured) return;
       const t = await db.teacher.create({
         data: { displayName: "T", email: `t-link-${Date.now()}@a.com` },
       });
@@ -464,6 +511,7 @@ describe("Provisioning Service Integration Tests", () => {
     });
 
     it("17. Student provisioning cannot create a TEACHER role and vice versa", async () => {
+      if (!isTestConfigured) return;
       const s = await db.student.create({
         data: {
           studentCode: `ST-${Date.now()}`,
@@ -495,6 +543,7 @@ describe("Provisioning Service Integration Tests", () => {
     });
 
     it("18. audit success and failure behavior is verified (no secrets logged)", async () => {
+      if (!isTestConfigured) return;
       const t = await db.teacher.create({
         data: { displayName: "Audit", email: `audit-${Date.now()}@a.com` },
       });

@@ -71,6 +71,7 @@ describe.skipIf(!isTestConfigured)("Batches Service Integration", () => {
     if (!isTestConfigured) return;
     await db.enrolment.deleteMany({});
     await db.batchSchedule.deleteMany({});
+    await db.homework.deleteMany({});
     await db.batch.deleteMany({});
     await db.curriculumTrack.deleteMany({ where: { id: trackId } });
     await db.subject.deleteMany({ where: { id: subjectId } });
@@ -82,6 +83,8 @@ describe.skipIf(!isTestConfigured)("Batches Service Integration", () => {
   beforeEach(async () => {
     await db.enrolment.deleteMany({});
     await db.batchSchedule.deleteMany({});
+    await db.teacherAssignment.deleteMany({});
+    await db.homework.deleteMany({});
     await db.batch.deleteMany({});
     await db.auditLog.deleteMany({ where: { entityType: "BATCH" } });
   });

@@ -299,7 +299,11 @@ Use transactions for:
 - Files should use **private object storage**.
 - Student downloads should use authorization checks followed by **short-lived signed URLs**.
 - Large uploads should transfer **directly between the browser and object storage** using presigned upload URLs rather than passing file bodies through the Next.js server.
+- Upload Authorization is strongly scoped via a strictly typed discriminator contract linking the requested upload to either a specific Batch or a Curriculum Track.
+- Upload Finalization verifies object existence and size using a standard HTTP `HEAD` request to a server-generated signed URL before marking the asset ACTIVE. Byte-level content sniffing is not implemented.
+- Stale pending uploads are cleaned via a discoverable reconciliation mechanism attempting blob deletion and updating a `storageDeletedAt` field.
 - The design must allow future migration to another S3-compatible provider without redesigning the application domain.
+- **Attachment Binding Rules:** An upload intent for Homework is permanently bound to its `usageCategory` (`HOMEWORK`) and `targetBatchId` at intent creation time. A `STUDY_MATERIAL` asset cannot be attached to Homework and vice versa. An asset authorized for Batch A cannot be attached to Homework in Batch B. Only an `ACTIVE` `FileAsset` matching these exact constraints may be attached. Detached replacement assets remain unchanged and are not automatically deleted or archived.
 
 Use intentional bucket separation:
 
