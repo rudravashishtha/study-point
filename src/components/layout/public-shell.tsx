@@ -1,66 +1,104 @@
+import { MapPin, Megaphone } from "lucide-react";
+import { PublicHeader } from "./public-header";
+import { siteConfig } from "@/config/site";
 import Link from "next/link";
-import { BookOpen, GraduationCap, MapPin, Megaphone } from "lucide-react";
-
-const publicLinks = [
-  { href: "/", label: "Home" },
-  { href: "/courses", label: "Courses" },
-  { href: "/resources", label: "Resources" },
-  { href: "/announcements", label: "Announcements" },
-  { href: "/contact", label: "Contact" },
-];
 
 export function PublicShell({ children }: { children: React.ReactNode }) {
   return (
-    <div className="min-h-dvh bg-background text-foreground">
-      <header className="border-b border-border bg-background/95">
-        <div className="mx-auto flex w-full max-w-6xl flex-col gap-4 px-4 py-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between gap-3">
-            <Link href="/" className="flex min-w-0 items-center gap-3">
-              <span className="flex size-10 items-center justify-center rounded-lg bg-primary text-primary-foreground">
-                <GraduationCap className="size-5" aria-hidden="true" />
-              </span>
-              <span className="min-w-0">
-                <span className="block truncate text-base font-semibold">
-                  1plus1 Mathematics
-                </span>
-                <span className="block truncate text-xs text-muted-foreground">
-                  CBSE and CISCE, Classes IX-XII
-                </span>
-              </span>
+    <div className="min-h-dvh bg-surface text-foreground font-sans antialiased flex flex-col relative overflow-hidden">
+      <PublicHeader />
+
+      {/* Spacer for fixed header */}
+      <div className="h-20 sm:h-24" />
+
+      <main className="flex-1 w-full">{children}</main>
+
+      <footer className="border-t border-border/10 bg-[#060A14] text-white mt-24 relative overflow-hidden">
+        {/* Footer mathematical subtle background */}
+        <div
+          className="absolute inset-0 opacity-10 pointer-events-none"
+          style={{
+            backgroundImage:
+              "radial-gradient(circle at 50% 0%, var(--brand-glow) 0%, transparent 70%)",
+          }}
+        />
+
+        <div className="mx-auto grid w-full max-w-7xl gap-12 px-4 py-16 sm:grid-cols-2 lg:grid-cols-4 sm:px-6 lg:px-8 relative z-10">
+          <div className="lg:col-span-2 space-y-6">
+            <Link href="/" className="inline-block">
+              <p className="font-heading text-3xl font-bold tracking-tight">
+                {siteConfig.name}
+              </p>
+              <p className="text-xs font-semibold tracking-[0.2em] uppercase text-brand-glow mt-1">
+                Mathematics Institute
+              </p>
             </Link>
-            <Link
-              href="/contact"
-              className="hidden h-8 items-center gap-1.5 rounded-lg bg-primary px-2.5 text-sm font-medium text-primary-foreground outline-none hover:bg-primary/80 focus-visible:ring-2 focus-visible:ring-ring sm:inline-flex"
-            >
-              <MapPin className="size-4" aria-hidden="true" />
-              Contact
-            </Link>
+            <p className="max-w-md text-base leading-relaxed text-slate-400">
+              {siteConfig.description} We build profound mathematical intuition through
+              structured foundations, not rote memorization.
+            </p>
           </div>
-          <nav aria-label="Public navigation" className="flex gap-2 overflow-x-auto pb-1">
-            {publicLinks.map((link) => (
-              <Link
-                key={link.href}
-                href={link.href}
-                className="rounded-md px-3 py-2 text-sm font-medium text-muted-foreground outline-none hover:bg-muted hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring"
-              >
-                {link.label}
-              </Link>
-            ))}
-          </nav>
+
+          <div className="space-y-4">
+            <h4 className="font-bold text-lg">Academics</h4>
+            <ul className="space-y-3 text-slate-400">
+              <li>
+                <Link href="/courses" className="hover:text-white transition-colors">
+                  Class IX & X Foundations
+                </Link>
+              </li>
+              <li>
+                <Link href="/courses" className="hover:text-white transition-colors">
+                  Class XI & XII Boards
+                </Link>
+              </li>
+              <li>
+                <Link href="/courses" className="hover:text-white transition-colors">
+                  CBSE & CISCE Tracks
+                </Link>
+              </li>
+              <li>
+                <Link href="/resources" className="hover:text-white transition-colors">
+                  Study Material
+                </Link>
+              </li>
+            </ul>
+          </div>
+
+          <div className="space-y-4">
+            <h4 className="font-bold text-lg">Institute</h4>
+            <ul className="space-y-3 text-slate-400">
+              <li className="flex items-start gap-3">
+                <MapPin className="size-5 shrink-0 text-brand-glow mt-0.5" />
+                <span>{siteConfig.contact.address}</span>
+              </li>
+              <li className="flex items-center gap-3">
+                <Megaphone className="size-5 shrink-0 text-brand-glow" />
+                <Link
+                  href="/announcements"
+                  className="hover:text-white transition-colors"
+                >
+                  Public Notices
+                </Link>
+              </li>
+            </ul>
+          </div>
         </div>
-      </header>
-      <main>{children}</main>
-      <footer className="border-t border-border bg-muted/40">
-        <div className="mx-auto grid w-full max-w-6xl gap-4 px-4 py-8 text-sm text-muted-foreground sm:grid-cols-3 sm:px-6 lg:px-8">
-          <p>Mathematics coaching for CBSE, ICSE, and ISC learners.</p>
-          <p className="flex items-center gap-2">
-            <BookOpen className="size-4" aria-hidden="true" />
-            Structured content, careful practice, and timely review.
-          </p>
-          <p className="flex items-center gap-2">
-            <Megaphone className="size-4" aria-hidden="true" />
-            Public notices and resources stay easy to find.
-          </p>
+
+        <div className="border-t border-white/10">
+          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-6 flex flex-col sm:flex-row justify-between items-center text-sm text-slate-500">
+            <p>
+              © {new Date().getFullYear()} {siteConfig.name}. All rights reserved.
+            </p>
+            <div className="flex gap-4 mt-4 sm:mt-0">
+              <Link href="#" className="hover:text-white transition-colors">
+                Privacy
+              </Link>
+              <Link href="#" className="hover:text-white transition-colors">
+                Terms
+              </Link>
+            </div>
+          </div>
         </div>
       </footer>
     </div>

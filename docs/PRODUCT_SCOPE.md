@@ -44,7 +44,7 @@ The admin manages academic sessions, curriculum-scoped students and enrolments, 
 
 ### Teacher
 
-Teacher portal screens are deferred. The schema and permission model must support the `TEACHER` role and multiple teachers, but Phase 1+ planning should not include a large teacher-specific portal unless later approved.
+The system supports separate Teacher accounts with access controlled per Batch and per capability. Teachers will have access to operational workflows for their assigned batches, including Attendance, Curriculum Progress, Assignments, Tests, and Results.
 
 ### Student
 
@@ -70,8 +70,6 @@ Students access only authorized data related to their active enrolment first, in
 ## Out of Scope Initially
 
 - Parent portal.
-- Teacher portal screens beyond schema/permission support.
-- Attendance.
 - Native mobile app.
 - Custom video conferencing.
 - Full accounting software.
@@ -174,9 +172,9 @@ Temporary import source files are retained for 30 days. Error reports can be ret
 - Public result, identifiable testimonial, and identifiable gallery content must track consent.
 - Private student resources must use protected access.
 - Admin-created/imported student records can exist without auth accounts.
-- Student account activation uses a secure Supabase invitation flow.
+- Student and Teacher account activation uses a secure Supabase invitation flow.
 - Student IDs are application-generated, human-readable identifiers. Use a sensible initial format such as `STU-2026-0001`, while keeping generation logic isolated so the format can be changed before real production data is imported.
-- Teacher portal is deferred; teacher role remains schema and permission support only.
+- Teacher authorization is contextual per Batch through explicit assignment and permission grants.
 - Student historical sessions are active-session first, historical read-only later.
 - Admin impersonation is not included.
 - Custom fee plans use normalized instalments, not JSON.

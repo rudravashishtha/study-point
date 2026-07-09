@@ -10,7 +10,7 @@ const publicEnvSchema = z.object({
 const serverEnvSchema = z.object({
   DATABASE_URL: z.string().optional(),
   DIRECT_URL: z.string().optional(),
-  SUPABASE_SERVICE_ROLE_KEY: z.string().optional(),
+  SUPABASE_SECRET_KEY: z.string().optional(),
   SENTRY_AUTH_TOKEN: z.string().optional(),
 });
 
@@ -24,6 +24,6 @@ export const publicEnv = publicEnvSchema.parse({
 export const serverEnv = serverEnvSchema.parse({
   DATABASE_URL: process.env.DATABASE_URL,
   DIRECT_URL: process.env.DIRECT_URL,
-  SUPABASE_SERVICE_ROLE_KEY: process.env.SUPABASE_SERVICE_ROLE_KEY,
+  SUPABASE_SECRET_KEY: process.env.SUPABASE_SECRET_KEY,
   SENTRY_AUTH_TOKEN: process.env.SENTRY_AUTH_TOKEN,
 });

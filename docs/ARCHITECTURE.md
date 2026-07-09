@@ -35,7 +35,7 @@ Build one full-stack Next.js application using:
 - Route Handlers for uploads, imports, webhooks, file download authorization, public endpoints, and APIs where an HTTP boundary is clearer.
 - Prisma for normal application database access.
 - Supabase Auth for identity.
-- Supabase Storage for files.
+- Cloudflare R2 for file storage (via provider-neutral abstraction).
 
 Do not create a separate backend, separate frontend, microservices, native app, generic CMS, or page builder.
 
@@ -254,7 +254,8 @@ RBAC covers broad access:
 - `TEACHER`.
 - `STUDENT`.
 
-Teacher role support is schema and permission support only until a teacher portal is approved.
+Admin is the superuser.
+Teachers are Batch-scoped, meaning the `TEACHER` role does not grant global permissions. Access to any Batch requires an explicit `TeacherAssignment` for that Teacher and Batch. Stored permissions are explicit Admin selections, and effective permissions are centrally derived at runtime. Account provisioning is separate from Teacher profiles and assignments.
 
 Ownership and scope checks cover data access:
 
@@ -274,7 +275,10 @@ Use Supabase client APIs for:
 
 - Authentication session management.
 - Auth admin invitation when server-side credentials are required.
-- Storage uploads/downloads/signed URLs.
+
+Use the provider-neutral storage abstraction (Cloudflare R2) for:
+
+- Storage uploads, downloads, and signed URLs.
 
 Use transactions for:
 
@@ -284,6 +288,18 @@ Use transactions for:
 - Archive/restore actions with audit logging.
 
 ## File Storage Architecture
+
+**Approved Future Architecture Decision (R2 & Provider Neutrality):**
+
+- **Cloudflare R2** will be the initial object-storage provider for notes, sample papers, worksheets, answer keys, and other large academic files.
+- PostgreSQL will store file metadata and curriculum relationships only, not file binary data.
+- The storage architecture must remain **provider-neutral**.
+- Future application code must use a **storage abstraction** rather than importing R2-specific logic throughout the codebase.
+- Database records should store **stable object keys** and provider-neutral metadata, not permanent provider-specific public URLs.
+- Files should use **private object storage**.
+- Student downloads should use authorization checks followed by **short-lived signed URLs**.
+- Large uploads should transfer **directly between the browser and object storage** using presigned upload URLs rather than passing file bodies through the Next.js server.
+- The design must allow future migration to another S3-compatible provider without redesigning the application domain.
 
 Use intentional bucket separation:
 
@@ -295,8 +311,6 @@ Use intentional bucket separation:
 - Question images.
 - Gallery images.
 - Temporary import source files and error reports.
-
-Private resources should not be permanently public. Serve them through authorized route handlers that verify the current user and return short-lived signed URLs or streamed content.
 
 Storage paths should be generated, stable, and non-guessable:
 

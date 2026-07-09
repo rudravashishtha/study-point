@@ -209,33 +209,36 @@ Validation gate:
 
 Scope:
 
-- Students.
-- Curriculum-scoped enrolments.
-- Curriculum-scoped batches.
-- Timetable.
-- Batch assignment/removal with session and curriculum matching.
-- Account activation workflow using Supabase invitation.
+- Slice 4A: Batch & Enrolment Backend
+- Slice 4B: Student Domain & Admin UI
+- Slice 4C: Batch, Schedule & Membership Admin UI
+- Slice 4D: Teacher Domain, Batch Assignments & Permissions
+- Slice 4E: Student & Teacher Account Provisioning
 
 Validation gate:
 
 - Integration tests for student/enrolment/batch curriculum invariants.
 - Account activation security review.
+- Teacher authorization model and per-batch permission enforcement review.
 - Mobile checks for student search, details, and quick actions.
 
-## Phase 5: Academic Content
+## Phase 5: Academic Content & Operations
 
 Scope:
 
+- Attendance
+- Batch Curriculum Progress
+- Assignments / Homework
+- Tests & Results
+- Teacher-facing operational workflows
 - Study materials with secure storage.
-- Homework.
-- Tests.
 - Question bank.
 - LaTeX rendering with source text preserved.
-- Curriculum-aware filters for materials, homework, tests, and questions.
 
 Validation gate:
 
 - Authorization tests for material visibility by session, curriculum track, and batch.
+- Teacher contextual permission tests (manage vs. view).
 - Question validation tests.
 - File upload validation review.
 - Mobile checks for content management.
@@ -424,6 +427,17 @@ E2E tests:
 
 - Confirm institute branding/contact details are available or can be placeholder content.
 - Confirm Git should be initialized at Phase 1 start.
+
+## Progress History
+
+- Phase 1: Completed.
+- Phase 2: Completed.
+- Phase 3: Completed.
+- Phase 4: Active.
+  - Slice 4A (Admin Domain Foundation): Completed.
+  - Slice 4B (Admin Session Management): Completed.
+  - Slice 4C (Admin Batch Foundation): Completed.
+  - Slice 4D (Teacher Management & Assignments): Completed.
 
 ## Phase 0 Stop
 
