@@ -1,0 +1,16 @@
+#!/usr/bin/expect -f
+set timeout -1
+spawn npx prisma migrate dev --create-only --name phase3_curriculum_audit
+expect "We need to reset the PostgreSQL database" {
+  send "y\r"
+  exp_continue
+} "If there are existing duplicate values, this will fail" {
+  send "y\r"
+  exp_continue
+} "Are you sure you want create and apply this migration?" {
+  send "y\r"
+  exp_continue
+} "Do you want to continue? All existing data will be lost." {
+  send "y\r"
+  exp_continue
+} eof

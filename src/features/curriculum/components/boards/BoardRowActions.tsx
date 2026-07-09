@@ -1,0 +1,59 @@
+"use client";
+
+import React, { useTransition } from "react";
+import { Board } from "@prisma/client";
+import { toast } from "sonner";
+import { archiveBoardAction, restoreBoardAction } from "../../actions/boards";
+import { useRouter } from "next/navigation";
+
+export function BoardRowActions({ board, onEdit }: { board: Board; onEdit: () => void }) {
+  const router = useRouter();
+  const [isPending, startTransition] = useTransition();
+
+  const handleAction = (
+    actionFn: (id: string) => Promise<{ success: boolean; error?: string }>,
+    successMessage: string,
+  ) => {
+    startTransition(async () => {
+      const res = await actionFn(board.id);
+      if (!res.success) {
+        toast.error(res.error);
+      } else {
+        toast.success(successMessage);
+        router.refresh();
+      }
+    });
+  };
+
+  return (
+    <div className="flex items-center space-x-2 justify-end">
+      <button
+        onClick={onEdit}
+        disabled={isPending || !!board.archivedAt}
+        className="text-sm font-medium text-blue-600 hover:underline disabled:opacity-50"
+      >
+        Edit
+      </button>
+
+      {!board.archivedAt && (
+        <button
+          onClick={() => handleAction(archiveBoardAction, "Board archived")}
+          disabled={isPending}
+          className="text-sm font-medium text-red-600 hover:underline disabled:opacity-50"
+        >
+          Archive
+        </button>
+      )}
+
+      {board.archivedAt && (
+        <button
+          onClick={() => handleAction(restoreBoardAction, "Board restored")}
+          disabled={isPending}
+          className="text-sm font-medium text-orange-600 hover:underline disabled:opacity-50"
+        >
+          Restore
+        </button>
+      )}
+    </div>
+  );
+}

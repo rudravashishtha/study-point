@@ -9,3 +9,209 @@ generator client {
 datasource db {
   provider = "postgresql"
 }
+enum Role {
+  ADMIN
+  TEACHER
+  STUDENT
+}
+
+enum AppUserStatus {
+  ACTIVE
+  INVITED
+  DISABLED
+}
+
+enum ClassLevel {
+  IX
+  X
+  XI
+  XII
+}
+
+model AppUser {
+  id                 String        @id @default(uuid())
+  supabaseAuthUserId String?       @unique
+  email              String?       @unique
+  role               Role
+  status             AppUserStatus @default(ACTIVE)
+  studentId          String?       @unique
+  teacherId          String?       @unique
+
+  student Student? @relation(fields: [studentId], references: [id])
+  teacher Teacher? @relation(fields: [teacherId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  createdBy String?
+  updatedBy String?
+}
+
+model Student {
+  id            String    @id @default(uuid())
+  studentCode   String    @unique
+  fullName      String
+  phone         String?
+  guardianPhone String?
+  email         String?
+  joiningDate   DateTime?
+  accountStatus String    @default("none") // none, invited, active, disabled
+
+  appUser    AppUser?
+  enrolments Enrolment[]
+
+  archivedAt DateTime?
+  archivedBy String?
+}
+
+model Teacher {
+  id             String  @id @default(uuid())
+  displayName    String
+  phone          String?
+  email          String?
+  bio            String?
+  qualifications String?
+  photoFileId    String?
+  active         Boolean @default(true)
+
+  appUser            AppUser?
+  teacherAssignments TeacherAssignment[]
+}
+
+model Board {
+  id         String    @id @default(uuid())
+  code       String    @unique // CBSE, CISCE
+  name       String
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+  createdBy  String?
+  updatedBy  String?
+  archivedAt DateTime?
+  archivedBy String?
+
+  programmes       Programme[]
+  curriculumTracks CurriculumTrack[]
+}
+
+model Programme {
+  id         String    @id @default(uuid())
+  boardId    String
+  code       String // ICSE, ISC
+  name       String
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+  createdBy  String?
+  updatedBy  String?
+  archivedAt DateTime?
+  archivedBy String?
+
+  board            Board             @relation(fields: [boardId], references: [id])
+  curriculumTracks CurriculumTrack[]
+
+  @@unique([boardId, code])
+}
+
+model Subject {
+  id         String    @id @default(uuid())
+  code       String    @unique // MATHEMATICS
+  name       String
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+  createdBy  String?
+  updatedBy  String?
+  archivedAt DateTime?
+  archivedBy String?
+
+  curriculumTracks CurriculumTrack[]
+}
+
+model CurriculumTrack {
+  id          String     @id @default(uuid())
+  boardId     String
+  programmeId String?
+  classLevel  ClassLevel
+  subjectId   String
+  displayName String
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  createdBy   String?
+  updatedBy   String?
+  archivedAt  DateTime?
+  archivedBy  String?
+
+  board      Board       @relation(fields: [boardId], references: [id])
+  programme  Programme?  @relation(fields: [programmeId], references: [id])
+  subject    Subject     @relation(fields: [subjectId], references: [id])
+  chapters   Chapter[]
+  batches    Batch[]
+  enrolments Enrolment[]
+
+  // Actually, Prisma does not natively support partial indexes yet using @@unique with WHERE.
+  // We rely on custom migration to enforce:
+  // 1. UNIQUE ("boardId", "classLevel", "subjectId") WHERE "programmeId" IS NULL
+  // 2. UNIQUE ("boardId", "programmeId", "classLevel", "subjectId") WHERE "programmeId" IS NOT NULL
+
+  // Only one CBSE track may exist for a given board/class/subject combination when programmeId is NULL.
+}
+
+model Chapter {
+  id                String    @id @default(uuid())
+  curriculumTrackId String
+  name              String
+  displayOrder      Int       @default(0)
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+  createdBy         String?
+  updatedBy         String?
+  archivedAt        DateTime?
+  archivedBy        String?
+
+  curriculumTrack CurriculumTrack @relation(fields: [curriculumTrackId], references: [id])
+  topics          Topic[]
+
+  @@index([curriculumTrackId])
+}
+
+model Topic {
+  id           String    @id @default(uuid())
+  chapterId    String
+  name         String
+  displayOrder Int       @default(0)
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  createdBy    String?
+  updatedBy    String?
+  archivedAt   DateTime?
+  archivedBy   String?
+
+  chapter Chapter @relation(fields: [chapterId], references: [id])
+
+  @@index([chapterId])
+}
+
+model AcademicSession {
+  id         String    @id @default(uuid())
+  name       String    @unique
+  startsOn   DateTime?
+  endsOn     DateTime?
+  isActive   Boolean   @default(false)
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+  createdBy  String?
+  updatedBy  String?
+  archivedAt DateTime?
+  archivedBy String?
+
+  batches    Batch[]
+  enrolments Enrolment[]
+}
+
+model AuditLog {
+  id          String   @id @default(uuid())
+  actorUserId String?
+  action      String
+  entityType  String
+  entityId    String?
+  summary     String
+  metadata    Json?
+  createdAt   DateTime @default(now())
+}
