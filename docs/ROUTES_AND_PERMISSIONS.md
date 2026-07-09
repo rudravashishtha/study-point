@@ -15,6 +15,29 @@ Last reviewed: 2026-07-07.
 - Use URL search parameters for list filters where appropriate.
 - Do not use class level alone for authorization or filtering when curriculum scope matters.
 
+### Teacher & Admin Architecture
+
+1. **Admin is global superuser**: The `ADMIN` role retains full operational control across the entire system.
+2. **Teacher access is Batch-scoped**: Contextual permissions are derived explicitly from active Batch assignments.
+3. **Multiple Teachers may belong to one Batch**: There is no limit to the number of Teachers assigned to a Batch.
+4. **One Teacher may have different permissions across Batches**: Permissions are scoped strictly to individual `TeacherAssignment` records.
+5. **Batch page is the canonical assignment mutation location**: Assignments and permissions are managed exclusively from the Batch detail UI.
+6. **Teacher detail page is read-only for assignments**: Provides global visibility into a Teacher's cross-batch operations without mutation controls.
+7. **Permission presets are UI-only**: Presets map to explicit permission arrays and are not stored dynamically.
+8. **Stored permissions are explicit**: A `TeacherAssignment` record stores a discrete `PermissionCapability[]`.
+9. **Effective permissions are runtime-derived**: Implied permissions (e.g., `BATCH_MANAGE` implying `BATCH_VIEW`) are strictly computed in-memory at evaluation boundaries.
+10. **Teacher account provisioning remains separate**: The `TEACHER` auth role enables login capability; authorization is independently defined by assignments.
+
+- **Teachers are Batch-scoped**. The `TEACHER` role alone grants no automatic access to any Batch.
+- **Batches may have multiple Teachers** assigned simultaneously.
+- **Teachers may have different permissions per Batch**. A Teacher can have `BATCH_MANAGE` in one Batch and only `BATCH_VIEW` in another.
+- **TeacherAssignment preserves assignment history**. Re-assigning or changing permissions does not mutate the historical record in a destructive way if archived.
+- **Stored permissions are explicit Admin selections**.
+- **Effective permissions are centrally derived**. Implied permissions (like `BATCH_MANAGE` → `BATCH_VIEW`) are resolved at runtime and never persisted to the database.
+- **Account provisioning is separate** from Teacher profiles and assignments. A Teacher profile can exist and be assigned to Batches before a Supabase authentication account is created.
+- **Teacher.active controls profile availability**.
+- **TeacherAssignment.archivedAt controls assignment lifecycle**.
+
 ## Route Groups
 
 Recommended App Router route groups:
@@ -71,9 +94,11 @@ All admin routes require authenticated `ADMIN` role.
 | `/admin/students/[studentId]/edit` | `ADMIN`         | Edit permanent student fields.                                                                                      |
 | `/admin/students/activate`         | `ADMIN`         | Batch account activation through Supabase invitations.                                                              |
 | `/admin/enrolments`                | `ADMIN`         | Manage session and curriculum-specific enrolments.                                                                  |
+| `/admin/teachers`                  | `ADMIN`         | Teacher profile list, creation, editing, and activation/deactivation.                                               |
+| `/admin/teachers/[teacherId]`      | `ADMIN`         | Teacher profile details and read-only cross-batch assignment visibility.                                            |
 | `/admin/batches`                   | `ADMIN`         | Batch list with curriculum/session filters and archive state.                                                       |
 | `/admin/batches/new`               | `ADMIN`         | Create batch for one academic session and curriculum track.                                                         |
-| `/admin/batches/[batchId]`         | `ADMIN`         | Details, students, schedule, public visibility, fee visibility.                                                     |
+| `/admin/batches/[batchId]`         | `ADMIN`         | Details, students, schedule, teachers, public visibility, fee visibility. Assignment mutations are canonical here.  |
 | `/admin/timetable`                 | `ADMIN`         | Batch schedule management.                                                                                          |
 | `/admin/materials`                 | `ADMIN`         | Study material list filtered by session, curriculum, chapter, topic, publication, archive state.                    |
 | `/admin/materials/new`             | `ADMIN`         | Upload/create material.                                                                                             |
@@ -105,6 +130,47 @@ All admin routes require authenticated `ADMIN` role.
 | `/admin/settings`                  | `ADMIN`         | Application settings.                                                                                               |
 
 Admin routes should preserve filters in URL search parameters for shareable, refresh-safe listing state.
+
+## Teacher Authorization Model (Planned)
+
+Admin
+
+- Institute-wide administrative authority.
+
+Teacher
+
+- No implicit Batch access from role alone.
+- Must have an active Teacher profile.
+- Must have an assignment to the target Batch.
+- Must hold the required permission for the requested operation.
+
+Authorization must be enforced server-side for every protected query and mutation. UI visibility is not an authorization boundary.
+
+The future authorization path should be documented as:
+Authenticated User
+→ Teacher Profile
+→ Teacher-Batch Assignment
+→ Required Permission
+→ Allow / Reject
+
+### Initial Permission Taxonomy
+
+Batch viewing
+Batch management
+Student/member viewing
+Attendance viewing
+Attendance management
+Curriculum progress viewing
+Curriculum progress management
+Assignments viewing
+Assignments management
+Tests viewing
+Tests management
+Results viewing
+Results management
+
+Rule: `CURRICULUM_PROGRESS_MANAGE ≠ CURRICULUM_STRUCTURE_MANAGE`
+Teachers should normally update what has been taught in their assigned Batch. They should not automatically gain permission to rename, reorder, create, or archive the institute's canonical Chapters and Topics.
 
 ## Teacher Routes
 
