@@ -3,7 +3,6 @@ import { BookOpen, ChevronRight } from "lucide-react";
 import Link from "next/link";
 import { getPublicCourses } from "@/server/services/public-courses";
 import { CourseGroup } from "@/features/public/components/CourseGroup";
-import { HeroSection } from "@/features/public/components/HeroSection";
 import { TeacherIntro } from "@/features/public/components/TeacherIntro";
 
 export const metadata: Metadata = {
@@ -42,8 +41,8 @@ export default async function CoursesPage() {
                 No Courses Available
               </h3>
               <p className="text-muted-foreground max-w-md mx-auto">
-                We don't have any active course batches at the moment. Please check back
-                later or contact us for updates.
+                We don&apos;t have any active course batches at the moment. Please check
+                back later or contact us for updates.
               </p>
             </div>
           ) : (

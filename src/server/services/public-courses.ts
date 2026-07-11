@@ -1,5 +1,4 @@
 import { db } from "../../lib/db";
-import { Prisma } from "@prisma/client";
 
 export interface PublicCourseTrack {
   id: string;
@@ -177,9 +176,9 @@ export async function getPublicCourses(): Promise<PublicCoursesData> {
   }
 
   // Convert to array format
-  const groups = Array.from(boardMap.entries()).map(([_, boardData]) => {
+  const groups = Array.from(boardMap.entries()).map(([_key, boardData]) => {
     const programmes = Array.from(boardData.programmeMap.entries()).map(
-      ([_, tracks]) => ({
+      ([_progKey, tracks]) => ({
         programme: tracks[0]?.programme ?? null,
         tracks: tracks.sort(
           (a, b) =>

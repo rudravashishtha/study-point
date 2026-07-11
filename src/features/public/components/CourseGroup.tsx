@@ -1,9 +1,6 @@
 "use client";
 
-import Link from "next/link";
-import { ChevronRight } from "lucide-react";
 import { CourseCard } from "./CourseCard";
-import { cn } from "@/lib/utils";
 
 interface CourseGroupProps {
   board: {

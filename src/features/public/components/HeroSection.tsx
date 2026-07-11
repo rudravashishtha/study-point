@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowRight, MessageSquare } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface HeroSectionProps {
@@ -22,11 +21,6 @@ export function HeroSection({ settings }: HeroSectionProps) {
     "Concept → Practice → Doubt Resolution → Test → Improvement";
   const ctaText = settings?.heroCtaText ?? "Enquire Now";
   const ctaTarget = settings?.heroCtaTarget ?? "/admissions";
-  const whatsappNumber = settings?.whatsappNumber;
-
-  const whatsappHref = whatsappNumber
-    ? `https://wa.me/${whatsappNumber.replace(/\D/g, "")}`
-    : "#";
 
   return (
     <section className="relative overflow-hidden py-16 md:py-24 lg:py-32">

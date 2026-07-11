@@ -1,8 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import { BookOpen, Users, Clock, IndianRupee } from "lucide-react";
-import { cn } from "@/lib/utils";
 
 interface CourseCardProps {
   track: {
