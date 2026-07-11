@@ -40,7 +40,10 @@ export const adminNavigationGroups = [
   },
   {
     name: "Finance",
-    links: [{ href: "/admin/fees", label: "Fees", icon: CreditCard }],
+    links: [
+      { href: "/admin/fees", label: "Fee Plans", icon: CreditCard },
+      { href: "/admin/fee-assignments", label: "Assignments", icon: CreditCard },
+    ],
   },
   {
     name: "Operations",
