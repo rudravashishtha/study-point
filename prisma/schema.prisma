@@ -208,6 +208,7 @@ model CurriculumTrack {
   homeworks          Homework[]
   tests              Test[]
   questions          Question[]
+  feePlans           FeePlan[]
 }
 
 model Chapter {
@@ -272,6 +273,7 @@ model AcademicSession {
   studyMaterials     StudyMaterial[]
   homeworks          Homework[]
   tests              Test[]
+  feePlans           FeePlan[]
 }
 
 model AuditLog {
@@ -314,6 +316,7 @@ model Batch {
   studyMaterials     StudyMaterial[]
   homeworks          Homework[]
   tests              Test[]
+  feePlans           FeePlan[]
 }
 
 model BatchSchedule {
@@ -353,6 +356,54 @@ model Enrolment {
 
   // Note: We do NOT use @@unique here.
   // We use a custom migration to create: UNIQUE (studentId, academicSessionId, curriculumTrackId) WHERE archivedAt IS NULL
+}
+
+model FeePlan {
+  id                String           @id @default(uuid())
+  academicSessionId String
+  curriculumTrackId String
+  batchId           String?
+  name              String
+  description       String?
+  totalAmount       Decimal          @db.Decimal(10, 2)
+  frequency         FeePlanFrequency
+  showPublicly      Boolean          @default(false)
+  isActive          Boolean          @default(true)
+  createdAt         DateTime         @default(now())
+  updatedAt         DateTime         @updatedAt
+  createdBy         String?
+  updatedBy         String?
+  archivedAt        DateTime?
+  archivedBy        String?
+
+  academicSession AcademicSession @relation(fields: [academicSessionId], references: [id])
+  curriculumTrack CurriculumTrack @relation(fields: [curriculumTrackId], references: [id])
+  batch           Batch?          @relation(fields: [batchId], references: [id])
+
+  instalments FeePlanInstallment[]
+
+  @@index([academicSessionId])
+  @@index([curriculumTrackId])
+  @@index([batchId])
+  @@index([frequency])
+  @@index([isActive])
+}
+
+model FeePlanInstallment {
+  id           String @id @default(uuid())
+  feePlanId    String
+  label        String
+  dueOffsetDays Int?
+  dueDate      DateTime?
+  amount       Decimal @db.Decimal(10, 2)
+  displayOrder Int     @default(0)
+  isActive     Boolean @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  feePlan FeePlan @relation(fields: [feePlanId], references: [id], onDelete: Cascade)
+
+  @@index([feePlanId])
 }
 
 enum FileAssetStorageAccessClass {
@@ -435,6 +486,36 @@ enum QuestionDifficulty {
   EASY
   MEDIUM
   HARD
+}
+
+enum FeePlanFrequency {
+  MONTHLY
+  QUARTERLY
+  YEARLY
+  CUSTOM
+}
+
+enum PaymentMethod {
+  CASH
+  UPI
+  BANK_TRANSFER
+  CHEQUE
+  OTHER
+}
+
+enum FeeDueStatus {
+  PENDING
+  PARTIALLY_PAID
+  PAID
+  WAIVED
+  CANCELLED
+  OVERDUE
+}
+
+enum FeeAssignmentStatus {
+  ACTIVE
+  COMPLETED
+  CANCELLED
 }
 
 enum ImportType {
