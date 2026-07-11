@@ -45,9 +45,7 @@ export function ImportResults({
       <div className="text-center space-y-2">
         <div
           className={`mx-auto flex size-16 items-center justify-center rounded-full ${
-            hasErrors
-              ? "bg-amber-100 text-amber-600"
-              : "bg-green-100 text-green-600"
+            hasErrors ? "bg-amber-100 text-amber-600" : "bg-green-100 text-green-600"
           }`}
         >
           {hasErrors ? (
@@ -90,9 +88,7 @@ export function ImportResults({
       <div className="rounded-md border bg-card p-4 space-y-2">
         <div className="flex items-center justify-between text-sm">
           <span className="text-muted-foreground">Status</span>
-          <Badge variant={hasErrors ? "destructive" : "default"}>
-            {results.status}
-          </Badge>
+          <Badge variant={hasErrors ? "destructive" : "default"}>{results.status}</Badge>
         </div>
         <div className="flex items-center justify-between text-sm">
           <span className="text-muted-foreground">Valid rows</span>

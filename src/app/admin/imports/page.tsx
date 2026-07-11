@@ -24,7 +24,10 @@ export default async function AdminImportsPage() {
         </div>
       </div>
 
-      <ImportHistoryPageClient initialJobs={result.data.items} total={result.data.total} />
+      <ImportHistoryPageClient
+        initialJobs={result.data.items}
+        total={result.data.total}
+      />
     </div>
   );
 }

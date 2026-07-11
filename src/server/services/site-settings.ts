@@ -21,7 +21,7 @@ export interface SiteSettingsData {
   defaultTitle: string | null;
   defaultDescription: string | null;
   ogImageFileId: string | null;
-  socialLinks: Prisma.JsonValue | null;
+  socialLinks: Record<string, string> | null;
   heroHeadline: string | null;
   heroSubheadline: string | null;
   heroCtaText: string | null;
@@ -99,7 +99,10 @@ async function getOrCreateSingleton() {
 export async function getSiteSettings(): Promise<ServiceResult<SiteSettingsData>> {
   try {
     const settings = await getOrCreateSingleton();
-    return success(settings);
+    return success({
+      ...settings,
+      socialLinks: (settings.socialLinks as Record<string, string> | null) ?? null,
+    });
   } catch (error) {
     return failure("INTERNAL_ERROR", "Failed to fetch site settings");
   }
@@ -125,7 +128,11 @@ export async function updateSiteSettings(
     if (Object.keys(updateData).length === 1) {
       // Only updatedBy was set
       const existingSettings = await getOrCreateSingleton();
-      return success(existingSettings);
+      return success({
+        ...existingSettings,
+        socialLinks:
+          (existingSettings.socialLinks as Record<string, string> | null) ?? null,
+      });
     }
 
     const updated = await db.$transaction(async (tx) => {
@@ -149,7 +156,10 @@ export async function updateSiteSettings(
       return result;
     });
 
-    return success(updated);
+    return success({
+      ...updated,
+      socialLinks: (updated.socialLinks as Record<string, string> | null) ?? null,
+    });
   } catch (error) {
     if (error instanceof DomainError) return failure(error.code, error.message);
     return failure("INTERNAL_ERROR", "Failed to update site settings");

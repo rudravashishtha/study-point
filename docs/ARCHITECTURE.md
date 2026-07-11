@@ -90,7 +90,7 @@ Current package baseline checked on 2026-07-07:
 | `lucide-react`          |                                                                                `1.23.0` |
 | `recharts`              |                                                                                 `3.9.2` |
 | SheetJS `xlsx`          | Official CDN tarball `0.20.3`; do not install npm registry `xlsx@0.18.5` without review |
-| `csv-parse`             | Not required — SheetJS handles `.csv` natively; removed from Phase 6A dependency set |
+| `csv-parse`             |    Not required — SheetJS handles `.csv` natively; removed from Phase 6A dependency set |
 | `serwist`               |                                                                                `9.5.11` |
 | `@serwist/next`         |                                                                                `9.5.11` |
 | `katex`                 |                                                                                `0.17.0` |
@@ -328,6 +328,7 @@ Archived files are retained. Temporary import source files are retained for 30 d
 ### Import Source File Retention
 
 Import source files intentionally bypass the `FileAsset` model. FileAsset is designed for the curriculum- and batch-scoped publish/finalization lifecycle of study materials, homework, and tests. Import source files:
+
 - Have a fixed 30-day retention lifecycle unrelated to any curriculum scope
 - Are admin-only uploads that do not need the intent → signed URL → finalization flow
 - Are temporary and do not require publication/unpublication/archival states
@@ -335,6 +336,7 @@ Import source files intentionally bypass the `FileAsset` model. FileAsset is des
 Reusing FileAsset would require adding an `IMPORT_SOURCE` usage category and special-casing its lifecycle in the existing file cleanup logic, increasing complexity without benefit.
 
 Instead, import source files are stored in a dedicated `import-sources` Supabase Storage bucket with path `{importJobId}/{originalFilename}`. The `sourceStoragePath` field on `ImportJob` stores the object path. Cleanup is handled through:
+
 1. **Admin action**: Manual source file deletion from the import history UI.
 2. **Supabase cron (deferred for Phase 6A)**: Automated daily cleanup of objects older than 30 days.
 

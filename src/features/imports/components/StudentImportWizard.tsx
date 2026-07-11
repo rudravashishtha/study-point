@@ -21,12 +21,7 @@ import { LoadingState } from "@/components/feedback/loading-state";
 import { toast } from "sonner";
 
 type WizardStep =
-  | "template"
-  | "upload"
-  | "validating"
-  | "preview"
-  | "confirming"
-  | "results";
+  "template" | "upload" | "validating" | "preview" | "confirming" | "results";
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024;
 
@@ -235,9 +230,7 @@ export function StudentImportWizard() {
         status: data.summary.status,
       });
       setStep("results");
-      toast.success(
-        `Imported ${data.summary.importedRows} student(s) successfully.`,
-      );
+      toast.success(`Imported ${data.summary.importedRows} student(s) successfully.`);
     } catch {
       toast.error("Import confirmation failed.");
       setStep("preview");
@@ -297,23 +290,11 @@ export function StudentImportWizard() {
         <StepArrow />
         <StepDot step={step} current="upload" label="Upload" />
         <StepArrow />
-        <StepDot
-          step={step}
-          current="validating"
-          label="Validate"
-        />
+        <StepDot step={step} current="validating" label="Validate" />
         <StepArrow />
-        <StepDot
-          step={step}
-          current="preview"
-          label="Preview"
-        />
+        <StepDot step={step} current="preview" label="Preview" />
         <StepArrow />
-        <StepDot
-          step={step}
-          current="confirming"
-          label="Confirm"
-        />
+        <StepDot step={step} current="confirming" label="Confirm" />
         <StepArrow />
         <StepDot step={step} current="results" label="Results" />
       </div>
@@ -477,10 +458,7 @@ export function StudentImportWizard() {
               <Button variant="outline" onClick={reset}>
                 Start over
               </Button>
-              <Button
-                onClick={handleConfirm}
-                disabled={!isReady || confirming}
-              >
+              <Button onClick={handleConfirm} disabled={!isReady || confirming}>
                 {confirming ? (
                   <>
                     <Loader2 className="size-4 mr-1 animate-spin" />
@@ -499,9 +477,7 @@ export function StudentImportWizard() {
       )}
 
       {/* Step 5: Confirming */}
-      {step === "confirming" && (
-        <LoadingState label="Importing students..." />
-      )}
+      {step === "confirming" && <LoadingState label="Importing students..." />}
 
       {/* Step 6: Results */}
       {step === "results" && results && (
@@ -521,10 +497,23 @@ export function StudentImportWizard() {
 }
 
 const STEP_ORDER: WizardStep[] = [
-  "template", "upload", "validating", "preview", "confirming", "results",
+  "template",
+  "upload",
+  "validating",
+  "preview",
+  "confirming",
+  "results",
 ];
 
-function StepDot({ step, current, label }: { step: WizardStep; current: WizardStep; label: string }) {
+function StepDot({
+  step,
+  current,
+  label,
+}: {
+  step: WizardStep;
+  current: WizardStep;
+  label: string;
+}) {
   const active = STEP_ORDER.indexOf(step) <= STEP_ORDER.indexOf(current);
   return (
     <span

@@ -744,13 +744,13 @@ Errors are stored as JSON rather than a separate denormalized `ImportError` mode
 
 Student import template (Phase 6A):
 
-| Column | Required | Max Length |
-|--------|----------|------------|
-| Full Name | Yes | 100 |
-| Phone | No | 20 |
-| Guardian Phone | No | 20 |
-| Email | No | — |
-| Joining Date | No | — (DD-MM-YYYY) |
+| Column         | Required | Max Length     |
+| -------------- | -------- | -------------- |
+| Full Name      | Yes      | 100            |
+| Phone          | No       | 20             |
+| Guardian Phone | No       | 20             |
+| Email          | No       | —              |
+| Joining Date   | No       | — (DD-MM-YYYY) |
 
 Question import required columns (future Phase 6B):
 
