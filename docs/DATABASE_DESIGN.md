@@ -684,37 +684,74 @@ Only flexible visual ordering or repeated simple blocks should use JSON; core re
 
 ### ImportJob
 
+**Design note**: Import source files intentionally bypass the `FileAsset` model. FileAsset is designed for the curriculum- and batch-scoped publish/finalization lifecycle of study materials, homework, and tests. Import source files have a fixed 30-day retention lifecycle unrelated to any curriculum scope, are admin-only uploads that do not need the intent → signed URL → finalization flow, and are temporary by nature. Reusing FileAsset would require adding an `IMPORT_SOURCE` usage category and special-casing its lifecycle in the existing file cleanup logic.
+
+Instead, import source files are stored in a dedicated `import-sources` Supabase Storage bucket with a 30-day retention policy. The storage path on ImportJob references the Supabase object key directly.
+
 Important fields:
 
 - `id`.
-- `importType`: students, questions.
+- `importType`: `STUDENT` or `QUESTION` (enum).
 - `originalFilename`.
-- `uploadedBy`.
-- `startedAt`.
-- `completedAt`.
-- `status`: pending, validating, ready, processing, completed, completed_with_errors, failed.
+- `fileSize`.
+- `sourceStoragePath`, nullable — Supabase Storage object path (e.g. `import-sources/{importJobId}/{originalFilename}`) for 30-day retention.
+- `createdBy`, string audit ID matching project convention.
+- `createdAt`, `updatedAt`.
+- `startedAt`, nullable.
+- `completedAt`, nullable.
+- `status`: `PENDING`, `VALIDATING`, `READY`, `PROCESSING`, `COMPLETED`, `COMPLETED_WITH_ERRORS`, `FAILED` (enum).
 - `totalRows`.
-- `successfulRows`.
+- `validRows`.
+- `warningRows`.
+- `errorRows`.
+- `importedRows`.
 - `failedRows`.
 - `skippedRows`.
-- `errorSummary`.
-- `sourceFileAssetId`, nullable, retained for 30 days.
-- `errorReportFileAssetId`, nullable.
+- `errorSummary`, nullable.
 
-### ImportError
+Relationships:
+
+- One `ImportJob` has many `ImportRow` records (cascade delete).
+- `createdBy` is a loose string reference to `AppUser.id` (matching project convention).
+
+### ImportRow
+
+Row-level parsed and validated data for an import job.
 
 Important fields:
 
 - `id`.
 - `importJobId`.
 - `rowNumber`.
-- `columnName`.
-- `severity`: warning, error.
-- `message`.
-- `expectedValue`, nullable.
-- `rawValue`, nullable.
+- `status`: `PENDING`, `VALID`, `WARNING`, `ERROR` (enum).
+- `data` — JSON object containing the parsed row values (keys match template columns).
+- `errors` — nullable JSON array of `{ column: string, problem: string, expectedValue?: string }`.
+- `warnings` — nullable JSON array of `{ column: string, problem: string }`.
 
-Question import required columns:
+Relationships:
+
+- Belongs to one `ImportJob`.
+
+Indexes:
+
+- `[importJobId]`
+- `[importJobId, status]`
+
+Errors are stored as JSON rather than a separate denormalized `ImportError` model because error structures vary significantly between import types (student vs. question), making JSON appropriate per the project guidance to use JSON only when data is genuinely flexible.
+
+### Import Template Columns
+
+Student import template (Phase 6A):
+
+| Column | Required | Max Length |
+|--------|----------|------------|
+| Full Name | Yes | 100 |
+| Phone | No | 20 |
+| Guardian Phone | No | 20 |
+| Email | No | — |
+| Joining Date | No | — (DD-MM-YYYY) |
+
+Question import required columns (future Phase 6B):
 
 - Board.
 - Programme, required for CISCE and must be ICSE or ISC.

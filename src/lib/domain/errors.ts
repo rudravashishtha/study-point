@@ -6,7 +6,9 @@ export type DomainErrorCode =
   | "CONCURRENT_UPDATE"
   | "UNAUTHORIZED"
   | "INVALID_RELATION"
-  | "INTERNAL_ERROR";
+  | "INTERNAL_ERROR"
+  | "IMPORT_VALIDATION"
+  | "IMPORT_FAILED";
 
 export class DomainError extends Error {
   constructor(

@@ -110,15 +110,14 @@ Preferred Phase 6 approach:
 
 ```sh
 mkdir -p vendor
-curl -O https://cdn.sheetjs.com/xlsx-0.20.3/xlsx-0.20.3.tgz
-mv xlsx-0.20.3.tgz vendor/
-npm install xlsx@file:vendor/xlsx-0.20.3.tgz csv-parse
+curl -L -o vendor/xlsx-0.20.3.tgz https://cdn.sheetjs.com/xlsx-0.20.3/xlsx-0.20.3.tgz
+npm install xlsx@file:vendor/xlsx-0.20.3.tgz
 ```
 
 Alternative if vendoring is rejected:
 
 ```sh
-npm install https://cdn.sheetjs.com/xlsx-0.20.3/xlsx-0.20.3.tgz csv-parse
+npm install https://cdn.sheetjs.com/xlsx-0.20.3/xlsx-0.20.3.tgz
 ```
 
 Keep spreadsheet parsing isolated behind import parser adapters. Do not let SheetJS row structures leak into domain services.
@@ -274,7 +273,7 @@ The next phase defined in the roadmap is **Phase 6: Bulk Imports**. Deferred Pha
 Scope:
 
 - Reusable import architecture.
-- Spreadsheet parser adapters using reviewed SheetJS distribution approach and `csv-parse`.
+- Spreadsheet parser adapters using reviewed SheetJS distribution approach (vendored CDN tarball).
 - Student template/import.
 - Question template/import with mandatory unambiguous curriculum columns.
 - Validation, preview, confirmation, import history.
@@ -459,16 +458,19 @@ E2E tests:
 - Phase 1: Completed.
 - Phase 2: Completed.
 - Phase 3: Completed.
-- Phase 4: Active.
+- Phase 4: Completed.
   - Slice 4A (Admin Domain Foundation): Completed.
   - Slice 4B (Admin Session Management): Completed.
   - Slice 4C (Admin Batch Foundation): Completed.
   - Slice 4D (Teacher Management & Assignments): Completed.
   - Slice 4E (Student Provisioning): Completed.
-- Phase 5: Active.
+- Phase 5: Completed.
   - Slice 5A (File Storage & Study Materials): Completed.
   - Slice 5B (Assignments / Homework): Completed.
   - Slice 5C (Test Management): Completed.
+- Phase 6: Active.
+  - Slice 6A (Bulk Student Import): Documentation approved, pending implementation.
+  - Documentation reconciliation completed: DATABASE_DESIGN.md, IMPLEMENTATION_PLAN.md, and ARCHITECTURE.md updated to reflect approved Phase 6A design (ImportJob/ImportRow models, source file retention via Supabase Storage, vendored SheetJS installation without csv-parse).
 
 ## Phase 0 Stop
 

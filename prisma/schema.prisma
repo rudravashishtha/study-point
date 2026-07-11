@@ -412,6 +412,28 @@ enum TestLifecycleState {
   ARCHIVED
 }
 
+enum ImportType {
+  STUDENT
+  QUESTION
+}
+
+enum ImportJobStatus {
+  PENDING
+  VALIDATING
+  READY
+  PROCESSING
+  COMPLETED
+  COMPLETED_WITH_ERRORS
+  FAILED
+}
+
+enum ImportRowStatus {
+  PENDING
+  VALID
+  WARNING
+  ERROR
+}
+
 model FileAsset {
   id                 String                      @id @default(uuid())
   bucket             String
@@ -485,6 +507,51 @@ model SystemSequence {
   id        String   @id
   lastValue Int
   updatedAt DateTime @updatedAt
+}
+
+model ImportJob {
+  id                String          @id @default(uuid())
+  importType        ImportType
+  originalFilename  String
+  fileSize          Int             @default(0)
+  sourceStoragePath String?
+  status            ImportJobStatus @default(PENDING)
+  totalRows         Int             @default(0)
+  validRows         Int             @default(0)
+  warningRows       Int             @default(0)
+  errorRows         Int             @default(0)
+  importedRows      Int             @default(0)
+  failedRows        Int             @default(0)
+  skippedRows       Int             @default(0)
+  startedAt         DateTime?
+  completedAt       DateTime?
+  errorSummary      String?
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @updatedAt
+  createdBy         String?
+  updatedBy         String?
+
+  rows ImportRow[]
+
+  @@index([createdBy])
+  @@index([importType])
+  @@index([status])
+  @@index([createdAt])
+}
+
+model ImportRow {
+  id          String          @id @default(uuid())
+  importJobId String
+  rowNumber   Int
+  status      ImportRowStatus @default(PENDING)
+  data        Json
+  errors      Json?
+  warnings    Json?
+
+  importJob ImportJob @relation(fields: [importJobId], references: [id], onDelete: Cascade)
+
+  @@index([importJobId])
+  @@index([importJobId, status])
 }
 
 model Homework {

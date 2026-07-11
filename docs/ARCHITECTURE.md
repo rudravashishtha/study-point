@@ -90,7 +90,7 @@ Current package baseline checked on 2026-07-07:
 | `lucide-react`          |                                                                                `1.23.0` |
 | `recharts`              |                                                                                 `3.9.2` |
 | SheetJS `xlsx`          | Official CDN tarball `0.20.3`; do not install npm registry `xlsx@0.18.5` without review |
-| `csv-parse`             |                                                                                 `7.0.1` |
+| `csv-parse`             | Not required — SheetJS handles `.csv` natively; removed from Phase 6A dependency set |
 | `serwist`               |                                                                                `9.5.11` |
 | `@serwist/next`         |                                                                                `9.5.11` |
 | `katex`                 |                                                                                `0.17.0` |
@@ -127,21 +127,18 @@ Install development dependencies:
 npm install -D prisma vitest @playwright/test prettier
 ```
 
-Add `csv-parse` when CSV import work begins.
-
-For SheetJS, do not install the outdated public npm registry `xlsx@0.18.5` without a fresh review. Official SheetJS docs currently recommend installing the current tarball from the SheetJS CDN, and also recommend vendoring for stability. Preferred project approach when Phase 6 begins:
+For SheetJS, do not install the outdated public npm registry `xlsx@0.18.5` without a fresh review. Official SheetJS docs recommend installing the current tarball from the SheetJS CDN, and also recommend vendoring for stability. `csv-parse` is not required — SheetJS handles `.csv` natively. Preferred project approach when Phase 6 begins:
 
 ```sh
 mkdir -p vendor
-curl -O https://cdn.sheetjs.com/xlsx-0.20.3/xlsx-0.20.3.tgz
-mv xlsx-0.20.3.tgz vendor/
-npm install xlsx@file:vendor/xlsx-0.20.3.tgz csv-parse
+curl -L -o vendor/xlsx-0.20.3.tgz https://cdn.sheetjs.com/xlsx-0.20.3/xlsx-0.20.3.tgz
+npm install xlsx@file:vendor/xlsx-0.20.3.tgz
 ```
 
 If vendoring is rejected, install the official CDN tarball directly:
 
 ```sh
-npm install https://cdn.sheetjs.com/xlsx-0.20.3/xlsx-0.20.3.tgz csv-parse
+npm install https://cdn.sheetjs.com/xlsx-0.20.3/xlsx-0.20.3.tgz
 ```
 
 Add `tsx` when seed scripts or standalone TypeScript utilities are introduced. Add `@types/katex` when KaTeX rendering is implemented and TypeScript needs package declarations.
@@ -314,7 +311,7 @@ Use intentional bucket separation:
 - Test papers.
 - Question images.
 - Gallery images.
-- Temporary import source files and error reports.
+- Import source files (`import-sources` bucket, 30-day retention).
 
 Storage paths should be generated, stable, and non-guessable:
 
@@ -322,9 +319,24 @@ Storage paths should be generated, stable, and non-guessable:
 {bucket}/{entityType}/{academicSessionId}/{curriculumTrackId}/{entityId}/{fileId}-{safeSlug}.{ext}
 ```
 
+**Import storage path exception**: Import source files use the path pattern `{importJobId}/{originalFilename}` under the `import-sources` bucket. This deviates from the normal academic-content convention because imports have no curriculum-track or academic-session scope, and the UUID-based directory makes the path sufficiently non-guessable without requiring a separate file ID.
+
 Do not trust original filenames as storage identifiers. Store metadata such as original filename, MIME type, size, bucket, path, visibility, uploadedBy, createdAt, retainedUntil, and archivedAt where relevant.
 
 Archived files are retained. Temporary import source files are retained for 30 days.
+
+### Import Source File Retention
+
+Import source files intentionally bypass the `FileAsset` model. FileAsset is designed for the curriculum- and batch-scoped publish/finalization lifecycle of study materials, homework, and tests. Import source files:
+- Have a fixed 30-day retention lifecycle unrelated to any curriculum scope
+- Are admin-only uploads that do not need the intent → signed URL → finalization flow
+- Are temporary and do not require publication/unpublication/archival states
+
+Reusing FileAsset would require adding an `IMPORT_SOURCE` usage category and special-casing its lifecycle in the existing file cleanup logic, increasing complexity without benefit.
+
+Instead, import source files are stored in a dedicated `import-sources` Supabase Storage bucket with path `{importJobId}/{originalFilename}`. The `sourceStoragePath` field on `ImportJob` stores the object path. Cleanup is handled through:
+1. **Admin action**: Manual source file deletion from the import history UI.
+2. **Supabase cron (deferred for Phase 6A)**: Automated daily cleanup of objects older than 30 days.
 
 ## UI Architecture
 
@@ -364,7 +376,7 @@ Core layers:
 - Preview model.
 - Confirmed write service.
 - Error report generation.
-- Import job and import error persistence.
+- ImportJob and ImportRow persistence (with JSON errors/warnings, not a separate ImportError model).
 
 Question import templates must require board, programme where required, class level, subject, chapter, and question fields. CISCE rows must specify ICSE or ISC. The importer must reject ambiguous rows rather than infer silently from class level alone.
 
