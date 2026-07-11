@@ -209,6 +209,7 @@ model CurriculumTrack {
   tests              Test[]
   questions          Question[]
   feePlans           FeePlan[]
+  announcements      Announcement[]
 }
 
 model Chapter {
@@ -274,6 +275,7 @@ model AcademicSession {
   homeworks          Homework[]
   tests              Test[]
   feePlans           FeePlan[]
+  announcements      Announcement[]
 }
 
 model AuditLog {
@@ -317,6 +319,38 @@ model Batch {
   homeworks          Homework[]
   tests              Test[]
   feePlans           FeePlan[]
+  announcements      Announcement[]
+}
+
+model Announcement {
+  id                String               @id @default(uuid())
+  academicSessionId String?
+  audience          AnnouncementAudience
+  curriculumTrackId String?
+  batchId           String?
+  title             String
+  content           String
+  priority          AnnouncementPriority @default(NORMAL)
+
+  publishedAt DateTime?
+  expiresAt   DateTime?
+  archivedAt  DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  createdBy  String?
+  updatedBy  String?
+  archivedBy String?
+
+  academicSession AcademicSession? @relation(fields: [academicSessionId], references: [id])
+  curriculumTrack CurriculumTrack? @relation(fields: [curriculumTrackId], references: [id])
+  batch           Batch?           @relation(fields: [batchId], references: [id])
+
+  @@index([audience])
+  @@index([publishedAt])
+  @@index([expiresAt])
+  @@index([curriculumTrackId])
+  @@index([batchId])
 }
 
 model BatchSchedule {
@@ -568,6 +602,19 @@ enum FeeAssignmentStatus {
   ACTIVE
   COMPLETED
   CANCELLED
+}
+
+enum AnnouncementAudience {
+  PUBLIC
+  ALL_STUDENTS
+  CURRICULUM_TRACK
+  BATCH
+}
+
+enum AnnouncementPriority {
+  NORMAL
+  HIGH
+  URGENT
 }
 
 enum ImportType {

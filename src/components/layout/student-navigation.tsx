@@ -9,6 +9,7 @@ import {
   ClipboardCheck,
   FileText,
   Home,
+  Megaphone,
   WalletCards,
 } from "lucide-react";
 
@@ -18,6 +19,7 @@ const studentLinks = [
   { href: "/student/timetable", label: "Timetable", icon: CalendarClock },
   { href: "/student/homework", label: "Work", icon: ClipboardCheck },
   { href: "/student/tests", label: "Tests", icon: FileText },
+  { href: "/student/announcements", label: "Notices", icon: Megaphone },
   { href: "/student/fees", label: "Fees", icon: WalletCards },
 ];
 
