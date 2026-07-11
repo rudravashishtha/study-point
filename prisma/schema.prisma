@@ -862,3 +862,33 @@ model Question {
   @@index([topicId])
   @@index([curriculumTrackId, questionType, difficulty])
 }
+
+model SiteSettings {
+  id              String   @id @default(uuid())
+  instituteName   String
+  tagline         String?
+  phone           String?
+  whatsappNumber  String?
+  email           String?
+  address         String?
+  landmark        String?
+  mapUrl          String?
+  openingHours    String?
+  logoFileId      String?
+  faviconFileId   String?
+  defaultTitle    String?
+  defaultDescription String?
+  ogImageFileId   String?
+  socialLinks     Json?
+  heroHeadline    String?
+  heroSubheadline String?
+  heroCtaText     String?
+  heroCtaTarget   String?
+  feeDisplayEnabled Boolean @default(true)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  createdBy       String?
+  updatedBy       String?
+
+  @@index([id])
+}
