@@ -37,8 +37,12 @@ export function ImportHistoryPageClient({
   const router = useRouter();
   const [jobs] = useState(initialJobs);
 
-  const handleView = (jobId: string) => {
-    window.location.href = `/admin/imports/students?jobId=${jobId}`;
+  const handleView = (jobId: string, importType?: ImportType) => {
+    const path =
+      importType === "QUESTION"
+        ? `/admin/imports/questions?jobId=${jobId}`
+        : `/admin/imports/students?jobId=${jobId}`;
+    window.location.href = path;
   };
 
   const handleDownloadErrors = async (jobId: string) => {
@@ -81,14 +85,22 @@ export function ImportHistoryPageClient({
     return (
       <DataListEmpty
         title="No imports yet"
-        description="Import students and other data using the bulk import system."
+        description="Import students, questions, and other data using the bulk import system."
         action={
-          <Link href="/admin/imports/students">
-            <Button>
-              <Plus className="size-4 mr-1" />
-              Import students
-            </Button>
-          </Link>
+          <div className="flex gap-2 justify-center">
+            <Link href="/admin/imports/students">
+              <Button>
+                <Plus className="size-4 mr-1" />
+                Import students
+              </Button>
+            </Link>
+            <Link href="/admin/imports/questions">
+              <Button variant="outline">
+                <Plus className="size-4 mr-1" />
+                Import questions
+              </Button>
+            </Link>
+          </div>
         }
       />
     );
@@ -97,15 +109,21 @@ export function ImportHistoryPageClient({
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <div className="text-sm text-muted-foreground">
-          {total} import job(s)
+        <div className="text-sm text-muted-foreground">{total} import job(s)</div>
+        <div className="flex gap-2">
+          <Link href="/admin/imports/questions">
+            <Button size="sm" variant="outline">
+              <FileSpreadsheet className="size-4 mr-1" />
+              New question import
+            </Button>
+          </Link>
+          <Link href="/admin/imports/students">
+            <Button size="sm">
+              <FileSpreadsheet className="size-4 mr-1" />
+              New student import
+            </Button>
+          </Link>
         </div>
-        <Link href="/admin/imports/students">
-          <Button size="sm">
-            <FileSpreadsheet className="size-4 mr-1" />
-            New student import
-          </Button>
-        </Link>
       </div>
 
       <ImportHistoryTable
@@ -116,11 +134,7 @@ export function ImportHistoryPageClient({
         showDeleteExpired={jobs.length > 0}
       />
 
-      <DataListPagination
-        currentPage={1}
-        totalItems={total}
-        pageSize={50}
-      />
+      <DataListPagination currentPage={1} totalItems={total} pageSize={50} />
     </div>
   );
 }

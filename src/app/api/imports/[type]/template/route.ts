@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getAppUser } from "@/lib/auth/permissions";
-import { generateStudentTemplate } from "@/server/services/imports";
+import {
+  generateStudentTemplate,
+  generateQuestionTemplate,
+} from "@/server/services/imports";
 
 export async function GET(
   _req: NextRequest,
@@ -14,14 +17,18 @@ export async function GET(
 
     const { type } = await params;
 
-    if (type !== "student") {
+    let result;
+    if (type === "student") {
+      result = await generateStudentTemplate();
+    } else if (type === "question") {
+      result = await generateQuestionTemplate();
+    } else {
       return NextResponse.json(
         { error: `Unsupported import type: ${type}` },
         { status: 400 },
       );
     }
 
-    const result = await generateStudentTemplate();
     if (!result.success) {
       return NextResponse.json(
         { error: result.error.message, code: result.error.code },

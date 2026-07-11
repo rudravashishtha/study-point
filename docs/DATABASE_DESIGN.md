@@ -494,7 +494,7 @@ Important fields:
 - `marks`.
 - `answerText`, nullable.
 - `solutionText`, nullable.
-- `imageFileId`, nullable.
+- `imageFileId`, nullable (bare `String?` — no `FileAsset` relation. Matches `Teacher.photoFileId` convention. FK enforcement deferred.)
 - `source`, nullable.
 - `academicRelevance`, nullable.
 - `archivedAt`, `archivedBy`.
@@ -508,7 +508,8 @@ Notes:
 
 Indexes:
 
-- Curriculum track, chapter, topic, type, difficulty, marks, archived state.
+- Curriculum track, chapter, topic, question type, difficulty, marks (compound covering common filter combinations).
+- Note: no standalone `archivedAt` index. Consistent with every other archived entity in the schema. At expected table sizes, PostgreSQL sequential scans for archive filtering are acceptable.
 
 ## Fees
 

@@ -207,6 +207,7 @@ model CurriculumTrack {
   studyMaterials     StudyMaterial[]
   homeworks          Homework[]
   tests              Test[]
+  questions          Question[]
 }
 
 model Chapter {
@@ -226,6 +227,7 @@ model Chapter {
   studyMaterials  StudyMaterial[]
   homeworks       Homework[]
   tests           Test[]
+  questions       Question[]
 
   @@index([curriculumTrackId])
 }
@@ -246,6 +248,7 @@ model Topic {
   studyMaterials StudyMaterial[]
   homeworks      Homework[]
   tests          Test[]
+  questions      Question[]
 
   @@index([chapterId])
 }
@@ -410,6 +413,28 @@ enum TestLifecycleState {
   DRAFT
   PUBLISHED
   ARCHIVED
+}
+
+enum QuestionFormat {
+  PLAIN_TEXT
+  MARKDOWN_LATEX
+}
+
+enum QuestionType {
+  SHORT_ANSWER
+  LONG_ANSWER
+  MCQ
+  NUMERICAL
+  PROOF
+  ASSERTION_REASON
+  CASE_STUDY
+  OTHER
+}
+
+enum QuestionDifficulty {
+  EASY
+  MEDIUM
+  HARD
 }
 
 enum ImportType {
@@ -624,4 +649,36 @@ model Test {
 
   @@index([academicSessionId, curriculumTrackId, lifecycleState])
   @@index([batchId, lifecycleState])
+}
+
+model Question {
+  id                String             @id @default(uuid())
+  curriculumTrackId String
+  chapterId         String
+  topicId           String?
+  questionText      String
+  questionFormat    QuestionFormat     @default(MARKDOWN_LATEX)
+  questionType      QuestionType
+  difficulty        QuestionDifficulty
+  marks             Int
+  answerText        String?
+  solutionText      String?
+  imageFileId       String?
+  source            String?
+  academicRelevance String?
+  archivedAt        DateTime?
+  archivedBy        String?
+  createdAt         DateTime           @default(now())
+  updatedAt         DateTime           @updatedAt
+  createdBy         String?
+  updatedBy         String?
+
+  curriculumTrack CurriculumTrack @relation(fields: [curriculumTrackId], references: [id])
+  chapter         Chapter         @relation(fields: [chapterId], references: [id])
+  topic           Topic?          @relation(fields: [topicId], references: [id])
+
+  @@index([curriculumTrackId])
+  @@index([chapterId])
+  @@index([topicId])
+  @@index([curriculumTrackId, questionType, difficulty])
 }

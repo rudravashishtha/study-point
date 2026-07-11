@@ -287,6 +287,18 @@ Validation gate:
 - Integration tests for confirmed imports and transaction behavior.
 - Large-file and mobile preview review.
 
+#### Phase 6B — Question Import
+
+Scope: Question template, upload, validation, preview, confirmation, import history.
+
+Accepted trade-offs:
+
+- **Preview: error-rows only.** The preview table displays only rows with validation errors, matching Phase 6A student import behavior. Displaying all rows with inline status indicators is intentionally deferred.
+- **Duplicate detection: none.** No uniqueness constraint on `questionText`, consistent with every content entity in the repository.
+- **`imageFileId`: bare `String?`.** No FileAsset relation. FK enforcement deferred, matching `Teacher.photoFileId` convention.
+- **No standalone `archivedAt` index.** Consistent with all 17 existing archived entities. At expected table sizes, PostgreSQL sequential scans for archive filtering are acceptable.
+- **Import history navigation** will be fixed to dispatch by `ImportType` rather than hardcoding `/admin/imports/students`.
+
 ## Phase 7: Fees And Announcements
 
 Scope:

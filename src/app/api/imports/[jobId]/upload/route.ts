@@ -19,6 +19,7 @@ export async function POST(
 
     const formData = await req.formData();
     const file = formData.get("file") as File | null;
+    const importTypeRaw = formData.get("importType") as string | null;
 
     if (!file) {
       return NextResponse.json(
@@ -26,6 +27,9 @@ export async function POST(
         { status: 400 },
       );
     }
+
+    const importType: ImportType =
+      importTypeRaw === "QUESTION" ? ImportType.QUESTION : ImportType.STUDENT;
 
     const ext = file.name.split(".").pop()?.toLowerCase() || "";
     const allowedExts = ["xlsx", "xls", "csv"];
@@ -56,7 +60,7 @@ export async function POST(
 
     const createResult = await createImportJob(
       {
-        importType: ImportType.STUDENT,
+        importType,
         originalFilename: file.name,
         fileSize: file.size,
       },

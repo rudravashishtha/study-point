@@ -30,7 +30,7 @@ interface ImportJobRow {
 
 interface ImportHistoryTableProps {
   jobs: ImportJobRow[];
-  onView?: (jobId: string) => void;
+  onView?: (jobId: string, importType?: ImportType) => void;
   onDownloadErrors?: (jobId: string) => void;
   onDeleteExpired?: () => void;
   showDeleteExpired?: boolean;
@@ -119,7 +119,9 @@ export function ImportHistoryTable({
                       {job.importedRows} / {job.totalRows}
                     </span>
                     {job.failedRows > 0 && (
-                      <span className="ml-1 text-destructive">({job.failedRows} failed)</span>
+                      <span className="ml-1 text-destructive">
+                        ({job.failedRows} failed)
+                      </span>
                     )}
                   </TableCell>
                   <TableCell className="text-right">
@@ -127,7 +129,7 @@ export function ImportHistoryTable({
                       <Button
                         variant="ghost"
                         size="icon-xs"
-                        onClick={() => onView?.(job.id)}
+                        onClick={() => onView?.(job.id, job.importType)}
                         title="View details"
                       >
                         <Eye className="size-4" />
@@ -138,7 +140,8 @@ export function ImportHistoryTable({
                         size="icon-xs"
                         onClick={() => onDownloadErrors?.(job.id)}
                         disabled={
-                          job.status !== "COMPLETED_WITH_ERRORS" && job.status !== "FAILED"
+                          job.status !== "COMPLETED_WITH_ERRORS" &&
+                          job.status !== "FAILED"
                         }
                         title="Download errors"
                       >
