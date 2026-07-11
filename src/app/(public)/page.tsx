@@ -1,17 +1,14 @@
-import { HeroEnvironment } from "./hero-environment";
-import { TeachingSequence } from "./teaching-sequence";
-import { CurriculumProgression } from "./curriculum-progression";
-import { TeacherSection } from "./teacher-section";
-import { CTASection } from "./cta-section";
+import { getPublicHomeData } from "@/server/services/public";
+import { HeroSection } from "@/features/public/components/HeroSection";
+import { TeacherIntro } from "@/features/public/components/TeacherIntro";
 
-export default function HomePage() {
+export default async function HomePage() {
+  const data = await getPublicHomeData();
+
   return (
-    <div className="w-full flex flex-col relative">
-      <HeroEnvironment />
-      <TeachingSequence />
-      <TeacherSection />
-      <CurriculumProgression />
-      <CTASection />
+    <div className="space-y-0">
+      <HeroSection settings={data.siteSettings} />
+      <TeacherIntro teacher={data.teacher} />
     </div>
   );
 }

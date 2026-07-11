@@ -395,6 +395,52 @@ export async function listStudentMaterials(
   return success(materials);
 }
 
+export async function listPublicResources(
+  page: number = 1,
+  pageSize: number = 20,
+): Promise<
+  ServiceResult<
+    Array<{
+      id: string;
+      title: string;
+      description: string | null;
+      visibility: string;
+      publishedAt: Date;
+      fileAsset: { id: string; originalName: string; mimeType: string } | null;
+    }>
+  >
+> {
+  if (page < 1) page = 1;
+  if (pageSize > 50) pageSize = 50;
+
+  const materials = await prisma.studyMaterial.findMany({
+    where: {
+      lifecycleState: "PUBLISHED",
+    },
+    orderBy: [{ publishedAt: "desc" }, { id: "desc" }],
+    skip: (page - 1) * pageSize,
+    take: pageSize,
+    include: { fileAsset: true },
+  });
+
+  return success(
+    materials.map((m) => ({
+      id: m.id,
+      title: m.title,
+      description: m.description,
+      visibility: m.visibility,
+      publishedAt: m.publishedAt!,
+      fileAsset: m.fileAsset
+        ? {
+            id: m.fileAsset.id,
+            originalName: m.fileAsset.originalFilename,
+            mimeType: m.fileAsset.mimeType,
+          }
+        : null,
+    })),
+  );
+}
+
 export async function getMaterialDownloadUrl(
   actorUserId: string,
   materialId: string,
