@@ -55,6 +55,7 @@ describe.skipIf(!isTestConfigured)("Homework Service Integration", () => {
     await db.enrolment.deleteMany();
     await db.batchSchedule.deleteMany();
     await db.teacherAssignment.deleteMany();
+    await db.test.deleteMany();
     await db.batch.deleteMany();
     await db.topic.deleteMany();
     await db.chapter.deleteMany();

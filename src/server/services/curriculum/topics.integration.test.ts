@@ -39,6 +39,7 @@ describe.skipIf(!isTestConfigured)("Topics Service (Integration)", () => {
     await testDb.batchSchedule.deleteMany({});
     await testDb.homework.deleteMany({});
     await testDb.teacherAssignment.deleteMany({});
+    await testDb.test.deleteMany({});
     await testDb.batch.deleteMany({});
     await testDb.curriculumTrack.deleteMany({});
     await testDb.programme.deleteMany({});
@@ -90,6 +91,7 @@ describe.skipIf(!isTestConfigured)("Topics Service (Integration)", () => {
       await testDb.batchSchedule.deleteMany({});
       await testDb.homework.deleteMany({});
       await testDb.teacherAssignment.deleteMany({});
+      await testDb.test.deleteMany({});
       await testDb.batch.deleteMany({});
       await testDb.curriculumTrack.deleteMany({});
       await testDb.programme.deleteMany({});

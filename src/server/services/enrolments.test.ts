@@ -106,6 +106,7 @@ describe.skipIf(!isTestConfigured)("Enrolment Service Integration", () => {
     await db.batchSchedule.deleteMany({});
     await db.teacherAssignment.deleteMany({});
     await db.homework.deleteMany({});
+    await db.test.deleteMany({});
     await db.batch.deleteMany({});
     if (student1Id && student2Id) {
       await db.student.deleteMany({ where: { id: { in: [student1Id, student2Id] } } });

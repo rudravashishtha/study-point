@@ -3,13 +3,21 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { motion } from "motion/react";
-import { BookOpen, CalendarClock, ClipboardCheck, Home, WalletCards } from "lucide-react";
+import {
+  BookOpen,
+  CalendarClock,
+  ClipboardCheck,
+  FileText,
+  Home,
+  WalletCards,
+} from "lucide-react";
 
 const studentLinks = [
   { href: "/student", label: "Home", icon: Home },
   { href: "/student/course", label: "Course", icon: BookOpen },
   { href: "/student/timetable", label: "Timetable", icon: CalendarClock },
   { href: "/student/homework", label: "Work", icon: ClipboardCheck },
+  { href: "/student/tests", label: "Tests", icon: FileText },
   { href: "/student/fees", label: "Fees", icon: WalletCards },
 ];
 

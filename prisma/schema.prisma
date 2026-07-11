@@ -206,6 +206,7 @@ model CurriculumTrack {
   uploadReservations FileAsset[]     @relation("FileAssetTrack")
   studyMaterials     StudyMaterial[]
   homeworks          Homework[]
+  tests              Test[]
 }
 
 model Chapter {
@@ -224,6 +225,7 @@ model Chapter {
   topics          Topic[]
   studyMaterials  StudyMaterial[]
   homeworks       Homework[]
+  tests           Test[]
 
   @@index([curriculumTrackId])
 }
@@ -243,6 +245,7 @@ model Topic {
   chapter        Chapter         @relation(fields: [chapterId], references: [id])
   studyMaterials StudyMaterial[]
   homeworks      Homework[]
+  tests          Test[]
 
   @@index([chapterId])
 }
@@ -265,6 +268,7 @@ model AcademicSession {
   uploadReservations FileAsset[]     @relation("FileAssetSession")
   studyMaterials     StudyMaterial[]
   homeworks          Homework[]
+  tests              Test[]
 }
 
 model AuditLog {
@@ -306,6 +310,7 @@ model Batch {
   uploadReservations FileAsset[]     @relation("FileAssetBatch")
   studyMaterials     StudyMaterial[]
   homeworks          Homework[]
+  tests              Test[]
 }
 
 model BatchSchedule {
@@ -362,6 +367,7 @@ enum FileAssetLifecycleState {
 enum FileUploadUsageCategory {
   STUDY_MATERIAL
   HOMEWORK
+  TEST
 }
 
 enum FileUploadScope {
@@ -389,6 +395,18 @@ enum StudyMaterialLifecycleState {
 }
 
 enum HomeworkLifecycleState {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}
+
+enum TestType {
+  CHAPTER_TEST
+  UNIT_TEST
+  FULL_SYLLABUS_TEST
+}
+
+enum TestLifecycleState {
   DRAFT
   PUBLISHED
   ARCHIVED
@@ -422,6 +440,7 @@ model FileAsset {
 
   studyMaterials StudyMaterial[]
   homeworks      Homework[]      @relation("FileAssetHomework")
+  tests          Test[]          @relation("FileAssetTest")
 }
 
 model StudyMaterial {
@@ -500,6 +519,41 @@ model Homework {
   chapter         Chapter?        @relation(fields: [chapterId], references: [id])
   topic           Topic?          @relation(fields: [topicId], references: [id])
   fileAsset       FileAsset?      @relation("FileAssetHomework", fields: [fileAssetId], references: [id])
+
+  @@index([academicSessionId, curriculumTrackId, lifecycleState])
+  @@index([batchId, lifecycleState])
+}
+
+model Test {
+  id                  String             @id @default(uuid())
+  academicSessionId   String
+  curriculumTrackId   String
+  batchId             String
+  chapterId           String?
+  topicId             String?
+  title               String
+  description         String?
+  testType            TestType
+  testDate            DateTime
+  durationMinutes     Int?
+  maximumMarks        Int
+  syllabusDescription String?
+  questionPaperFileId String?
+  lifecycleState      TestLifecycleState @default(DRAFT)
+  publishedAt         DateTime?
+  createdAt           DateTime           @default(now())
+  updatedAt           DateTime           @updatedAt
+  archivedAt          DateTime?
+  createdBy           String?
+  updatedBy           String?
+  archivedBy          String?
+
+  academicSession AcademicSession @relation(fields: [academicSessionId], references: [id])
+  curriculumTrack CurriculumTrack @relation(fields: [curriculumTrackId], references: [id])
+  batch           Batch           @relation(fields: [batchId], references: [id])
+  chapter         Chapter?        @relation(fields: [chapterId], references: [id])
+  topic           Topic?          @relation(fields: [topicId], references: [id])
+  fileAsset       FileAsset?      @relation("FileAssetTest", fields: [questionPaperFileId], references: [id])
 
   @@index([academicSessionId, curriculumTrackId, lifecycleState])
   @@index([batchId, lifecycleState])

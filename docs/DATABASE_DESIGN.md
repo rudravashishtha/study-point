@@ -439,28 +439,45 @@ Future extension:
 
 ### Test
 
+Batch-scoped test scheduling and publication (Slice 5C). Track-wide tests are intentionally deferred; `batchId` is **required**.
+
 Important fields:
 
 - `id`.
-- `academicSessionId`.
-- `curriculumTrackId`.
-- `batchId`, nullable.
-- `chapterId`, nullable.
-- `topicId`, nullable.
-- `title`.
-- `testType`: chapter_test, unit_test, full_syllabus_test.
-- `testDate`.
-- `durationMinutes`, nullable.
-- `maximumMarks`.
-- `syllabusDescription`.
-- `questionPaperFileId`, nullable.
+- `academicSessionId` (derived server-side from the authoritative `batchId`; never client-supplied).
+- `curriculumTrackId` (derived server-side from the authoritative `batchId`; never client-supplied).
+- `batchId` (required, non-null). Server loads the `Batch` and derives `academicSessionId`/`curriculumTrackId`.
+- `chapterId`, nullable. Must belong to `curriculumTrackId` when present.
+- `topicId`, nullable. Must belong to `chapterId` (or `curriculumTrackId` when no chapter) when present.
+- `title` (required).
+- `description`, nullable.
+- `testType`: `CHAPTER_TEST`, `UNIT_TEST`, `FULL_SYLLABUS_TEST` (UPPERCASE enum, matching Prisma schema convention).
+- `testDate` (`DateTime`, scheduled start date and time).
+- `durationMinutes`, nullable `Int`.
+- `maximumMarks` (`Int`, required, positive — enforced in the service layer; see Important Constraints).
+- `syllabusDescription`, nullable.
+- `questionPaperFileId`, nullable (`FileAsset` relation, `usageCategory = TEST`).
+- `lifecycleState`: `DRAFT`, `PUBLISHED`, `ARCHIVED` (`TestLifecycleState` enum). New test starts `DRAFT`; publish sets `publishedAt`; archived is terminal.
 - `publishedAt`, nullable.
 - `archivedAt`, `archivedBy`.
-- Metadata fields.
+- `createdBy`, `updatedBy`, `archivedBy` (String audit IDs, project convention).
 
-Future extension:
+Constraints:
 
-- Add `TestResult` later with `testId` and `enrolmentId`. Avoid redundant `studentId` unless a snapshot is explicitly justified.
+- `maximumMarks` must be positive (service-enforced; not a DB CHECK in this slice).
+- `chapterId`/`topicId` must belong to the test's `curriculumTrackId`.
+- `questionPaperFileId` must reference an `ACTIVE` `FileAsset` with `usageCategory = TEST` and `targetBatchId === test.batchId` (anti-swapping rule).
+- Attachment binding: a `TEST` asset cannot attach to Study Materials, and a `STUDY_MATERIAL`/`HOMEWORK` asset cannot attach to a Test.
+
+Indexes:
+
+- `[academicSessionId, curriculumTrackId, lifecycleState]`
+- `[batchId, lifecycleState]`
+
+Future extension (deferred):
+
+- `TestResult` later with `testId` and `enrolmentId`. Avoid redundant `studentId` unless a snapshot is explicitly justified.
+- Student question-paper download/release semantics: deferred pending product decision B9.1.
 
 ### Question
 

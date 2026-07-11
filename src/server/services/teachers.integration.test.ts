@@ -35,6 +35,7 @@ beforeAll(async () => {
   await testDb.auditLog.deleteMany({});
   await testDb.teacherAssignment.deleteMany({});
   await testDb.homework.deleteMany({});
+  await testDb.test.deleteMany({});
   await testDb.batch.deleteMany({});
   await testDb.teacher.deleteMany({});
   await testDb.enrolment.deleteMany({});
@@ -68,6 +69,7 @@ afterAll(async () => {
     await testDb.auditLog.deleteMany({});
     await testDb.teacherAssignment.deleteMany({});
     await testDb.homework.deleteMany({});
+    await testDb.test.deleteMany({});
     await testDb.batch.deleteMany({});
     await testDb.teacher.deleteMany({});
     await testDb.enrolment.deleteMany({});

@@ -29,6 +29,7 @@ describe.skipIf(!isTestConfigured)("Inspect P2002", () => {
     await testDb.enrolment.deleteMany({});
     await testDb.batchSchedule.deleteMany({});
     await testDb.teacherAssignment.deleteMany({});
+    await testDb.test.deleteMany({});
     await testDb.batch.deleteMany({});
     await testDb.topic.deleteMany({});
     await testDb.chapter.deleteMany({});
@@ -45,6 +46,7 @@ describe.skipIf(!isTestConfigured)("Inspect P2002", () => {
       await testDb.enrolment.deleteMany({});
       await testDb.batchSchedule.deleteMany({});
       await testDb.teacherAssignment.deleteMany({});
+      await testDb.test.deleteMany({});
       await testDb.batch.deleteMany({});
       await testDb.topic.deleteMany({});
       await testDb.chapter.deleteMany({});
