@@ -2,7 +2,7 @@
 
 Phase: 0 research and planning.
 Status: Draft for human review.
-Last reviewed: 2026-07-07.
+Last reviewed: 2026-07-11.
 
 ## Product Goal
 

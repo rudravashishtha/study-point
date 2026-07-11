@@ -2,7 +2,7 @@
 
 Phase: 0 research and planning.
 Status: Draft for human review.
-Last reviewed: 2026-07-07.
+Last reviewed: 2026-07-11.
 
 ## Phase 0 Findings
 
@@ -226,7 +226,7 @@ Validation gate:
 
 Scope:
 
-- Slice 5A (Active): File Storage & Study Materials
+- Slice 5A (Completed): File Storage & Study Materials
   - Storage bucket operational setup and intent -> signed URL -> finalization flow.
   - StudyMaterial and FileAsset schema with strict discriminator scoping (BATCH vs CURRICULUM_TRACK).
   - Deterministic cleanup and orphan tracking.
@@ -234,7 +234,7 @@ Scope:
   - Deferred Teacher photo updates.
 - Attendance (Deferred)
 - Batch Curriculum Progress (Deferred)
-- Slice 5B (Active): Assignments / Homework
+- Slice 5B (Completed): Assignments / Homework
   - Strictly Batch-scoped Homework assignments.
   - Server-side derivation of session and track from authoritative Batch.
   - Schema additions for `Homework` and `HomeworkLifecycleState`.
@@ -244,8 +244,16 @@ Scope:
   - Admin/Teacher (Batch-scoped) CRUD via Dialogs.
   - Student read-only UI for published assignments across active enrolments.
   - Overdue assignments remain visible and marked as overdue.
-  - Submissions, grading, reminders, tests, and question bank are explicitly deferred.
-- Tests & Results (Deferred)
+- Slice 5C (Completed): Test Management
+  - Batch-scoped test scheduling and publication.
+  - Schema: Test model, TestType enum, TestLifecycleState enum.
+  - Reuses FileAsset upload mechanics with strict usage category binding (TEST) and targetBatch matching.
+  - Lifecycle: DRAFT, PUBLISHED, ARCHIVED (terminal).
+  - Admin/Teacher (Batch-scoped) CRUD via Dialogs.
+  - Student read-only UI for published tests across active enrolments.
+  - Question paper download via authorized route handler.
+- Submissions, grading, and reminders are explicitly deferred.
+- Results (Deferred)
 - Teacher-facing operational workflows (Deferred)
 - Question bank (Deferred)
 - LaTeX rendering with source text preserved (Deferred)
@@ -254,9 +262,12 @@ Validation gate:
 
 - Authorization tests for material visibility by session, curriculum track, and batch.
 - Teacher contextual permission tests (manage vs. view).
-- Question validation tests.
 - File upload validation review.
 - Mobile checks for content management.
+
+### Next Planned Slice
+
+The next phase defined in the roadmap is **Phase 6: Bulk Imports**. Deferred Phase 5 items (Attendance, Batch Curriculum Progress, Submissions/Grading/Reminders, Results, Teacher-facing operational workflows, Question bank, and LaTeX rendering) remain deferred until after Phase 6 and subsequent phases.
 
 ## Phase 6: Bulk Imports
 
@@ -455,7 +466,9 @@ E2E tests:
   - Slice 4D (Teacher Management & Assignments): Completed.
   - Slice 4E (Student Provisioning): Completed.
 - Phase 5: Active.
-  - Slice 5A (File Storage & Study Materials): Documentation Updated. Awaiting Schema Checkpoint -> Migration Proofs -> Operational Bucket Check -> Backend -> UI.
+  - Slice 5A (File Storage & Study Materials): Completed.
+  - Slice 5B (Assignments / Homework): Completed.
+  - Slice 5C (Test Management): Completed.
 
 ## Phase 0 Stop
 
