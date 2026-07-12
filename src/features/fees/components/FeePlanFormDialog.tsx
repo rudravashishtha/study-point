@@ -132,7 +132,7 @@ export function FeePlanFormDialog({
     value: string | number,
   ) => {
     const updated = [...instalments];
-    (updated[index] as any)[field] = value;
+    updated[index] = { ...updated[index], [field]: value };
     setInstalments(updated);
   };
 

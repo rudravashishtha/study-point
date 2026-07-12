@@ -2,16 +2,6 @@
 
 import { ExternalLink, MapPin } from "lucide-react";
 
-const DAY_LABELS = [
-  "Sunday",
-  "Monday",
-  "Tuesday",
-  "Wednesday",
-  "Thursday",
-  "Friday",
-  "Saturday",
-];
-
 function formatTime(time: string): string {
   const [h, m] = time.split(":");
   const hour = parseInt(h, 10);
@@ -26,7 +16,19 @@ export function StudentTimetableGrid({
   groups: {
     dayOfWeek: number;
     dayLabel: string;
-    schedules: any[];
+    schedules: {
+      id: string;
+      startTime: string;
+      endTime: string;
+      roomOrLocation?: string | null;
+      liveClassUrl?: string | null;
+      batch?: {
+        name: string;
+        curriculumTrack?: {
+          subject?: { name: string };
+        };
+      };
+    }[];
   }[];
 }) {
   if (groups.length === 0) return null;

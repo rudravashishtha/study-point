@@ -183,12 +183,18 @@ export function StudentImportWizard() {
       if (errRes.ok) {
         const errData = await errRes.json();
         if (errData.errors && Array.isArray(errData.errors)) {
-          return errData.errors.map((e: any) => ({
-            rowNumber: e.rowNumber,
-            status: "ERROR" as const,
-            data: e.data,
-            errors: e.problems,
-          }));
+          return errData.errors.map(
+            (e: {
+              rowNumber: number;
+              data: Record<string, string>;
+              problems: Array<{ column: string; problem: string; expectedValue: string }>;
+            }) => ({
+              rowNumber: e.rowNumber,
+              status: "ERROR" as const,
+              data: e.data,
+              errors: e.problems,
+            }),
+          );
         }
       }
       return null;

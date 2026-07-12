@@ -1,15 +1,13 @@
 "use client";
+"use no memo";
 
 import React, { useTransition, useEffect } from "react";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
-import { useForm, Controller } from "react-hook-form";
+import { useForm, Controller, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { CurriculumTrack, Board, Programme, Subject } from "@prisma/client";
-import {
-  createCurriculumTrackSchema,
-  updateCurriculumTrackSchema,
-} from "@/lib/validation/curriculum";
+import { createCurriculumTrackSchema } from "@/lib/validation/curriculum";
 import {
   createTrackAction,
   updateTrackAction,
@@ -40,14 +38,11 @@ export function TrackFormDialog({
     register,
     handleSubmit,
     control,
-    watch,
     setValue,
     reset,
     formState: { errors },
-  } = useForm<any>({
-    resolver: zodResolver(
-      track ? updateCurriculumTrackSchema : createCurriculumTrackSchema,
-    ),
+  } = useForm<CreateInput>({
+    resolver: zodResolver(createCurriculumTrackSchema),
     defaultValues: {
       boardId: track?.boardId || "",
       programmeId: track?.programmeId || null,
@@ -57,11 +52,10 @@ export function TrackFormDialog({
     },
   });
 
-  const selectedBoardId = watch("boardId");
+  const selectedBoardId = useWatch({ control, name: "boardId" });
   const selectedBoard = boards.find((b) => b.id === selectedBoardId);
-  const selectedProgrammeId = watch("programmeId");
-  const selectedProgramme = programmes.find((p) => p.id === selectedProgrammeId);
-  const selectedClassLevel = watch("classLevel");
+  const selectedProgrammeId = useWatch({ control, name: "programmeId" });
+  const selectedClassLevel = useWatch({ control, name: "classLevel" });
 
   useEffect(() => {
     if (open) {

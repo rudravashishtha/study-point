@@ -1,6 +1,6 @@
 import { PrismaClient } from "@prisma/client";
 import { Pool } from "pg";
-import { config } from "dotenv";
+
 import * as util from "util";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { extractPrismaConstraintName } from "../src/lib/db/errors";
@@ -91,14 +91,29 @@ async function main() {
     });
 
     console.log("FAIL: Expected P2002 error, but insert succeeded");
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.log("--- RAW FULL ERROR DUMP ---");
     console.log(util.inspect(error, { depth: null, colors: true }));
 
-    const driverCause = error.meta?.driverAdapterError?.cause;
+    const e = error as {
+      code?: string;
+      message?: string;
+      meta?: {
+        target?: string;
+        driverAdapterError?: {
+          cause?: {
+            originalCode?: string;
+            originalMessage?: string;
+            kind?: string;
+            constraint?: string;
+          };
+        };
+      };
+    };
+    const driverCause = e.meta?.driverAdapterError?.cause;
     console.log("\n--- EXTRACTED RAW FIELDS ---");
-    console.log("error.code:", error.code);
-    console.log("error.meta.target:", error.meta?.target);
+    console.log("error.code:", e.code);
+    console.log("error.meta.target:", e.meta?.target);
     console.log(
       "error.meta.driverAdapterError.cause.originalCode:",
       driverCause?.originalCode,

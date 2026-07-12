@@ -164,22 +164,24 @@ export async function createEnrolment(
       { isolationLevel: Prisma.TransactionIsolationLevel.Serializable },
     );
     return { success: true, data: created };
-  } catch (error: any) {
-    if (error.message === "CAPACITY_EXCEEDED") {
+  } catch (error: unknown) {
+    if (error instanceof Error && error.message === "CAPACITY_EXCEEDED") {
       return {
         success: false,
         error: { code: "CAPACITY_EXCEEDED", message: "Batch capacity exceeded" },
       };
     }
-    const constraintName = extractPrismaConstraintName(error);
-    if (constraintName === "Enrolment_student_session_track_key") {
-      return {
-        success: false,
-        error: {
-          code: "DUPLICATE_IDENTITY",
-          message: "Student is already enrolled in this track for this session",
-        },
-      };
+    if (error instanceof Prisma.PrismaClientKnownRequestError) {
+      const constraintName = extractPrismaConstraintName(error);
+      if (constraintName === "Enrolment_student_session_track_key") {
+        return {
+          success: false,
+          error: {
+            code: "DUPLICATE_IDENTITY",
+            message: "Student is already enrolled in this track for this session",
+          },
+        };
+      }
     }
     if (isConcurrencyConflict(error)) {
       return {
@@ -199,7 +201,8 @@ export async function createEnrolment(
         },
       };
     }
-    return { success: false, error: { code: "INTERNAL_ERROR", message: error.message } };
+    const message = error instanceof Error ? error.message : "Unknown error";
+    return { success: false, error: { code: "INTERNAL_ERROR", message } };
   }
 }
 
@@ -314,8 +317,8 @@ export async function updateEnrolment(
       { isolationLevel: Prisma.TransactionIsolationLevel.Serializable },
     );
     return { success: true, data: updated };
-  } catch (error: any) {
-    if (error.message === "CAPACITY_EXCEEDED") {
+  } catch (error: unknown) {
+    if (error instanceof Error && error.message === "CAPACITY_EXCEEDED") {
       return {
         success: false,
         error: { code: "CAPACITY_EXCEEDED", message: "Batch capacity exceeded" },
@@ -339,7 +342,8 @@ export async function updateEnrolment(
         },
       };
     }
-    return { success: false, error: { code: "INTERNAL_ERROR", message: error.message } };
+    const message = error instanceof Error ? error.message : "Unknown error";
+    return { success: false, error: { code: "INTERNAL_ERROR", message } };
   }
 }
 
@@ -373,8 +377,9 @@ export async function archiveEnrolment(id: string): Promise<ServiceResult<Enrolm
       return updated;
     });
     return { success: true, data: archived };
-  } catch (error: any) {
-    return { success: false, error: { code: "INTERNAL_ERROR", message: error.message } };
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : "Unknown error";
+    return { success: false, error: { code: "INTERNAL_ERROR", message } };
   }
 }
 
@@ -431,22 +436,24 @@ export async function restoreEnrolment(id: string): Promise<ServiceResult<Enrolm
       { isolationLevel: Prisma.TransactionIsolationLevel.Serializable },
     );
     return { success: true, data: restored };
-  } catch (error: any) {
-    if (error.message === "CAPACITY_EXCEEDED") {
+  } catch (error: unknown) {
+    if (error instanceof Error && error.message === "CAPACITY_EXCEEDED") {
       return {
         success: false,
         error: { code: "CAPACITY_EXCEEDED", message: "Batch capacity exceeded" },
       };
     }
-    const constraintName = extractPrismaConstraintName(error);
-    if (constraintName === "Enrolment_student_session_track_key") {
-      return {
-        success: false,
-        error: {
-          code: "DUPLICATE_IDENTITY",
-          message: "Student is already enrolled in this track for this session",
-        },
-      };
+    if (error instanceof Prisma.PrismaClientKnownRequestError) {
+      const constraintName = extractPrismaConstraintName(error);
+      if (constraintName === "Enrolment_student_session_track_key") {
+        return {
+          success: false,
+          error: {
+            code: "DUPLICATE_IDENTITY",
+            message: "Student is already enrolled in this track for this session",
+          },
+        };
+      }
     }
     if (isConcurrencyConflict(error)) {
       return {
@@ -457,7 +464,8 @@ export async function restoreEnrolment(id: string): Promise<ServiceResult<Enrolm
         },
       };
     }
-    return { success: false, error: { code: "INTERNAL_ERROR", message: error.message } };
+    const message = error instanceof Error ? error.message : "Unknown error";
+    return { success: false, error: { code: "INTERNAL_ERROR", message } };
   }
 }
 export async function assignToBatch(

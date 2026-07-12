@@ -10,6 +10,8 @@ import {
   CreateStudyMaterialInput,
   UpdateStudyMaterialInput,
 } from "@/server/services/study-materials";
+import { failure } from "@/server/services/types";
+import { db } from "@/lib/db";
 import {
   createHomework,
   updateHomework,
@@ -76,15 +78,28 @@ export async function archiveTeacherHomeworkAction(batchId: string, id: string) 
 
 export async function createTeacherMaterialAction(
   batchId: string,
-  input: Omit<CreateStudyMaterialInput, "visibility" | "batchId">,
+  input: Omit<
+    CreateStudyMaterialInput,
+    "visibility" | "batchId" | "academicSessionId" | "curriculumTrackId"
+  >,
 ) {
   const user = await requireAppUser();
   await requireTeacherPermission(batchId, "MATERIALS_MANAGE");
+
+  const batch = await db.batch.findUnique({
+    where: { id: batchId },
+    select: { academicSessionId: true, curriculumTrackId: true },
+  });
+  if (!batch) {
+    return failure("NOT_FOUND", "Batch not found");
+  }
 
   const payload: CreateStudyMaterialInput = {
     ...input,
     visibility: "BATCH",
     batchId,
+    academicSessionId: batch.academicSessionId,
+    curriculumTrackId: batch.curriculumTrackId,
   };
 
   const res = await createStudyMaterial(user.id, payload);
@@ -97,7 +112,10 @@ export async function createTeacherMaterialAction(
 export async function updateTeacherMaterialAction(
   batchId: string,
   id: string,
-  input: Omit<UpdateStudyMaterialInput, "visibility" | "batchId">,
+  input: Omit<
+    UpdateStudyMaterialInput,
+    "visibility" | "batchId" | "academicSessionId" | "curriculumTrackId"
+  >,
 ) {
   const user = await requireAppUser();
   await requireTeacherPermission(batchId, "MATERIALS_MANAGE");

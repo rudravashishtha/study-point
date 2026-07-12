@@ -45,7 +45,10 @@ export async function updateStudentAction(
 ): Promise<ActionResult> {
   try {
     const actor = await getActor();
-    const parsed = updateStudentSchema.parse({ id, ...(data as any) });
+    const parsed = updateStudentSchema.parse({
+      id,
+      ...(data as Record<string, unknown>),
+    });
     await updateStudent(parsed, actor.userId);
     revalidatePath("/admin/students");
     return { success: true, data: undefined };

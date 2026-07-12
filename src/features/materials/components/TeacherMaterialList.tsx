@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { StudyMaterialLifecycleState, StudyMaterialResourceType } from "@prisma/client";
 import {
   Table,
   TableBody,
@@ -35,18 +34,45 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
+export interface TeacherMaterialItem {
+  id: string;
+  title: string;
+  description?: string | null;
+  resourceType: string;
+  visibility?: string;
+  lifecycleState: string;
+  fileAssetId?: string | null;
+  externalLinkUrl?: string | null;
+  chapterId?: string | null;
+  topicId?: string | null;
+  createdAt: string | Date;
+}
+
+export interface TeacherChapterItem {
+  id: string;
+  name: string;
+  topics?: { id: string; name: string }[];
+}
+
+interface ActionResult {
+  success: boolean;
+  error?: { message: string };
+}
+
 export function TeacherMaterialList({
   materials,
   chapters,
   batchId,
   canManage,
 }: {
-  materials: any[];
-  chapters: any[];
+  materials: TeacherMaterialItem[];
+  chapters: TeacherChapterItem[];
   batchId: string;
   canManage: boolean;
 }) {
-  const [editingMaterial, setEditingMaterial] = useState<any>(null);
+  const [editingMaterial, setEditingMaterial] = useState<TeacherMaterialItem | null>(
+    null,
+  );
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [search, setSearch] = useState("");
   const [filterState, setFilterState] = useState<string>("ALL");
@@ -57,16 +83,20 @@ export function TeacherMaterialList({
     return true;
   });
 
-  const handleAction = async (action: () => Promise<any>, successMsg: string) => {
+  const handleAction = async (
+    action: () => Promise<ActionResult>,
+    successMsg: string,
+  ) => {
     try {
       const res = await action();
       if (!res.success) {
-        toast.error("Error", { description: res.error.message });
+        toast.error("Error", { description: res.error?.message });
         return;
       }
       toast.success("Success", { description: successMsg });
-    } catch (e: any) {
-      toast.error("Error", { description: e.message });
+    } catch (e: unknown) {
+      const message = e instanceof Error ? e.message : "Unknown error";
+      toast.error("Error", { description: message });
     }
   };
 

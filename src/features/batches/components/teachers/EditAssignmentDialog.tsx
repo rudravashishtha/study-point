@@ -49,9 +49,9 @@ export function EditAssignmentDialog({
         toast.success("Success", { description: "Permissions updated successfully." });
         onOpenChange(false);
       }
-    } catch (e: any) {
+    } catch (e: unknown) {
       toast.error("Error", {
-        description: e.message || "An unexpected error occurred",
+        description: e instanceof Error ? e.message : "An unexpected error occurred",
       });
     } finally {
       setIsSubmitting(false);

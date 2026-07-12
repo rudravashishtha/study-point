@@ -12,10 +12,8 @@ import {
   DropdownMenuTrigger,
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
-import { Teacher } from "@prisma/client";
 import { TeacherFormDialog } from "./TeacherFormDialog";
 import { useRouter } from "next/navigation";
-import { updateTeacherAction } from "@/app/admin/teachers/actions";
 import { toast } from "sonner";
 
 import { TeacherWithAppUser } from "./TeacherList";
@@ -62,9 +60,10 @@ export function TeacherRowActions({ teacher, onActionComplete }: TeacherRowActio
         router.refresh();
         onActionComplete?.();
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       toast.error("Action Failed", {
-        description: error.message || "An unexpected error occurred",
+        description:
+          error instanceof Error ? error.message : "An unexpected error occurred",
       });
     } finally {
       setIsProcessing(false);
@@ -88,9 +87,10 @@ export function TeacherRowActions({ teacher, onActionComplete }: TeacherRowActio
         router.refresh();
         onActionComplete?.();
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       toast.error("Action Failed", {
-        description: error.message || "An unexpected error occurred",
+        description:
+          error instanceof Error ? error.message : "An unexpected error occurred",
       });
     } finally {
       setIsProcessing(false);

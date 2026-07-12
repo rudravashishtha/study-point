@@ -2,6 +2,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { TestType } from "@prisma/client";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -17,22 +18,65 @@ import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import { createAdminTestAction, updateAdminTestAction } from "@/app/admin/tests/actions";
 import { TestUpload } from "@/components/upload/TestUpload";
-import { TestType } from "@prisma/client";
+
+interface TestFormBatch {
+  id: string;
+  name: string;
+  archivedAt?: Date | string | null;
+}
+
+interface TestFormSession {
+  id: string;
+  name: string;
+}
+
+interface TestFormTrack {
+  id: string;
+  name?: string;
+}
+
+interface TestFormData {
+  id: string;
+  title: string;
+  description?: string | null;
+  batchId: string;
+  testType: string;
+  testDate: string | Date;
+  durationMinutes?: number | null;
+  maximumMarks: number;
+  syllabusDescription?: string | null;
+  chapterId?: string | null;
+  topicId?: string | null;
+  questionPaperFileId?: string | null;
+  fileAssetId?: string | null;
+}
+
+interface TestFormPayload {
+  batchId: string;
+  title: string;
+  description: string | null;
+  testType: TestType;
+  testDate: string;
+  maximumMarks: number;
+  durationMinutes: number | null;
+  syllabusDescription: string | null;
+  chapterId: string | null;
+  topicId: string | null;
+  questionPaperFileId?: string;
+}
 
 export function TestFormDialog({
   open,
   onOpenChange,
   test,
-  sessions,
   batches,
-  tracks,
 }: {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  test?: any;
-  sessions: any[];
-  batches: any[];
-  tracks: any[];
+  test?: TestFormData;
+  sessions: TestFormSession[];
+  batches: TestFormBatch[];
+  tracks: TestFormTrack[];
 }) {
   const [loading, setLoading] = useState(false);
 
@@ -77,11 +121,11 @@ export function TestFormDialog({
       if (!maximumMarks || parseInt(maximumMarks) < 1)
         throw new Error("Valid maximum marks is required");
 
-      const payload: any = {
+      const payload: TestFormPayload = {
         batchId,
         title: title.trim(),
         description: description.trim() || null,
-        testType,
+        testType: testType as TestType,
         testDate: new Date(testDate).toISOString(),
         maximumMarks: parseInt(maximumMarks),
         durationMinutes: durationMinutes ? parseInt(durationMinutes) : null,
@@ -101,8 +145,9 @@ export function TestFormDialog({
       }
       toast.success("Success", { description: "Test saved" });
       onOpenChange(false);
-    } catch (e: any) {
-      toast.error("Error", { description: e.message });
+    } catch (e: unknown) {
+      const message = e instanceof Error ? e.message : "Unknown error";
+      toast.error("Error", { description: message });
     } finally {
       setLoading(false);
     }
@@ -126,7 +171,7 @@ export function TestFormDialog({
                 <SelectValue placeholder="Select batch" />
               </SelectTrigger>
               <SelectContent>
-                {batches.map((b: any) => (
+                {batches.map((b) => (
                   <SelectItem key={b.id} value={b.id}>
                     {b.name}
                     {b.archivedAt ? " (Archived)" : ""}

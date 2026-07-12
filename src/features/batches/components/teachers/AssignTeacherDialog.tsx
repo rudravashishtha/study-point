@@ -65,9 +65,9 @@ export function AssignTeacherDialog({
         setSelectedTeacherId("");
         setPermissions([]);
       }
-    } catch (e: any) {
+    } catch (e: unknown) {
       toast.error("Error", {
-        description: e.message || "An unexpected error occurred",
+        description: e instanceof Error ? e.message : "An unexpected error occurred",
       });
     } finally {
       setIsSubmitting(false);
@@ -76,7 +76,7 @@ export function AssignTeacherDialog({
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      {trigger && <DialogTrigger render={trigger as any} />}
+      {trigger && <DialogTrigger render={trigger as React.ReactElement} />}
       <DialogContent className="max-w-4xl w-[95vw] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Assign Teacher to Batch</DialogTitle>

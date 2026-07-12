@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { ArrowLeft, Users, Calendar } from "lucide-react";
+import { ArrowLeft, Users, Calendar, UserCheck } from "lucide-react";
 import { requireAdmin } from "@/lib/auth/permissions";
 import { getBatchById } from "@/server/services/batches";
 import { getBatchEnrolments } from "@/server/services/enrolments";
@@ -11,7 +11,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { BatchScheduleEditor } from "@/features/batches/components/BatchScheduleEditor";
 import { BatchMembershipTab } from "@/features/batches/components/BatchMembershipTab";
 import { BatchTeachersTab } from "@/features/batches/components/teachers/BatchTeachersTab";
-import { UserCheck } from "lucide-react";
+import { Batch, Enrolment, Student, TeacherAssignment, Teacher } from "@prisma/client";
+
+type EnrolmentWithStudent = Enrolment & { student: Student };
 
 export default async function BatchDetailPage({
   params,
@@ -84,21 +86,28 @@ export default async function BatchDetailPage({
           value="schedule"
           className="mt-0 border rounded-md p-6 bg-card text-card-foreground shadow-sm"
         >
-          <BatchScheduleEditor batch={batch as any} isArchived={isArchived} />
+          <BatchScheduleEditor
+            batch={
+              batch as Batch & { schedules: import("@prisma/client").BatchSchedule[] }
+            }
+            isArchived={isArchived}
+          />
         </TabsContent>
 
         <TabsContent value="members" className="mt-0">
           <BatchMembershipTab
-            batch={batch as any}
-            enrolments={enrolments as any}
+            batch={batch as Batch}
+            enrolments={enrolments as EnrolmentWithStudent[]}
             isArchived={isArchived}
           />
         </TabsContent>
 
         <TabsContent value="teachers" className="mt-0">
           <BatchTeachersTab
-            batch={batch as any}
-            assignments={teacherAssignments as any}
+            batch={batch as Batch}
+            assignments={
+              teacherAssignments as (TeacherAssignment & { teacher: Teacher })[]
+            }
             isArchived={isArchived}
           />
         </TabsContent>

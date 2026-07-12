@@ -40,13 +40,16 @@ export async function createTrackAction(data: unknown) {
 
     revalidatePath("/admin/curriculum/curriculum-tracks");
     return { success: true };
-  } catch (error: any) {
-    if (error.name === "ZodError") {
-      return { success: false, error: error.errors[0].message };
+  } catch (error: unknown) {
+    if (error instanceof Error && error.name === "ZodError") {
+      return {
+        success: false,
+        error: (error as unknown as { errors: { message: string }[] }).errors[0].message,
+      };
     }
     return {
       success: false,
-      error: error.message || "Failed to create curriculum track",
+      error: error instanceof Error ? error.message : "Failed to create curriculum track",
     };
   }
 }
@@ -60,13 +63,16 @@ export async function updateTrackAction(id: string, data: unknown) {
 
     revalidatePath("/admin/curriculum/curriculum-tracks");
     return { success: true };
-  } catch (error: any) {
-    if (error.name === "ZodError") {
-      return { success: false, error: error.errors[0].message };
+  } catch (error: unknown) {
+    if (error instanceof Error && error.name === "ZodError") {
+      return {
+        success: false,
+        error: (error as unknown as { errors: { message: string }[] }).errors[0].message,
+      };
     }
     return {
       success: false,
-      error: error.message || "Failed to update curriculum track",
+      error: error instanceof Error ? error.message : "Failed to update curriculum track",
     };
   }
 }
@@ -78,10 +84,11 @@ export async function archiveTrackAction(id: string) {
 
     revalidatePath("/admin/curriculum/curriculum-tracks");
     return { success: true };
-  } catch (error: any) {
+  } catch (error: unknown) {
     return {
       success: false,
-      error: error.message || "Failed to archive curriculum track",
+      error:
+        error instanceof Error ? error.message : "Failed to archive curriculum track",
     };
   }
 }
@@ -93,10 +100,11 @@ export async function restoreTrackAction(id: string) {
 
     revalidatePath("/admin/curriculum/curriculum-tracks");
     return { success: true };
-  } catch (error: any) {
+  } catch (error: unknown) {
     return {
       success: false,
-      error: error.message || "Failed to restore curriculum track",
+      error:
+        error instanceof Error ? error.message : "Failed to restore curriculum track",
     };
   }
 }

@@ -6,12 +6,14 @@ import {
   updateBatch,
   archiveBatch,
   restoreBatch,
+  type CreateBatchInput,
+  type UpdateBatchInput,
 } from "@/server/services/batches";
 import { requireAdmin } from "@/lib/auth/permissions";
 
-export async function createBatchAction(data: any) {
-  const actorUserId = await requireAdmin();
-  const result = await createBatch({ ...data, actorUserId });
+export async function createBatchAction(data: CreateBatchInput) {
+  await requireAdmin();
+  const result = await createBatch(data);
 
   if (result.success) {
     revalidatePath("/admin/batches");
@@ -19,14 +21,15 @@ export async function createBatchAction(data: any) {
   return result;
 }
 
-export async function updateBatchDetailsAction(id: string, data: any) {
-  const actorUserId = await requireAdmin();
+export async function updateBatchDetailsAction(id: string, data: UpdateBatchInput) {
+  await requireAdmin();
 
   // We explicitly DO NOT send 'schedules' to ensure the updateBatch
   // service safely preserves existing schedules.
-  const { schedules, ...detailsOnly } = data;
+  const detailsOnly = { ...data };
+  delete detailsOnly.schedules;
 
-  const result = await updateBatch(id, { ...detailsOnly, actorUserId });
+  const result = await updateBatch(id, detailsOnly);
 
   if (result.success) {
     revalidatePath("/admin/batches");

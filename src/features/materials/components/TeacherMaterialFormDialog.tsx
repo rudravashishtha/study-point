@@ -1,5 +1,6 @@
-/* eslint-disable */
 "use client";
+
+/* eslint-disable react-hooks/set-state-in-effect */
 
 import { useEffect, useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -14,12 +15,19 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { StudyMaterialResourceType } from "@prisma/client";
+import type { CreateStudyMaterialInput } from "@/server/services/study-materials";
+import type { TeacherMaterialItem, TeacherChapterItem } from "./TeacherMaterialList";
 import { toast } from "sonner";
 import {
   createTeacherMaterialAction,
   updateTeacherMaterialAction,
 } from "@/app/teacher/batches/[batchId]/actions";
 import { StudyMaterialUpload } from "@/components/upload/StudyMaterialUpload";
+
+type TeacherMaterialCreateInput = Omit<
+  CreateStudyMaterialInput,
+  "visibility" | "batchId" | "academicSessionId" | "curriculumTrackId"
+>;
 
 export function TeacherMaterialFormDialog({
   open,
@@ -30,9 +38,9 @@ export function TeacherMaterialFormDialog({
 }: {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  material?: any;
+  material?: TeacherMaterialItem | null;
   batchId: string;
-  chapters: any[];
+  chapters: TeacherChapterItem[];
 }) {
   const [loading, setLoading] = useState(false);
 
@@ -46,16 +54,17 @@ export function TeacherMaterialFormDialog({
   const [externalLinkUrl, setExternalLinkUrl] = useState("");
   const [fileAssetId, setFileAssetId] = useState("");
 
-  // eslint-disable-next-line
   useEffect(() => {
     if (open) {
-      setTitle(material?.title || "");
-      setDescription(material?.description || "");
-      setResourceType(material?.resourceType || "DOCUMENT");
-      setChapterId(material?.chapterId || "none");
-      setTopicId(material?.topicId || "none");
-      setExternalLinkUrl(material?.externalLinkUrl || "");
-      setFileAssetId(material?.fileAssetId || "");
+      setTitle((material?.title as string) || "");
+      setDescription((material?.description as string) || "");
+      setResourceType(
+        (material?.resourceType as StudyMaterialResourceType) || "DOCUMENT",
+      );
+      setChapterId((material?.chapterId as string) || "none");
+      setTopicId((material?.topicId as string) || "none");
+      setExternalLinkUrl((material?.externalLinkUrl as string) || "");
+      setFileAssetId((material?.fileAssetId as string) || "");
     }
   }, [open, material]);
 
@@ -64,7 +73,7 @@ export function TeacherMaterialFormDialog({
     setLoading(true);
 
     try {
-      const payload: any = {
+      const payload: TeacherMaterialCreateInput = {
         title,
         description: description || null,
         resourceType,
@@ -93,8 +102,10 @@ export function TeacherMaterialFormDialog({
       }
       toast.success("Success", { description: "Material saved" });
       onOpenChange(false);
-    } catch (e: any) {
-      toast.error("Error", { description: e.message });
+    } catch (e: unknown) {
+      toast.error("Error", {
+        description: e instanceof Error ? e.message : "Unknown error",
+      });
     } finally {
       setLoading(false);
     }
@@ -189,7 +200,7 @@ export function TeacherMaterialFormDialog({
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="none">-- No Topic --</SelectItem>
-                  {topics.map((t: any) => (
+                  {topics.map((t: { id: string; name: string }) => (
                     <SelectItem key={t.id} value={t.id}>
                       {t.name}
                     </SelectItem>

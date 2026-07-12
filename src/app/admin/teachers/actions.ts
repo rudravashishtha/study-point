@@ -44,8 +44,10 @@ export async function createTeacherAction(data: CreateTeacherParams) {
     }
     revalidatePath("/admin/teachers");
     return { success: true, teacherId: result.data.id };
-  } catch (error: any) {
-    return { error: error.message || "An unexpected error occurred" };
+  } catch (error: unknown) {
+    return {
+      error: error instanceof Error ? error.message : "An unexpected error occurred",
+    };
   }
 }
 
@@ -71,8 +73,10 @@ export async function updateTeacherAction(id: string, data: UpdateTeacherParams)
     revalidatePath("/admin/teachers");
     revalidatePath(`/admin/teachers/${id}`);
     return { success: true };
-  } catch (error: any) {
-    return { error: error.message || "An unexpected error occurred" };
+  } catch (error: unknown) {
+    return {
+      error: error instanceof Error ? error.message : "An unexpected error occurred",
+    };
   }
 }
 
@@ -92,8 +96,10 @@ export async function archiveTeacherAction(id: string) {
     revalidatePath("/admin/teachers");
     revalidatePath(`/admin/teachers/${id}`);
     return { success: true };
-  } catch (error: any) {
-    return { error: error.message || "An unexpected error occurred" };
+  } catch (error: unknown) {
+    return {
+      error: error instanceof Error ? error.message : "An unexpected error occurred",
+    };
   }
 }
 
@@ -107,8 +113,10 @@ export async function restoreTeacherAction(id: string) {
     revalidatePath("/admin/teachers");
     revalidatePath(`/admin/teachers/${id}`);
     return { success: true };
-  } catch (error: any) {
-    return { error: error.message || "An unexpected error occurred" };
+  } catch (error: unknown) {
+    return {
+      error: error instanceof Error ? error.message : "An unexpected error occurred",
+    };
   }
 }
 
@@ -119,7 +127,7 @@ export async function inviteTeacherAction(id: string): Promise<ActionResult> {
     revalidatePath("/admin/teachers");
     revalidatePath(`/admin/teachers/${id}`);
     return { success: true, data: undefined };
-  } catch (error: any) {
+  } catch (error: unknown) {
     return handleActionError(error);
   }
 }

@@ -103,7 +103,7 @@ export async function getSiteSettings(): Promise<ServiceResult<SiteSettingsData>
       ...settings,
       socialLinks: (settings.socialLinks as Record<string, string> | null) ?? null,
     });
-  } catch (error) {
+  } catch {
     return failure("INTERNAL_ERROR", "Failed to fetch site settings");
   }
 }

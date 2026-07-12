@@ -1,3 +1,4 @@
+import { Prisma } from "@prisma/client";
 import { db } from "../../lib/db";
 import { ActorContext } from "../../lib/domain/actor";
 import { createAuditLog } from "../../lib/domain/audit";
@@ -110,7 +111,7 @@ export interface ListTeachersOptions {
 
 export async function listTeachers(options?: ListTeachersOptions) {
   const status = options?.status ?? "active";
-  const where: any = {};
+  const where: Prisma.TeacherWhereInput = {};
 
   if (status === "active") where.active = true;
   if (status === "inactive") where.active = false;

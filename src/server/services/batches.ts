@@ -276,7 +276,7 @@ export async function createBatch(
     });
 
     return { success: true, data: batch };
-  } catch (error: any) {
+  } catch (error: unknown) {
     if (error instanceof z.ZodError) {
       return {
         success: false,
@@ -286,7 +286,7 @@ export async function createBatch(
         },
       };
     }
-    if (error.code === "P2002") {
+    if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2002") {
       const constraint = extractPrismaConstraintName(error);
       if (constraint === "Batch_session_track_name_key") {
         return {
@@ -298,7 +298,8 @@ export async function createBatch(
         };
       }
     }
-    return { success: false, error: { code: "INTERNAL_ERROR", message: error.message } };
+    const message = error instanceof Error ? error.message : "Unknown error";
+    return { success: false, error: { code: "INTERNAL_ERROR", message } };
   }
 }
 
@@ -337,7 +338,8 @@ export async function updateBatch(
         };
       }
 
-      const { schedules: _schedules, ...primitiveUpdates } = data;
+      const { schedules: _, ...primitiveUpdates } = data;
+      void _;
 
       const batch = await tx.batch.update({
         where: { id },
@@ -374,7 +376,7 @@ export async function updateBatch(
     });
 
     return { success: true, data: updated };
-  } catch (error: any) {
+  } catch (error: unknown) {
     if (error instanceof z.ZodError) {
       return {
         success: false,
@@ -384,7 +386,7 @@ export async function updateBatch(
         },
       };
     }
-    if (error.code === "P2002") {
+    if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2002") {
       const constraint = extractPrismaConstraintName(error);
       if (constraint === "Batch_session_track_name_key") {
         return {
@@ -396,7 +398,8 @@ export async function updateBatch(
         };
       }
     }
-    return { success: false, error: { code: "INTERNAL_ERROR", message: error.message } };
+    const message = error instanceof Error ? error.message : "Unknown error";
+    return { success: false, error: { code: "INTERNAL_ERROR", message } };
   }
 }
 
@@ -450,8 +453,9 @@ export async function archiveBatch(id: string): Promise<ServiceResult<Batch>> {
     });
 
     return { success: true, data: updated };
-  } catch (error: any) {
-    return { success: false, error: { code: "INTERNAL_ERROR", message: error.message } };
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : "Unknown error";
+    return { success: false, error: { code: "INTERNAL_ERROR", message } };
   }
 }
 
@@ -484,8 +488,8 @@ export async function restoreBatch(id: string): Promise<ServiceResult<Batch>> {
     });
 
     return { success: true, data: updated };
-  } catch (error: any) {
-    if (error.code === "P2002") {
+  } catch (error: unknown) {
+    if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2002") {
       const constraint = extractPrismaConstraintName(error);
       if (constraint === "Batch_session_track_name_key") {
         return {
@@ -498,6 +502,7 @@ export async function restoreBatch(id: string): Promise<ServiceResult<Batch>> {
         };
       }
     }
-    return { success: false, error: { code: "INTERNAL_ERROR", message: error.message } };
+    const message = error instanceof Error ? error.message : "Unknown error";
+    return { success: false, error: { code: "INTERNAL_ERROR", message } };
   }
 }

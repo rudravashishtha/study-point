@@ -25,7 +25,7 @@ export async function inviteStudentAction(studentId: string): Promise<ActionResu
     await inviteStudent(actor, studentId);
     revalidatePath("/admin/students/activate");
     return { success: true, data: undefined };
-  } catch (error: any) {
+  } catch (error: unknown) {
     return handleActionError(error);
   }
 }

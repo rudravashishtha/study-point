@@ -88,9 +88,9 @@ export function TeacherFormDialog({
         router.refresh();
         onSuccess?.();
       }
-    } catch (e: any) {
+    } catch (e: unknown) {
       toast.error("Error", {
-        description: e.message || "An error occurred",
+        description: e instanceof Error ? e.message : "An error occurred",
       });
     } finally {
       setIsSubmitting(false);
@@ -99,7 +99,7 @@ export function TeacherFormDialog({
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      {trigger && <DialogTrigger render={trigger as any} />}
+      {trigger && <DialogTrigger render={trigger as React.ReactElement} />}
       <DialogContent className="max-w-3xl w-[95vw] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>

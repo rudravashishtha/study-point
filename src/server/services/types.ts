@@ -6,6 +6,6 @@ export function success<T>(data: T): ServiceResult<T> {
   return { success: true, data };
 }
 
-export function failure(code: string, message: string): ServiceResult<any> {
+export function failure(code: string, message: string): ServiceResult<never> {
   return { success: false, error: { code, message } };
 }

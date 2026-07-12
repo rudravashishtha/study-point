@@ -277,7 +277,7 @@ export async function getTeacherBatchAssignments(
   teacherId: string,
   options?: { includeArchived?: boolean },
 ) {
-  const where: any = { teacherId };
+  const where: Prisma.TeacherAssignmentWhereInput = { teacherId };
   if (!options?.includeArchived) {
     where.archivedAt = null;
   }

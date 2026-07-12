@@ -102,7 +102,10 @@ export default async function TeacherDetailPage({
               <div className="space-y-3">
                 {activeAssignments.map((assignment) => {
                   const effective = resolveEffectivePermissions(assignment.permissions);
-                  const track = assignment.batch.curriculumTrack as any;
+                  const track = assignment.batch.curriculumTrack as {
+                    subject: { name: string };
+                    classLevel: string;
+                  };
 
                   return (
                     <div
@@ -173,7 +176,10 @@ export default async function TeacherDetailPage({
               </div>
               <div className="space-y-3 opacity-70">
                 {historicalAssignments.map((assignment) => {
-                  const track = assignment.batch.curriculumTrack as any;
+                  const track = assignment.batch.curriculumTrack as {
+                    subject: { name: string };
+                    classLevel: string;
+                  };
                   return (
                     <div
                       key={assignment.id}

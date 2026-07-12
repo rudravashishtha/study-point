@@ -1,10 +1,4 @@
-import {
-  FileAsset,
-  FileAssetLifecycleState,
-  FileAssetStorageAccessClass,
-  FileUploadScope,
-  FileUploadUsageCategory,
-} from "@prisma/client";
+import { FileAsset, FileUploadScope, FileUploadUsageCategory } from "@prisma/client";
 import { z } from "zod";
 import { db as prisma } from "../../lib/db";
 import { ServiceResult, success, failure } from "./types";
@@ -253,7 +247,7 @@ export async function abandonUpload(
   });
 
   // Attempt to delete from storage as cleanup
-  const { data: removeData, error: removeError } = await supabaseAdmin.storage
+  const { error: removeError } = await supabaseAdmin.storage
     .from(BUCKET_NAME)
     .remove([asset.storageKey]);
 

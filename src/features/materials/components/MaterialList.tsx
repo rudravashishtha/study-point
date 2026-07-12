@@ -2,12 +2,6 @@
 
 import { useState } from "react";
 import {
-  StudyMaterial,
-  StudyMaterialLifecycleState,
-  StudyMaterialVisibility,
-  StudyMaterialResourceType,
-} from "@prisma/client";
-import {
   Table,
   TableBody,
   TableCell,
@@ -39,6 +33,33 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { StudyMaterialVisibility, StudyMaterialResourceType } from "@prisma/client";
+import type { MaterialFormBatch, MaterialFormTrack } from "./MaterialFormDialog";
+
+interface MaterialListItem {
+  id: string;
+  title: string;
+  description: string | null;
+  resourceType: StudyMaterialResourceType;
+  visibility: StudyMaterialVisibility;
+  lifecycleState: string;
+  createdAt: string | Date;
+  batchId: string | null;
+  academicSessionId: string;
+  curriculumTrackId: string;
+  externalLinkUrl: string | null;
+  fileAssetId: string | null;
+}
+
+interface MaterialListSession {
+  id: string;
+  name: string;
+}
+
+interface MaterialActionResult {
+  success: boolean;
+  error?: { message: string };
+}
 
 export function MaterialList({
   materials,
@@ -46,12 +67,12 @@ export function MaterialList({
   batches,
   tracks,
 }: {
-  materials: any[];
-  sessions: any[];
-  batches: any[];
-  tracks: any[];
+  materials: MaterialListItem[];
+  sessions: MaterialListSession[];
+  batches: MaterialFormBatch[];
+  tracks: MaterialFormTrack[];
 }) {
-  const [editingMaterial, setEditingMaterial] = useState<any>(null);
+  const [editingMaterial, setEditingMaterial] = useState<MaterialListItem | null>(null);
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [search, setSearch] = useState("");
   const [filterState, setFilterState] = useState<string>("ALL");
@@ -62,16 +83,21 @@ export function MaterialList({
     return true;
   });
 
-  const handleAction = async (action: () => Promise<any>, successMsg: string) => {
+  const handleAction = async (
+    action: () => Promise<MaterialActionResult>,
+    successMsg: string,
+  ) => {
     try {
       const res = await action();
       if (!res.success) {
-        toast.error("Error", { description: res.error.message });
+        toast.error("Error", { description: res.error?.message });
         return;
       }
       toast.success("Success", { description: successMsg });
-    } catch (e: any) {
-      toast.error("Error", { description: e.message });
+    } catch (e: unknown) {
+      toast.error("Error", {
+        description: e instanceof Error ? e.message : "Unknown error",
+      });
     }
   };
 

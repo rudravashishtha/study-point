@@ -1,13 +1,6 @@
-import { Teacher, AppUser } from "@prisma/client";
+import type { Teacher } from "@prisma/client";
 import { Badge } from "@/components/ui/badge";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
+import { TableCell, TableHead, TableRow } from "@/components/ui/table";
 import { DataListMobileShell } from "@/components/admin/data-list/DataListMobileShell";
 import { DataListTableShell } from "@/components/admin/data-list/DataListTableShell";
 import { DataListEmpty } from "@/components/admin/data-list/DataListEmpty";

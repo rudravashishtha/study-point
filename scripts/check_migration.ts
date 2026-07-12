@@ -34,7 +34,9 @@ async function main() {
         )
     `);
     console.log("Pre-migration indexes:");
-    indexes.rows.forEach((i: any) => console.log(i.indexname, "->", i.indexdef));
+    indexes.rows.forEach((i: { indexname: string; indexdef: string }) =>
+      console.log(i.indexname, "->", i.indexdef),
+    );
   } else if (mode === "post") {
     console.log("--- POST-MIGRATION PROOF (DEV DB) ---");
 
@@ -42,8 +44,11 @@ async function main() {
     try {
       await pool.query(`SELECT "teacherId" FROM "Batch" LIMIT 1`);
       console.log("1. Batch.teacherId STILL EXISTS (FAIL)");
-    } catch (e: any) {
-      console.log("1. Batch.teacherId check:", e.message);
+    } catch (e: unknown) {
+      console.log(
+        "1. Batch.teacherId check:",
+        e instanceof Error ? e.message : String(e),
+      );
     }
 
     // 2. 5 protected indexes
@@ -60,7 +65,9 @@ async function main() {
         )
     `);
     console.log("2. Post-migration protected indexes:");
-    indexes2.rows.forEach((i: any) => console.log(i.indexname, "->", i.indexdef));
+    indexes2.rows.forEach((i: { indexname: string; indexdef: string }) =>
+      console.log(i.indexname, "->", i.indexdef),
+    );
 
     // 3. TeacherAssignment_teacher_batch_key
     const taIndex = await pool.query(
@@ -76,10 +83,11 @@ async function main() {
       WHERE tc.table_name = 'TeacherAssignment'
     `);
     console.log("4. Foreign Keys:");
-    fks.rows.forEach((fk: any) =>
-      console.log(
-        `${fk.constraint_name} ON UPDATE ${fk.update_rule} ON DELETE ${fk.delete_rule}`,
-      ),
+    fks.rows.forEach(
+      (fk: { constraint_name: string; update_rule: string; delete_rule: string }) =>
+        console.log(
+          `${fk.constraint_name} ON UPDATE ${fk.update_rule} ON DELETE ${fk.delete_rule}`,
+        ),
     );
 
     // 5. Backfill Count & Legacy Verification

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getAppUser } from "@/lib/auth/permissions";
-import { createUploadIntent, uploadIntentSchema } from "@/server/services/file-assets";
+import { createUploadIntent } from "@/server/services/file-assets";
 
 export async function POST(req: NextRequest) {
   try {
@@ -20,7 +20,7 @@ export async function POST(req: NextRequest) {
     }
 
     return NextResponse.json(result.data);
-  } catch (err: any) {
+  } catch {
     return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
   }
 }

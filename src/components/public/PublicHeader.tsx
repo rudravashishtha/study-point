@@ -2,9 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Menu, X, Phone, MessageSquare } from "lucide-react";
-import { cn } from "@/lib/utils";
-
+import { Phone, MessageSquare } from "lucide-react";
 interface PublicHeaderProps {
   settings: {
     instituteName: string;
@@ -27,14 +25,9 @@ export function PublicHeader({ settings }: PublicHeaderProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const phone = settings?.phone ?? null;
-  const whatsappNumber = settings?.whatsappNumber ?? null;
   const instituteName = settings?.instituteName ?? "Study Point";
 
   const phoneHref = phone ? `tel:+${phone.replace(/\D/g, "")}` : "#";
-  const whatsappHref = whatsappNumber
-    ? `https://wa.me/${whatsappNumber.replace(/\D/g, "")}`
-    : "#";
-
   const phoneLink = phone ? (
     <a
       href={phoneHref}

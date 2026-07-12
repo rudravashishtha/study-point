@@ -14,12 +14,44 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { StudyMaterialVisibility, StudyMaterialResourceType } from "@prisma/client";
+import type { CreateStudyMaterialInput } from "@/server/services/study-materials";
 import { toast } from "sonner";
 import {
   createAdminMaterialAction,
   updateAdminMaterialAction,
 } from "@/app/admin/materials/actions";
 import { StudyMaterialUpload } from "@/components/upload/StudyMaterialUpload";
+
+interface MaterialFormData {
+  id: string;
+  title: string;
+  description: string | null;
+  visibility: StudyMaterialVisibility;
+  resourceType: StudyMaterialResourceType;
+  batchId: string | null;
+  academicSessionId: string;
+  curriculumTrackId: string;
+  externalLinkUrl: string | null;
+  fileAssetId: string | null;
+}
+
+interface MaterialFormSession {
+  id: string;
+  name: string;
+}
+
+export interface MaterialFormBatch {
+  id: string;
+  name: string;
+  archivedAt: Date | string | null;
+  academicSessionId: string;
+  curriculumTrackId: string;
+}
+
+export interface MaterialFormTrack {
+  id: string;
+  name?: string | null;
+}
 
 export function MaterialFormDialog({
   open,
@@ -31,10 +63,10 @@ export function MaterialFormDialog({
 }: {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  material?: any;
-  sessions: any[];
-  batches: any[];
-  tracks: any[];
+  material?: MaterialFormData | null;
+  sessions: MaterialFormSession[];
+  batches: MaterialFormBatch[];
+  tracks: MaterialFormTrack[];
 }) {
   const [loading, setLoading] = useState(false);
 
@@ -80,11 +112,14 @@ export function MaterialFormDialog({
     setLoading(true);
 
     try {
-      const payload: any = {
+      const payload: CreateStudyMaterialInput = {
         title,
         description: description || null,
         visibility,
         resourceType,
+        academicSessionId: "",
+        curriculumTrackId: "",
+        batchId: null,
       };
 
       if (visibility === "BATCH") {
@@ -118,8 +153,10 @@ export function MaterialFormDialog({
       }
       toast.success("Success", { description: "Material saved" });
       onOpenChange(false);
-    } catch (e: any) {
-      toast.error("Error", { description: e.message });
+    } catch (e: unknown) {
+      toast.error("Error", {
+        description: e instanceof Error ? e.message : "Unknown error",
+      });
     } finally {
       setLoading(false);
     }
@@ -140,7 +177,7 @@ export function MaterialFormDialog({
             <Select
               value={visibility}
               onValueChange={(v) => {
-                setVisibility(v as any);
+                setVisibility(v as StudyMaterialVisibility);
                 setBatchId("");
               }}
               disabled={!!material} // Prevent widening/swapping
@@ -239,7 +276,10 @@ export function MaterialFormDialog({
 
           <div className="space-y-2">
             <Label>Resource Type</Label>
-            <Select value={resourceType} onValueChange={(v) => setResourceType(v as any)}>
+            <Select
+              value={resourceType}
+              onValueChange={(v) => setResourceType(v as StudyMaterialResourceType)}
+            >
               <SelectTrigger>
                 <SelectValue placeholder="Type" />
               </SelectTrigger>

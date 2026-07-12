@@ -9,9 +9,21 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Badge } from "@/components/ui/badge";
 
-export function StudentTestList({ tests }: { tests: any[] }) {
+interface StudentTestItem {
+  id: string;
+  title: string;
+  description?: string | null;
+  testType: string;
+  testDate: string | Date;
+  maximumMarks: number;
+  durationMinutes?: number | null;
+  batch?: { name: string } | null;
+  chapter?: { name: string } | null;
+  topic?: { name: string } | null;
+}
+
+export function StudentTestList({ tests }: { tests: StudentTestItem[] }) {
   if (tests.length === 0) {
     return null;
   }

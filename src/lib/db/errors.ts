@@ -76,11 +76,12 @@ export function isConcurrencyConflict(error: unknown): boolean {
 
   // Handle generic unwrapped errors or PrismaClientUnknownRequestError containing 'cause'
   if (error && typeof error === "object") {
-    const cause = (error as any).cause;
+    const errObj = error as Record<string, unknown>;
+    const cause = errObj.cause as Record<string, unknown> | undefined;
     if (cause && (cause.originalCode === "40P01" || cause.code === "40P01")) {
       return true;
     }
-    if ((error as any).code === "40P01" || (error as any).originalCode === "40P01") {
+    if (errObj.code === "40P01" || errObj.originalCode === "40P01") {
       return true;
     }
   }

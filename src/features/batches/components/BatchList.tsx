@@ -66,7 +66,7 @@ export function BatchList({
         }
         toast.success("Batch archived successfully");
         router.refresh();
-      } catch (err) {
+      } catch {
         toast.error("Failed to archive batch");
       }
     });
@@ -82,7 +82,7 @@ export function BatchList({
         }
         toast.success("Batch restored successfully");
         router.refresh();
-      } catch (err) {
+      } catch {
         toast.error("Failed to restore batch");
       }
     });

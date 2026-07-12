@@ -1,6 +1,5 @@
 "use client";
 
-import { useRouter } from "next/navigation";
 import {
   Table,
   TableBody,
@@ -66,8 +65,6 @@ export function ImportHistoryTable({
   onDeleteExpired,
   showDeleteExpired,
 }: ImportHistoryTableProps) {
-  const router = useRouter();
-
   return (
     <div className="rounded-md border bg-card">
       <div className="overflow-x-auto">

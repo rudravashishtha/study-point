@@ -264,6 +264,7 @@ export async function validateImport(
   jobId: string,
   _actorUserId: string,
 ): Promise<ServiceResult<ImportSummary>> {
+  void _actorUserId;
   try {
     const job = await db.importJob.findUnique({ where: { id: jobId } });
     if (!job) return failure("NOT_FOUND", "Import job not found");
@@ -531,6 +532,7 @@ export async function listImportJobs(
     pageSize: number;
   }>
 > {
+  void _actorUserId;
   try {
     const page = Math.max(1, input.page || 1);
     const pageSize = Math.min(100, Math.max(1, input.pageSize || 20));
@@ -596,6 +598,7 @@ export async function getImportJob(
     createdBy: string | null;
   }>
 > {
+  void _actorUserId;
   try {
     const job = await db.importJob.findUnique({ where: { id: jobId } });
     if (!job) return failure("NOT_FOUND", "Import job not found");
@@ -610,6 +613,7 @@ export async function getImportErrors(
   jobId: string,
   _actorUserId: string,
 ): Promise<ServiceResult<ImportErrorReport>> {
+  void _actorUserId;
   try {
     const job = await db.importJob.findUnique({
       where: { id: jobId },

@@ -1,9 +1,7 @@
 import {
   StudyMaterial,
-  StudyMaterialLifecycleState,
   StudyMaterialResourceType,
   StudyMaterialVisibility,
-  Role,
 } from "@prisma/client";
 import { z } from "zod";
 import { db as prisma } from "../../lib/db";
@@ -57,7 +55,7 @@ export async function createStudyMaterial(
       return failure("UNAUTHORIZED", "Teachers cannot create CURRICULUM_TRACK materials");
     }
     const assignment = actor.teacher?.teacherAssignments.find(
-      (a: any) => a.batchId === data.batchId && a.archivedAt === null,
+      (a) => a.batchId === data.batchId && a.archivedAt === null,
     );
     if (!assignment) {
       return failure("UNAUTHORIZED", "Not assigned to this batch");
@@ -483,7 +481,7 @@ export async function getMaterialDownloadUrl(
   } else if (actor.role === "TEACHER" && actor.teacher) {
     if (material.visibility === "BATCH" && material.batchId) {
       const assignment = actor.teacher.teacherAssignments.find(
-        (a: any) => a.batchId === material.batchId,
+        (a) => a.batchId === material.batchId,
       );
       if (assignment) {
         const perms = resolveEffectivePermissions(assignment.permissions);
@@ -497,11 +495,11 @@ export async function getMaterialDownloadUrl(
       const activeEnrolments = actor.student.enrolments;
       if (material.visibility === "BATCH" && material.batchId) {
         authorized = activeEnrolments.some(
-          (e: any) => e.batchId === material.batchId && e.batch && !e.batch.archivedAt,
+          (e) => e.batchId === material.batchId && e.batch && !e.batch.archivedAt,
         );
       } else if (material.visibility === "CURRICULUM_TRACK") {
         authorized = activeEnrolments.some(
-          (e: any) =>
+          (e) =>
             e.academicSessionId === material.academicSessionId &&
             e.curriculumTrackId === material.curriculumTrackId,
         );

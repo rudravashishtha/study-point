@@ -1,7 +1,7 @@
 import React from "react";
 import { requireAdmin } from "@/lib/auth/permissions";
 import { parseListParams } from "@/lib/url/search-params";
-import { listBatches } from "@/server/services/batches";
+import { listBatches, type ListBatchesInput } from "@/server/services/batches";
 import { listAcademicSessions } from "@/server/services/academic-sessions";
 import { listTracks } from "@/server/services/curriculum/tracks";
 import { BatchList } from "@/features/batches/components/BatchList";
@@ -10,6 +10,13 @@ import { DataListArchiveFilter } from "@/components/admin/data-list/DataListArch
 import { DataListPagination } from "@/components/admin/data-list/DataListPagination";
 import { DataListEmpty } from "@/components/admin/data-list/DataListEmpty";
 import { CreateBatchButton } from "./CreateBatchButton";
+import { CurriculumTrack, Board, Subject, Programme } from "@prisma/client";
+
+type TrackWithRelations = CurriculumTrack & {
+  board: Board;
+  subject: Subject;
+  programme: Programme | null;
+};
 
 export default async function AdminBatchesPage({
   searchParams,
@@ -35,7 +42,7 @@ export default async function AdminBatchesPage({
             ? "ARCHIVED_ONLY"
             : "ALL",
       q: params.query,
-      sort: params.sortField as any,
+      sort: params.sortField as ListBatchesInput["sort"],
       direction: params.sortDir,
     }),
     listAcademicSessions({
@@ -63,7 +70,7 @@ export default async function AdminBatchesPage({
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-3xl font-bold tracking-tight">Batches</h1>
-        <CreateBatchButton sessions={sessions} tracks={tracks as any} />
+        <CreateBatchButton sessions={sessions} tracks={tracks as TrackWithRelations[]} />
       </div>
 
       <div className="flex flex-col space-y-4 md:flex-row md:items-center md:justify-between md:space-y-0">
@@ -82,9 +89,15 @@ export default async function AdminBatchesPage({
       ) : (
         <>
           <BatchList
-            batches={listResult.items as any}
+            batches={
+              listResult.items as (import("@prisma/client").Batch & {
+                academicSession: import("@prisma/client").AcademicSession;
+                curriculumTrack: TrackWithRelations;
+                _count: { enrolments: number };
+              })[]
+            }
             sessions={sessions}
-            tracks={tracks as any}
+            tracks={tracks as TrackWithRelations[]}
           />
           <DataListPagination
             currentPage={params.page}

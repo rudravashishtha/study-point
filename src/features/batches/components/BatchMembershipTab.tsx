@@ -52,7 +52,7 @@ export function BatchMembershipTab({
         }
         toast.success("Student removed from batch successfully");
         router.refresh();
-      } catch (err) {
+      } catch {
         toast.error("Failed to remove student from batch");
       }
     });

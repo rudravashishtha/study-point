@@ -16,7 +16,7 @@ import { removeTeacherAssignmentAction } from "../../actions/batch-actions";
 import { toast } from "sonner";
 import { EditAssignmentDialog } from "./EditAssignmentDialog";
 
-interface AssignmentRowActionsProps {
+export interface AssignmentRowActionsProps {
   batchId: string;
   assignment: TeacherAssignment & { teacher: { displayName: string } };
   disabled?: boolean;
@@ -51,9 +51,10 @@ export function AssignmentRowActions({
           description: `Teacher removed successfully.`,
         });
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       toast.error("Action Failed", {
-        description: error.message || "An unexpected error occurred",
+        description:
+          error instanceof Error ? error.message : "An unexpected error occurred",
       });
     } finally {
       setIsProcessing(false);

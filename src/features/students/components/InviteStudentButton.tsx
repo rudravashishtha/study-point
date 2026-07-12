@@ -30,9 +30,10 @@ export function InviteStudentButton({ studentId, isEligible }: InviteStudentButt
           description: "Student invited successfully.",
         });
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       toast.error("Action Failed", {
-        description: error.message || "An unexpected error occurred",
+        description:
+          error instanceof Error ? error.message : "An unexpected error occurred",
       });
     } finally {
       setIsPending(false);

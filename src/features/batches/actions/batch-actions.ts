@@ -22,8 +22,18 @@ export async function lookupStudentByCodeAction(studentCode: string) {
   return success(student);
 }
 
-export async function updateBatchSchedulesAction(batchId: string, schedules: any[]) {
-  const actorUserId = await requireAdmin();
+export async function updateBatchSchedulesAction(
+  batchId: string,
+  schedules: {
+    dayOfWeek: number;
+    startTime: string;
+    endTime: string;
+    roomOrLocation?: string | null;
+    liveClassUrl?: string | null;
+    isActive: boolean;
+  }[],
+) {
+  await requireAdmin();
 
   const result = await updateBatch(batchId, { schedules });
 
@@ -55,7 +65,7 @@ export async function resolveStudentBatchMembershipAction(
 }
 
 export async function createEnrolmentForBatchAction(batchId: string, studentId: string) {
-  const actorUserId = await requireAdmin();
+  await requireAdmin();
 
   const batch = await getBatchById(batchId);
   if (!batch) return failure("NOT_FOUND", "Batch not found");
@@ -81,7 +91,7 @@ export async function createEnrolmentForBatchAction(batchId: string, studentId: 
 }
 
 export async function assignEnrolmentToBatchAction(batchId: string, enrolmentId: string) {
-  const actorUserId = await requireAdmin();
+  await requireAdmin();
 
   const batch = await getBatchById(batchId);
   if (!batch) return failure("NOT_FOUND", "Batch not found");
@@ -103,7 +113,7 @@ export async function removeEnrolmentFromBatchAction(
   batchId: string,
   enrolmentId: string,
 ) {
-  const actorUserId = await requireAdmin();
+  await requireAdmin();
 
   // Technically we don't strictly *need* to load the batch to remove, but we should verify it.
   const batch = await getBatchById(batchId);

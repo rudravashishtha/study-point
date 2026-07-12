@@ -24,7 +24,7 @@ export async function GET(
 
     // Redirect to the signed URL
     return NextResponse.redirect(result.data);
-  } catch (err: any) {
+  } catch {
     return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
   }
 }

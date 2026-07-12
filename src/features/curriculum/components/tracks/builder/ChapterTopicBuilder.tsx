@@ -17,14 +17,9 @@ import {
 } from "@/app/admin/curriculum/curriculum-tracks/[trackId]/actions";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import {
-  createChapterSchema,
-  updateChapterSchema,
-  createTopicSchema,
-  updateTopicSchema,
-} from "@/lib/validation/curriculum";
-import { z } from "zod";
+import { createChapterSchema, createTopicSchema } from "@/lib/validation/curriculum";
 import { toast } from "sonner";
+import { z } from "zod";
 import { ChevronDown, ChevronRight, Plus, Archive, RotateCcw, Edit2 } from "lucide-react";
 
 type TopicModel = Topic;
@@ -33,7 +28,6 @@ type ChapterModel = Chapter & { topics: TopicModel[] };
 export function ChapterTopicBuilder({
   trackId,
   initialChapters,
-  archiveState,
 }: {
   trackId: string;
   initialChapters: ChapterModel[];
@@ -48,7 +42,7 @@ export function ChapterTopicBuilder({
     null,
   );
   const [isAddingChapter, setIsAddingChapter] = useState(false);
-  const [isPending, startTransition] = useTransition();
+  const [, startTransition] = useTransition();
 
   const toggleChapter = (id: string) => {
     const newExpanded = new Set(expandedChapters);
@@ -337,15 +331,15 @@ function ChapterForm({
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<any>({
-    resolver: zodResolver(chapter ? updateChapterSchema : createChapterSchema),
+  } = useForm<z.infer<typeof createChapterSchema>>({
+    resolver: zodResolver(createChapterSchema),
     defaultValues: { curriculumTrackId: trackId, name: chapter?.name || "" },
   });
 
-  const onSubmit = (data: any) => {
+  const onSubmit = (data: z.infer<typeof createChapterSchema>) => {
     startTransition(async () => {
       const res = chapter
-        ? await updateChapterAction(trackId, chapter.id, data)
+        ? await updateChapterAction(trackId, chapter.id, { name: data.name })
         : await createChapterAction(trackId, data);
 
       if (!res.success) toast.error(res.error);
@@ -406,15 +400,15 @@ function TopicForm({
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<any>({
-    resolver: zodResolver(topic ? updateTopicSchema : createTopicSchema),
+  } = useForm<z.infer<typeof createTopicSchema>>({
+    resolver: zodResolver(createTopicSchema),
     defaultValues: { chapterId: chapterId, name: topic?.name || "" },
   });
 
-  const onSubmit = (data: any) => {
+  const onSubmit = (data: z.infer<typeof createTopicSchema>) => {
     startTransition(async () => {
       const res = topic
-        ? await updateTopicAction(trackId, chapterId, topic.id, data)
+        ? await updateTopicAction(trackId, chapterId, topic.id, { name: data.name })
         : await createTopicAction(trackId, chapterId, data);
 
       if (!res.success) toast.error(res.error);

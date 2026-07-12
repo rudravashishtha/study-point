@@ -1,6 +1,5 @@
 import Link from "next/link";
-import { MapPin, Phone, Mail, MessageSquare, Globe } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { Globe } from "lucide-react";
 
 interface PublicFooterProps {
   settings: {
@@ -44,13 +43,6 @@ export function PublicFooter({ settings }: PublicFooterProps) {
   const mapUrl = settings?.mapUrl ?? null;
   const openingHours = settings?.openingHours ?? null;
   const socialLinks = settings?.socialLinks ?? null;
-
-  const whatsappHref = whatsappNumber
-    ? `https://wa.me/${whatsappNumber.replace(/\D/g, "")}`
-    : "#";
-
-  const phoneHref = phone ? `tel:${phone.replace(/\D/g, "")}` : "#";
-  const emailHref = email ? `mailto:${email}` : "#";
 
   return (
     <footer

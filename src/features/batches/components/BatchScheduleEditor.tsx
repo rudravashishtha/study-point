@@ -96,7 +96,7 @@ export function BatchScheduleEditor({
         toast.success("Batch schedules updated successfully");
         // We reset form values to matched saved data to clear any dirty state
         form.reset(data);
-      } catch (err) {
+      } catch {
         toast.error("An unexpected error occurred");
       }
     });
@@ -213,13 +213,15 @@ export function BatchScheduleEditor({
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mr-8">
                   <FormField
-                    control={form.control as any}
+                    control={form.control}
                     name={`schedules.${index}.dayOfWeek`}
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Day</FormLabel>
                         <Select
-                          onValueChange={(val) => field.onChange(parseInt(val, 10))}
+                          onValueChange={(val) => {
+                            if (val != null) field.onChange(parseInt(val, 10));
+                          }}
                           value={field.value.toString()}
                           disabled={isPending}
                         >
@@ -241,7 +243,7 @@ export function BatchScheduleEditor({
                     )}
                   />
                   <FormField
-                    control={form.control as any}
+                    control={form.control}
                     name={`schedules.${index}.startTime`}
                     render={({ field }) => (
                       <FormItem>
@@ -254,7 +256,7 @@ export function BatchScheduleEditor({
                     )}
                   />
                   <FormField
-                    control={form.control as any}
+                    control={form.control}
                     name={`schedules.${index}.endTime`}
                     render={({ field }) => (
                       <FormItem>
@@ -270,7 +272,7 @@ export function BatchScheduleEditor({
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mr-8">
                   <FormField
-                    control={form.control as any}
+                    control={form.control}
                     name={`schedules.${index}.roomOrLocation`}
                     render={({ field }) => (
                       <FormItem>
@@ -288,7 +290,7 @@ export function BatchScheduleEditor({
                     )}
                   />
                   <FormField
-                    control={form.control as any}
+                    control={form.control}
                     name={`schedules.${index}.liveClassUrl`}
                     render={({ field }) => (
                       <FormItem>
@@ -310,7 +312,7 @@ export function BatchScheduleEditor({
 
                 <div className="pt-2 flex items-center justify-between border-t mt-2">
                   <FormField
-                    control={form.control as any}
+                    control={form.control}
                     name={`schedules.${index}.isActive`}
                     render={({ field }) => (
                       <FormItem className="flex items-center gap-2 space-y-0">

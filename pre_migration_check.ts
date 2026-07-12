@@ -6,11 +6,11 @@ const prisma = new PrismaClient();
 async function main() {
   console.log("--- PRE-MIGRATION PROOF ---");
 
-  const res: any =
+  const res: { c: bigint }[] =
     await prisma.$queryRaw`SELECT COUNT(*) as c FROM "Batch" WHERE "teacherId" IS NOT NULL`;
   console.log("Source teacher links in Batch:", Number(res[0].c));
 
-  const indexes: any = await prisma.$queryRaw`
+  const indexes: { indexname: string; indexdef: string }[] = await prisma.$queryRaw`
     SELECT indexname, indexdef 
     FROM pg_indexes 
     WHERE tablename IN ('AcademicSession', 'CurriculumTrack', 'Batch', 'Enrolment')
@@ -23,7 +23,7 @@ async function main() {
       )
   `;
   console.log("Pre-migration indexes:");
-  indexes.forEach((i: any) => console.log(i.indexname, "->", i.indexdef));
+  indexes.forEach((i) => console.log(i.indexname, "->", i.indexdef));
 }
 
 main()

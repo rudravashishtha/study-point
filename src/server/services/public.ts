@@ -83,7 +83,6 @@ export async function getPublicHomeData(): Promise<PublicHomeData> {
 }
 
 async function getPublicBatches() {
-  const now = new Date();
   const activeSession = await db.academicSession.findFirst({
     where: { isActive: true },
     select: { id: true },
@@ -131,7 +130,7 @@ async function getPublicBatches() {
     batchMap.set(fp.batch.id, existing);
   }
 
-  return Array.from(batchMap.entries()).map(([batchId, fps]) => {
+  return Array.from(batchMap.entries()).map(([, fps]) => {
     const batch = fps[0].batch!;
     const fp = fps[0];
     return {

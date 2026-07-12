@@ -9,12 +9,13 @@ if (!publicEnv.NEXT_PUBLIC_SUPABASE_URL || !serverEnv.SUPABASE_SECRET_KEY) {
  * Safely identifies if a Supabase Auth error is specifically due to an existing user conflict.
  * Relies on known @supabase/supabase-js AuthApiError patterns.
  */
-export function isExistingSupabaseUserConflict(error: any): boolean {
-  if (!error) return false;
+export function isExistingSupabaseUserConflict(error: unknown): boolean {
+  if (!error || typeof error !== "object") return false;
 
-  const isAuthApiError = error.name === "AuthApiError";
-  const has422Status = error.status === 422;
-  const msg = (error.message || "").toLowerCase();
+  const obj = error as Record<string, unknown>;
+  const isAuthApiError = obj.name === "AuthApiError";
+  const has422Status = obj.status === 422;
+  const msg = (typeof obj.message === "string" ? obj.message : "").toLowerCase();
 
   const isConflictMessage =
     msg.includes("already exists") ||
