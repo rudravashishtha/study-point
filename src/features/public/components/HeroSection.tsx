@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { cn } from "@/lib/utils";
+import { WhatsAppButton } from "@/features/public/components/WhatsAppButton";
 
 interface HeroSectionProps {
   settings: {
@@ -70,15 +71,12 @@ export function HeroSection({ settings }: HeroSectionProps) {
                 <path d="m12 5 7 7-7 7" />
               </svg>
             </Link>
-            <a
-              href={`https://wa.me/${(settings?.whatsappNumber || "").replace(/\D/g, "")}`}
-              target="_blank"
-              rel="noopener noreferrer"
+            <WhatsAppButton
+              phoneNumber={settings?.whatsappNumber}
               className={cn(
                 "inline-flex items-center gap-2 rounded-full border-2 border-primary px-8 py-4 text-lg font-semibold text-primary transition-all hover:bg-primary hover:text-primary-foreground",
                 "focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2",
               )}
-              aria-label="Contact via WhatsApp"
             >
               <svg
                 className="size-5"
@@ -94,7 +92,7 @@ export function HeroSection({ settings }: HeroSectionProps) {
                 <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z" />
               </svg>
               <span className="hidden sm:inline">WhatsApp</span>
-            </a>
+            </WhatsAppButton>
           </div>
         </div>
       </div>

@@ -368,7 +368,42 @@ Delivered incrementally to keep each public surface reviewable:
 - 9A.4 (Public Courses page): Courses grouped by board, programme, class level, subject.
 - 9A.5 (Public Resources page): Free study resources, grouped by resource type, with guarded public download for published `CURRICULUM_TRACK` materials. No email capture. Admin-side resource authoring reuses the StudyMaterial model (`CURRICULUM_TRACK` visibility); a dedicated `/admin/website/resources` management UI remains a follow-up.
 
-## Phase 10: PWA And Production Hardening
+## Phase 10: Authentication & Account Experience
+
+Scheduled after completion of the Public Website (Phase 9). This phase delivers premium, role-specific authentication and account experiences on top of the existing authentication and permission architecture (Supabase Auth SSR, `AppUser`/role model, permission helpers, and audit log established in Phase 2).
+
+Scope:
+
+- Beautiful, role-specific login pages for:
+  - Student
+  - Teacher
+  - Admin
+  - Super Admin (if applicable)
+- First-time account activation (Supabase invitation / provisioning flow wired to the existing student/teacher/admin provisioning from Phase 4).
+- Forgot password flow.
+- Reset password flow.
+- Session expiry handling (graceful re-authentication without data loss where feasible).
+- Logout flow (server-side session/cookie cleanup).
+- Unauthorized / Access Denied pages (role- and ownership-aware).
+- Role-aware post-login redirects to the correct portal surface.
+- Mobile-first responsive authentication UI.
+- Accessibility for all auth surfaces (labels, focus states, error messaging, reduced motion).
+- Integration with the existing authentication and permission architecture (no parallel auth system; reuse Supabase SSR clients, permission helpers, and audit logging).
+
+Non-goals for this phase:
+
+- New authorization models or permission primitives (reuse Phase 2 foundations).
+- Parent portal or additional roles beyond those already defined.
+
+Validation gate:
+
+- E2E for role-specific login, first-time activation, forgot/reset password, session expiry, and logout.
+- Authorization tests confirming role-aware redirects and Access Denied behavior.
+- Mobile viewport checks for every auth surface.
+- Accessibility review for auth forms and error states.
+- Lint, type check, unit/integration tests, production build.
+
+## Phase 11: PWA And Production Hardening
 
 Scope:
 
@@ -499,7 +534,8 @@ E2E tests:
   - 9A.2 (Public Layout & Footer): Completed — `b1bee68`.
   - 9A.3 (Public Home page): Completed — `0961926`.
   - 9A.4 (Public Courses page): Completed — `f495a9b`.
-  - 9A.5 (Public Resources page): Committed — `888771a`. Design reconciled to the implemented schema (no `PUBLIC` visibility / `expiresAt`); public-resource query unified into `listPublicResources` (CURRICULUM_TRACK + PUBLISHED). Follow-up commit pending for design-reconciliation edits (docs + unit test + service unification).
+  - 9A.5 (Public Resources page): Completed and pushed — `11d3273`. Design reconciled to the implemented schema (no `PUBLIC` visibility / `expiresAt`); public-resource query unified into `listPublicResources` (CURRICULUM_TRACK + PUBLISHED); added `PublicResourceCard` unit test; deleted stray `scripts/verify-slice4a-db.ts`.
+  - 9A.6 (Public Contact page): In progress — Contact page rewrites against `SiteSettings`, ISR `revalidate = 3600` added to all ISR public pages, and a reusable `WhatsAppButton` (single `wa.me` implementation) replaces duplicated links in `PublicHeader`, `PublicFooter`, and `HeroSection`. Pending commit approval.
 
 ## Phase 0 Stop
 
@@ -510,14 +546,19 @@ Stop here and wait for human approval before application initialization or Phase
 ## Status Block
 
 ```text
-Phase: 9A.5
-Status: Complete (committed as 888771a); design-reconciliation rework uncommitted, pending follow-up commit
-Working tree: Dirty (design reconciliation edits + ResourceCard unit test uncommitted)
-Commit: 888771a (Resources page) + follow-up pending
+Phase: 9A.6
+Status: Implementation complete; pending commit approval (do not commit without explicit request)
+Working tree: Dirty (Contact page rewrite, WhatsAppButton component + test, ISR revalidate on 4 public pages, header/footer/hero refactor, planning-doc update)
+Commit: 11d3273 (9A.5) pushed to origin/main
 Push: pending
 
+Completed in this slice:
+- Contact page renders real SiteSettings (phone, WhatsApp prefilled CTA, email, address, landmark, hours, social, Google Maps embed + directions)
+- export const revalidate = 3600 added to /, /courses, /resources, /contact (announcements stays force-dynamic)
+- WhatsAppButton (src/features/public/components/WhatsAppButton.tsx) is the single wa.me implementation; PublicHeader/PublicFooter/HeroSection refactored to use it
+
 Next planned phase:
-Phase 9A.6 — Public Resources admin authoring (Optional) OR Phase 10 — PWA And Production Hardening
+Phase 10 — Authentication & Account Experience (scheduled after Public Website completes), then Phase 11 — PWA And Production Hardening
 
 Outstanding blockers:
 - None

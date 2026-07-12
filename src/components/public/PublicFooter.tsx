@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Globe } from "lucide-react";
+import { WhatsAppButton } from "@/features/public/components/WhatsAppButton";
 
 interface PublicFooterProps {
   settings: {
@@ -112,10 +113,9 @@ export function PublicFooter({ settings }: PublicFooterProps) {
                 </a>
               )}
               {whatsappNumber && (
-                <a
-                  href={`https://wa.me/${whatsappNumber.replace(/\D/g, "")}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
+                <WhatsAppButton
+                  phoneNumber={whatsappNumber}
+                  ariaLabel="Message us on WhatsApp"
                   className="flex items-center gap-2 hover:text-foreground transition-colors"
                 >
                   <svg
@@ -135,7 +135,7 @@ export function PublicFooter({ settings }: PublicFooterProps) {
                     />
                   </svg>
                   <span>WhatsApp</span>
-                </a>
+                </WhatsAppButton>
               )}
               {email && (
                 <a

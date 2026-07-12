@@ -7,6 +7,8 @@ import {
   getResourceTypeMeta,
 } from "@/features/public/components/PublicResourceCard";
 
+export const revalidate = 3600;
+
 export const metadata: Metadata = {
   title: "Free Study Resources | Study Point Mathematics",
   description:

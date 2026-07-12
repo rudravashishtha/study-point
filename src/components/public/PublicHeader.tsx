@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { Phone, MessageSquare } from "lucide-react";
+import { WhatsAppButton } from "@/features/public/components/WhatsAppButton";
 interface PublicHeaderProps {
   settings: {
     instituteName: string;
@@ -75,16 +76,13 @@ export function PublicHeader({ settings }: PublicHeaderProps) {
 
         <div className="flex items-center gap-3">
           {phoneLink}
-          <a
-            href={`https://wa.me/${(settings?.whatsappNumber || "").replace(/\D/g, "")}`}
-            target="_blank"
-            rel="noopener noreferrer"
+          <WhatsAppButton
+            phoneNumber={settings?.whatsappNumber}
             className="flex items-center gap-1.5 rounded-full bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground shadow-sm transition-colors hover:bg-primary/90"
-            aria-label="Contact via WhatsApp"
           >
             <MessageSquare className="size-4" aria-hidden="true" />
             <span className="hidden sm:inline">WhatsApp</span>
-          </a>
+          </WhatsAppButton>
 
           <button
             type="button"

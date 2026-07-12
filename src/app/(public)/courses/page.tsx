@@ -5,6 +5,8 @@ import { getPublicCourses } from "@/server/services/public-courses";
 import { CourseGroup } from "@/features/public/components/CourseGroup";
 import { TeacherIntro } from "@/features/public/components/TeacherIntro";
 
+export const revalidate = 3600;
+
 export const metadata: Metadata = {
   title: "Courses | Study Point Mathematics",
   description:
