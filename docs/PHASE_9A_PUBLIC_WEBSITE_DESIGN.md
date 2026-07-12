@@ -44,7 +44,7 @@
 | Academic Sessions | `AcademicSession` model, `listAcademicSessions`     | Current session for batch display                  |
 | Curriculum        | `CurriculumTrack`, `Board`, `Subject`, `ClassLevel` | Course grouping, display names                     |
 | Fee Plans         | `FeePlan`, `FeePlanInstallment`                     | Public fee display (configurable per course/batch) |
-| Study Materials   | `StudyMaterial`, `FileAsset`                        | Public resources (visibility = PUBLIC)             |
+| Study Materials   | `StudyMaterial`, `FileAsset`                        | Public resources (visibility = `CURRICULUM_TRACK`) |
 | Announcements     | `Announcement`, `listPublicAnnouncements`           | `/announcements` page (already live)               |
 | Contact Info      | `SiteSettings` (to be created)                      | Phone, WhatsApp, address, map, hours               |
 | Teacher Profile   | `Teacher` model                                     | About page photo, qualifications, philosophy       |
@@ -55,7 +55,7 @@
 | ------------------- | -------------------------------------------------------------------------------------- |
 | `SiteSettings`      | Singleton: institute name, tagline, contact, map, WhatsApp, social links, SEO defaults |
 | `AdmissionsEnquiry` | Log form submissions before WhatsApp redirect (best-effort)                            |
-| `PublicResource`    | Already covered by `StudyMaterial` with `visibility: PUBLIC`                           |
+| `PublicResource`    | Already covered by `StudyMaterial` with `visibility: CURRICULUM_TRACK`                 |
 
 ---
 
@@ -194,7 +194,7 @@
 ### Integration Tests
 
 - `listPublicAnnouncements` — already covered
-- `listPublicResources` (new) — filter by `visibility: PUBLIC`, published, not expired, valid FileAsset, not archived
+  - `listPublicResources` — authoritative public-resource query: filter by `visibility: CURRICULUM_TRACK`, `lifecycleState: PUBLISHED`, not archived; file-asset activeness enforced at download time
 - `getSiteSettings` — singleton fetch
 
 ### Build & Typecheck
@@ -244,6 +244,8 @@ Verify before closing Phase 9A:
 8. **9A.8 Admissions** — Form → WhatsApp redirect (best-effort logging)
 9. **9A.9 SEO** — `generateMetadata`, sitemap, robots, structured data (Organization, Course, FAQ, Breadcrumb)
 10. **9A.10 Polish** — ISR config, image optimization, accessibility audit, Lighthouse audit
+
+> **Implementation note (actual delivery):** The repository delivered Phase 9A in 5 compressed slices rather than the 10 suggested above: 9A.1 SiteSettings foundation, 9A.2 Public Layout & Footer, 9A.3 Public Home, 9A.4 Public Courses, 9A.5 Public Resources. The Resources page committed as **9A.5** therefore corresponds to the suggested **9A.6** here. Design content (scope, visibility criteria, components) is unchanged.
 
 ---
 
@@ -303,13 +305,23 @@ Never block the user from contacting the institute due to logging failure.
 
 ## Resource Visibility Criteria
 
-A `StudyMaterial` appears on `/resources` iff:
+The `StudyMaterialVisibility` enum is `{ CURRICULUM_TRACK, BATCH }`. There is **no**
+`PUBLIC` value — publicly shared resources use `CURRICULUM_TRACK` visibility, while
+`BATCH`-scoped materials remain restricted to enrolled students. `StudyMaterial` has
+**no `expiresAt` field**, so resource expiry is out of scope (deferred; would require a
+schema change if product later requires it).
 
-- `visibility === "PUBLIC"`
-- `publishedAt !== null`
-- `archivedAt === null`
-- `expiresAt === null OR expiresAt > now()`
-- `fileAsset` exists and `fileAsset.lifecycleState === "ACTIVE"`
+A `StudyMaterial` appears on `/resources` iff (single authoritative policy implemented in
+`listPublicResources`):
+
+- `visibility === "CURRICULUM_TRACK"`
+- `lifecycleState === "PUBLISHED"` (implies `publishedAt` is set and `archivedAt` is null)
+- `fileAsset` exists and `fileAsset.lifecycleState === "ACTIVE"` — enforced when the public
+  download route resolves the signed URL.
+
+This same `listPublicResources` query is the only public-resource selection policy and is
+shared by the Home page data and the `/resources` page, so batch-restricted materials are
+never exposed publicly.
 
 ---
 

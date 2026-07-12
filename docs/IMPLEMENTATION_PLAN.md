@@ -358,6 +358,16 @@ Validation gate:
 - Public empty/published states.
 - SEO basics.
 
+### Phase 9A — Public Website Slices
+
+Delivered incrementally to keep each public surface reviewable:
+
+- 9A.1 (SiteSettings foundation): Structured site settings model and admin editing.
+- 9A.2 (Public Layout & Footer): Public shell, navigation, header/footer.
+- 9A.3 (Public Home page): Hero, teacher intro, methodology highlights, results/testimonials, FAQ, contact, WhatsApp CTA.
+- 9A.4 (Public Courses page): Courses grouped by board, programme, class level, subject.
+- 9A.5 (Public Resources page): Free study resources, grouped by resource type, with guarded public download for published `CURRICULUM_TRACK` materials. No email capture. Admin-side resource authoring reuses the StudyMaterial model (`CURRICULUM_TRACK` visibility); a dedicated `/admin/website/resources` management UI remains a follow-up.
+
 ## Phase 10: PWA And Production Hardening
 
 Scope:
@@ -480,10 +490,35 @@ E2E tests:
   - Slice 5A (File Storage & Study Materials): Completed.
   - Slice 5B (Assignments / Homework): Completed.
   - Slice 5C (Test Management): Completed.
-- Phase 6: Active.
-  - Slice 6A (Bulk Student Import): Documentation approved, pending implementation.
-  - Documentation reconciliation completed: DATABASE_DESIGN.md, IMPLEMENTATION_PLAN.md, and ARCHITECTURE.md updated to reflect approved Phase 6A design (ImportJob/ImportRow models, source file retention via Supabase Storage, vendored SheetJS installation without csv-parse).
+- Phase 6: Completed (Bulk Imports — student and question import, validation, preview, confirmation, import history).
+- Phase 7: Completed (Fees and Announcements).
+- Phase 8: Completed (Student Portal).
+  - `f7dbb38 feat: Phase 8 — Student Portal enhancements`.
+- Phase 9: In progress (Public Website), delivered as 5 compressed slices 9A.1–9A.5 (design doc `PHASE_9A_PUBLIC_WEBSITE_DESIGN.md` suggested 10; its 9A.6 "Resources" = actual 9A.5).
+  - 9A.1 (SiteSettings foundation): Completed — `060825d`.
+  - 9A.2 (Public Layout & Footer): Completed — `b1bee68`.
+  - 9A.3 (Public Home page): Completed — `0961926`.
+  - 9A.4 (Public Courses page): Completed — `f495a9b`.
+  - 9A.5 (Public Resources page): Committed — `888771a`. Design reconciled to the implemented schema (no `PUBLIC` visibility / `expiresAt`); public-resource query unified into `listPublicResources` (CURRICULUM_TRACK + PUBLISHED). Follow-up commit pending for design-reconciliation edits (docs + unit test + service unification).
 
 ## Phase 0 Stop
 
 Stop here and wait for human approval before application initialization or Phase 1 implementation.
+
+---
+
+## Status Block
+
+```text
+Phase: 9A.5
+Status: Complete (committed as 888771a); design-reconciliation rework uncommitted, pending follow-up commit
+Working tree: Dirty (design reconciliation edits + ResourceCard unit test uncommitted)
+Commit: 888771a (Resources page) + follow-up pending
+Push: pending
+
+Next planned phase:
+Phase 9A.6 — Public Resources admin authoring (Optional) OR Phase 10 — PWA And Production Hardening
+
+Outstanding blockers:
+- None
+```

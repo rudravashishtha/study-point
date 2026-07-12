@@ -46,9 +46,12 @@ export interface PublicHomeData {
     id: string;
     title: string;
     description: string | null;
+    resourceType: string;
     visibility: string;
-    publishedAt: Date;
-    fileAsset: { id: string; originalName: string; mimeType: string } | null;
+    publishedAt: Date | null;
+    externalLinkUrl: string | null;
+    fileAssetId: string | null;
+    fileName: string | null;
   }>;
 }
 

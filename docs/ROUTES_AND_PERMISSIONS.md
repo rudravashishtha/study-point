@@ -55,13 +55,14 @@ Recommended App Router route groups:
 
 Keep public navigation compact. Structured content models can render as sections or anchors without requiring every section to be a top-level route.
 
-| Route            | Access | Notes                                                                                                                                                                                                     |
-| ---------------- | ------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `/`              | Public | Home page with institute identity, teacher intro, methodology highlights, selected results/testimonials, public batch highlights, configurable fee highlights, FAQ highlights, contact, and WhatsApp CTA. |
-| `/courses`       | Public | CBSE and CISCE course information grouped by board, programme where relevant, class level, and subject.                                                                                                   |
-| `/resources`     | Public | Published public resources only; no email capture.                                                                                                                                                        |
-| `/announcements` | Public | Public announcements only.                                                                                                                                                                                |
-| `/contact`       | Public | Contact, map, WhatsApp, directions, address, landmark, and opening hours.                                                                                                                                 |
+| Route                                 | Access | Notes                                                                                                                                                                                                     |
+| ------------------------------------- | ------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `/`                                   | Public | Home page with institute identity, teacher intro, methodology highlights, selected results/testimonials, public batch highlights, configurable fee highlights, FAQ highlights, contact, and WhatsApp CTA. |
+| `/courses`                            | Public | CBSE and CISCE course information grouped by board, programme where relevant, class level, and subject.                                                                                                   |
+| `/resources`                          | Public | Published public resources only; no email capture.                                                                                                                                                        |
+| `/api/public/materials/[id]/download` | Public | Unauthenticated file download for published `CURRICULUM_TRACK` study materials only. Returns 404 for batch-restricted, unpublished, archived, or missing assets. Never serves private files.              |
+| `/announcements`                      | Public | Public announcements only.                                                                                                                                                                                |
+| `/contact`                            | Public | Contact, map, WhatsApp, directions, address, landmark, and opening hours.                                                                                                                                 |
 
 Optional content such as methodology, results, testimonials, gallery, batch timings, fee information, and FAQ can be sections on the home or courses pages. Dedicated routes can be added later only if content volume justifies them.
 

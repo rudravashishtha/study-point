@@ -350,6 +350,7 @@ Public website:
 - Small public navigation: Home, Courses, Resources, Announcements, Contact.
 - Structured sections can appear on the home or courses pages instead of every content model requiring a top-level route.
 - Avoid generic SaaS patterns, fake statistics, excessive gradients, glassmorphism, and stock-photo-heavy design.
+- Public study resources: the `/resources` page and the public Home data share a single authoritative query, `listPublicResources`, which selects published `StudyMaterial` rows with `visibility: CURRICULUM_TRACK` (there is no `PUBLIC` visibility value; `BATCH`-scoped materials stay restricted). The public download route additionally requires an `ACTIVE` `FileAsset`. Public resources are not email-gated.
 
 Admin dashboard:
 

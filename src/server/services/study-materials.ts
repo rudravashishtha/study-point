@@ -395,25 +395,29 @@ export async function listStudentMaterials(
 
 export async function listPublicResources(
   page: number = 1,
-  pageSize: number = 20,
+  pageSize: number = 60,
 ): Promise<
   ServiceResult<
     Array<{
       id: string;
       title: string;
       description: string | null;
+      resourceType: string;
       visibility: string;
-      publishedAt: Date;
-      fileAsset: { id: string; originalName: string; mimeType: string } | null;
+      publishedAt: Date | null;
+      externalLinkUrl: string | null;
+      fileAssetId: string | null;
+      fileName: string | null;
     }>
   >
 > {
   if (page < 1) page = 1;
-  if (pageSize > 50) pageSize = 50;
+  if (pageSize > 100) pageSize = 100;
 
   const materials = await prisma.studyMaterial.findMany({
     where: {
       lifecycleState: "PUBLISHED",
+      visibility: "CURRICULUM_TRACK",
     },
     orderBy: [{ publishedAt: "desc" }, { id: "desc" }],
     skip: (page - 1) * pageSize,
@@ -426,15 +430,12 @@ export async function listPublicResources(
       id: m.id,
       title: m.title,
       description: m.description,
+      resourceType: m.resourceType,
       visibility: m.visibility,
-      publishedAt: m.publishedAt!,
-      fileAsset: m.fileAsset
-        ? {
-            id: m.fileAsset.id,
-            originalName: m.fileAsset.originalFilename,
-            mimeType: m.fileAsset.mimeType,
-          }
-        : null,
+      publishedAt: m.publishedAt,
+      externalLinkUrl: m.externalLinkUrl,
+      fileAssetId: m.fileAssetId,
+      fileName: m.fileAsset ? m.fileAsset.originalFilename : null,
     })),
   );
 }

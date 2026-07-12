@@ -207,4 +207,24 @@ None | <list>
 
 ---
 
+## Quality Baseline
+
+The repository has established the following mandatory baseline:
+
+- ESLint: 0 errors
+- ESLint: 0 warnings
+- TypeScript: 0 errors
+- Build: Passing
+- Tests: Passing
+
+Rules:
+
+- Every future phase must preserve this baseline.
+- No phase may introduce new ESLint warnings or errors.
+- No phase may introduce new TypeScript errors.
+- All gates (format, lint, typecheck, test, build) must pass before commit approval.
+- Any regression against this baseline must be fixed within the same phase before requesting commit approval.
+
+---
+
 _This document is the single source of truth for phase governance. Amendments require the same approval process as a phase commit._
