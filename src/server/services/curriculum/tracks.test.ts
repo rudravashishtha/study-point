@@ -1,9 +1,8 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { createTrack } from "./tracks";
 import { db } from "../../../lib/db";
-import { ActorContext } from "../../../lib/domain/actor";
 import { DomainError } from "../../../lib/domain/errors";
-import { Prisma } from "@prisma/client";
+import { Prisma, Board, Subject, Programme } from "@prisma/client";
 
 vi.mock("../../../lib/db", () => ({
   db: {
@@ -48,12 +47,12 @@ describe("Curriculum Track Service", () => {
       vi.mocked(db.board.findUnique).mockResolvedValue({
         id: "board-1",
         archivedAt: null,
-      } as any);
+      } as unknown as Board);
       vi.mocked(db.programme.findUnique).mockResolvedValue({
         id: "prog-1",
         boardId: "other-board", // mismatch
         archivedAt: null,
-      } as any);
+      } as unknown as Programme);
 
       await expect(
         createTrack(actor, { ...baseData, programmeId: "prog-1" }),
@@ -65,11 +64,11 @@ describe("Curriculum Track Service", () => {
         id: "board-1",
         code: "CBSE",
         archivedAt: null,
-      } as any);
+      } as unknown as Board);
       vi.mocked(db.subject.findUnique).mockResolvedValue({
         id: "sub-1",
         archivedAt: null,
-      } as any);
+      } as unknown as Subject);
 
       const p2002Error = new Prisma.PrismaClientKnownRequestError(
         "Unique constraint failed",
@@ -79,7 +78,7 @@ describe("Curriculum Track Service", () => {
         },
       );
       // Simulate PgAdapter error structure with constraint.name
-      (p2002Error as any).meta = {
+      (p2002Error as unknown as Record<string, unknown>).meta = {
         driverAdapterError: {
           cause: {
             constraint: { name: "CurriculumTrack_board_class_subject_null_prog_key" },

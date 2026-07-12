@@ -4,9 +4,10 @@ import { PrismaClient } from "@prisma/client";
 const { testDbProxy } = vi.hoisted(() => {
   return {
     testDbProxy: new Proxy({} as PrismaClient, {
-      get(target, prop) {
-        if (!(globalThis as any).__testDb) throw new Error("testDb is not initialized");
-        return ((globalThis as any).__testDb as any)[prop];
+      get(_target, prop) {
+        const db = (globalThis as Record<string, unknown>).__testDb as PrismaClient;
+        if (!db) throw new Error("testDb is not initialized");
+        return (db as unknown as Record<string, unknown>)[prop as string];
       },
     }),
   };

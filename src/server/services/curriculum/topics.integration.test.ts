@@ -10,9 +10,10 @@ import {
 const { testDbProxy } = vi.hoisted(() => {
   return {
     testDbProxy: new Proxy({} as PrismaClient, {
-      get(target, prop) {
-        if (!(globalThis as any).__testDb) throw new Error("testDb is not initialized");
-        return ((globalThis as any).__testDb as any)[prop];
+      get(_target, prop) {
+        const db = (globalThis as Record<string, unknown>).__testDb as PrismaClient;
+        if (!db) throw new Error("testDb is not initialized");
+        return (db as unknown as Record<string, unknown>)[prop as string];
       },
     }),
   };
@@ -21,11 +22,10 @@ const { testDbProxy } = vi.hoisted(() => {
 vi.mock("../../../lib/db", () => ({ db: testDbProxy }));
 
 import { createTopic, moveTopic, listTopics } from "./topics";
-import { db } from "../../../lib/db";
 
 describe.skipIf(!isTestConfigured)("Topics Service (Integration)", () => {
   let testActor: ActorContext | null = null;
-  let testChapter: any;
+  let testChapter: Awaited<ReturnType<PrismaClient["chapter"]["create"]>>;
 
   beforeAll(async () => {
     if (!isTestConfigured) return;
@@ -82,7 +82,8 @@ describe.skipIf(!isTestConfigured)("Topics Service (Integration)", () => {
   });
 
   afterAll(async () => {
-    const testDb = (globalThis as any).__testDb as PrismaClient | null;
+    const testDb = (globalThis as Record<string, unknown>)
+      .__testDb as PrismaClient | null;
     if (testDb) {
       await testDb.auditLog.deleteMany({});
       await testDb.topic.deleteMany({});
@@ -104,7 +105,8 @@ describe.skipIf(!isTestConfigured)("Topics Service (Integration)", () => {
   });
 
   beforeEach(async () => {
-    const testDb = (globalThis as any).__testDb as PrismaClient | null;
+    const testDb = (globalThis as Record<string, unknown>)
+      .__testDb as PrismaClient | null;
     if (testDb) {
       await testDb.auditLog.deleteMany();
       await testDb.topic.deleteMany();
@@ -118,7 +120,7 @@ describe.skipIf(!isTestConfigured)("Topics Service (Integration)", () => {
 
     const initialState = [t1.id, t2.id, t3.id];
 
-    const testDb = (globalThis as any).__testDb as PrismaClient;
+    const testDb = (globalThis as Record<string, unknown>).__testDb as PrismaClient;
     await testDb.auditLog.deleteMany({});
 
     const operations: { id: string; direction: "UP" | "DOWN" }[] = [
@@ -151,9 +153,9 @@ describe.skipIf(!isTestConfigured)("Topics Service (Integration)", () => {
     expect(finalTopics).toHaveLength(3);
 
     // Check against valid serial histories
-    const getPermutations = (arr: any[]): any[][] => {
+    const getPermutations = <T>(arr: T[]): T[][] => {
       if (arr.length <= 1) return [arr];
-      const perms: any[][] = [];
+      const perms: T[][] = [];
       for (let i = 0; i < arr.length; i++) {
         const rest = getPermutations(arr.slice(0, i).concat(arr.slice(i + 1)));
         for (const p of rest) perms.push([arr[i], ...p]);
@@ -162,7 +164,7 @@ describe.skipIf(!isTestConfigured)("Topics Service (Integration)", () => {
     };
 
     const applyOps = (startState: string[], ops: typeof operations) => {
-      let state = [...startState];
+      const state = [...startState];
       let auditCount = 0;
       const expectedAudits: {
         entityId: string;
@@ -213,9 +215,11 @@ describe.skipIf(!isTestConfigured)("Topics Service (Integration)", () => {
         return moveAudits.some(
           (a) =>
             a.entityId === expectedAudit.entityId &&
-            (a.metadata as any).swappedWithId === expectedAudit.swappedWithId &&
-            (a.metadata as any).previousOrder === expectedAudit.previousOrder &&
-            (a.metadata as any).newOrder === expectedAudit.newOrder,
+            (a.metadata as Record<string, unknown>).swappedWithId ===
+              expectedAudit.swappedWithId &&
+            (a.metadata as Record<string, unknown>).previousOrder ===
+              expectedAudit.previousOrder &&
+            (a.metadata as Record<string, unknown>).newOrder === expectedAudit.newOrder,
         );
       });
 

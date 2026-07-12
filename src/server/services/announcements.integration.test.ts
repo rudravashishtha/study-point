@@ -4,9 +4,10 @@ import { PrismaClient, Role } from "@prisma/client";
 const { testDbProxy } = vi.hoisted(() => {
   return {
     testDbProxy: new Proxy({} as PrismaClient, {
-      get(target, prop) {
-        if (!(globalThis as any).__testDb) throw new Error("testDb is not initialized");
-        return ((globalThis as any).__testDb as any)[prop];
+      get(_target, prop) {
+        const db = (globalThis as Record<string, unknown>).__testDb as PrismaClient;
+        if (!db) throw new Error("testDb is not initialized");
+        return (db as unknown as Record<string, unknown>)[prop as string];
       },
     }),
   };
@@ -66,13 +67,13 @@ describe.skipIf(!isTestConfigured)("Announcement Service Integration", () => {
   let studentActorA: ActorContext;
   let studentActorB: ActorContext;
   let studentActorC: ActorContext;
-  let session: any;
-  let trackA: any;
-  let trackB: any;
-  let batchA: any;
-  let batchB: any;
-  let archivedTrack: any;
-  let archivedBatch: any;
+  let session: Awaited<ReturnType<typeof db.academicSession.create>>;
+  let trackA: Awaited<ReturnType<typeof db.curriculumTrack.create>>;
+  let trackB: Awaited<ReturnType<typeof db.curriculumTrack.create>>;
+  let batchA: Awaited<ReturnType<typeof db.batch.create>>;
+  let batchB: Awaited<ReturnType<typeof db.batch.create>>;
+  let archivedTrack: Awaited<ReturnType<typeof db.curriculumTrack.create>>;
+  let archivedBatch: Awaited<ReturnType<typeof db.batch.create>>;
 
   beforeAll(async () => {
     const admin = await db.appUser.create({

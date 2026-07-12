@@ -1,12 +1,13 @@
 import { describe, it, expect, beforeAll, afterAll, vi } from "vitest";
-import { PrismaClient, Role } from "@prisma/client";
+import { PrismaClient } from "@prisma/client";
 
 const { testDbProxy } = vi.hoisted(() => {
   return {
     testDbProxy: new Proxy({} as PrismaClient, {
-      get(target, prop) {
-        if (!(globalThis as any).__testDb) throw new Error("testDb is not initialized");
-        return ((globalThis as any).__testDb as any)[prop];
+      get(_target, prop) {
+        const db = (globalThis as Record<string, unknown>).__testDb as PrismaClient;
+        if (!db) throw new Error("testDb is not initialized");
+        return (db as unknown as Record<string, unknown>)[prop as string];
       },
     }),
   };
@@ -20,23 +21,26 @@ vi.mock("@supabase/supabase-js", () => {
   return {
     createClient: () => ({
       storage: {
-        from: (bucket: string) => ({
-          createSignedUploadUrl: vi
-            .fn()
-            .mockResolvedValue({ data: { signedUrl: "https://mock" }, error: null }),
-          createSignedUrl: vi
-            .fn()
-            .mockResolvedValue({ data: { signedUrl: "https://mock" }, error: null }),
-          list: vi.fn().mockResolvedValue({
-            data: [
-              { name: "test-file", metadata: { size: 1024, mimetype: "image/png" } },
-            ],
-            error: null,
-          }),
-          remove: vi
-            .fn()
-            .mockResolvedValue({ data: [{ name: "test-file" }], error: null }),
-        }),
+        from: (_bucket: string) => {
+          void _bucket;
+          return {
+            createSignedUploadUrl: vi
+              .fn()
+              .mockResolvedValue({ data: { signedUrl: "https://mock" }, error: null }),
+            createSignedUrl: vi
+              .fn()
+              .mockResolvedValue({ data: { signedUrl: "https://mock" }, error: null }),
+            list: vi.fn().mockResolvedValue({
+              data: [
+                { name: "test-file", metadata: { size: 1024, mimetype: "image/png" } },
+              ],
+              error: null,
+            }),
+            remove: vi
+              .fn()
+              .mockResolvedValue({ data: [{ name: "test-file" }], error: null }),
+          };
+        },
       },
     }),
   };

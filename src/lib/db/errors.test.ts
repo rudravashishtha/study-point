@@ -1,7 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { Prisma } from "@prisma/client";
 import {
-  extractPrismaConstraintName,
   extractPrismaUniqueFields,
   matchUniqueFields,
   isConcurrencyConflict,

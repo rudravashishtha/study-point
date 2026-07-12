@@ -1,6 +1,5 @@
 import { describe, it, expect, beforeEach, afterAll, beforeAll, vi } from "vitest";
 import { createBatch, updateBatch, archiveBatch, restoreBatch } from "./batches";
-import { db as prisma } from "../../lib/db";
 import {
   isTestConfigured,
   setupIsolatedTestDb,
@@ -10,7 +9,7 @@ import { PrismaClient } from "@prisma/client";
 
 vi.mock("../../lib/db", () => ({
   get db() {
-    return (globalThis as any).__testDb;
+    return (globalThis as Record<string, unknown>).__testDb;
   },
 }));
 

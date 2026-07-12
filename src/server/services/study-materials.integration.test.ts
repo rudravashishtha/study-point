@@ -5,8 +5,9 @@ const { testDbProxy } = vi.hoisted(() => {
   return {
     testDbProxy: new Proxy({} as PrismaClient, {
       get(target, prop) {
-        if (!(globalThis as any).__testDb) throw new Error("testDb is not initialized");
-        return ((globalThis as any).__testDb as any)[prop];
+        const g = globalThis as Record<string, unknown>;
+        if (!g.__testDb) throw new Error("testDb is not initialized");
+        return (g.__testDb as Record<string | symbol, unknown>)[prop];
       },
     }),
   };
@@ -28,11 +29,6 @@ import {
   teardownTestDb,
   isTestConfigured,
 } from "@/lib/test/db-isolation";
-import {
-  createStudyMaterial,
-  getMaterialDownloadUrl,
-  listStudentMaterials,
-} from "./study-materials";
 
 describe("StudyMaterials Integration", () => {
   beforeAll(async () => {

@@ -6,7 +6,6 @@ import {
   restoreEnrolment,
 } from "./enrolments";
 import { createBatch } from "./batches";
-import { db as prisma } from "../../lib/db";
 import {
   isTestConfigured,
   setupIsolatedTestDb,
@@ -16,7 +15,7 @@ import { PrismaClient } from "@prisma/client";
 
 vi.mock("../../lib/db", () => ({
   get db() {
-    return (globalThis as any).__testDb;
+    return (globalThis as Record<string, unknown>).__testDb;
   },
 }));
 
@@ -74,7 +73,7 @@ describe.skipIf(!isTestConfigured)("Enrolment Service Integration", () => {
     }
     trackId = track.id;
 
-    const teacher = await db.teacher.create({
+    await db.teacher.create({
       data: { displayName: "Test Teacher Enrolment", active: true },
     });
 

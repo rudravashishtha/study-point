@@ -41,11 +41,27 @@ afterEach(() => {
   cleanup();
   vi.resetAllMocks();
   (TestUpload as Mock).mockImplementation(defaultUploadImpl);
-  const defaultResult = { success: true, data: {} } as const;
-  vi.mocked(testActions.createAdminTestAction).mockResolvedValue(defaultResult as any);
-  vi.mocked(testActions.updateAdminTestAction).mockResolvedValue(defaultResult as any);
-  vi.mocked(testActions.publishAdminTestAction).mockResolvedValue(defaultResult as any);
-  vi.mocked(testActions.archiveAdminTestAction).mockResolvedValue(defaultResult as any);
+  const defaultResult = { success: true as const, data: {} } as const;
+  vi.mocked(testActions.createAdminTestAction).mockResolvedValue(
+    defaultResult as unknown as Awaited<
+      ReturnType<typeof testActions.createAdminTestAction>
+    >,
+  );
+  vi.mocked(testActions.updateAdminTestAction).mockResolvedValue(
+    defaultResult as unknown as Awaited<
+      ReturnType<typeof testActions.updateAdminTestAction>
+    >,
+  );
+  vi.mocked(testActions.publishAdminTestAction).mockResolvedValue(
+    defaultResult as unknown as Awaited<
+      ReturnType<typeof testActions.publishAdminTestAction>
+    >,
+  );
+  vi.mocked(testActions.archiveAdminTestAction).mockResolvedValue(
+    defaultResult as unknown as Awaited<
+      ReturnType<typeof testActions.archiveAdminTestAction>
+    >,
+  );
 });
 
 describe("Admin Test UI", () => {
@@ -226,15 +242,17 @@ describe("Admin Test UI", () => {
   });
 
   it("9. Finalized upload includes only the resulting fileAssetId in payload", async () => {
-    (TestUpload as Mock).mockImplementation(({ onUploadSuccess }: any) => (
-      <button
-        data-testid="mock-test-upload"
-        type="button"
-        onClick={() => onUploadSuccess("mock-asset-789")}
-      >
-        Mock Test Upload
-      </button>
-    ));
+    (TestUpload as Mock).mockImplementation(
+      ({ onUploadSuccess }: { onUploadSuccess: (id: string) => void }) => (
+        <button
+          data-testid="mock-test-upload"
+          type="button"
+          onClick={() => onUploadSuccess("mock-asset-789")}
+        >
+          Mock Test Upload
+        </button>
+      ),
+    );
 
     render(<TestList tests={[]} sessions={sessions} batches={batches} tracks={tracks} />);
     fireEvent.click(screen.getByRole("button", { name: /create test/i }));

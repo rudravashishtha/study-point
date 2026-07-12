@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 import "@testing-library/jest-dom/vitest";
-import { describe, it, expect, vi, afterEach } from "vitest";
+import { describe, it, expect, vi, afterEach, type Mock } from "vitest";
 import { render, screen, cleanup } from "@testing-library/react";
 import { StudentMaterialList } from "./StudentMaterialList";
 import StudentCoursePage from "@/app/student/course/page";
@@ -128,13 +128,13 @@ describe("Student Materials UI", () => {
 
 describe("StudentCoursePage Server Component", () => {
   it("renders empty state when there are active enrolments but no materials", async () => {
-    (requireRole as any).mockResolvedValue({
+    (requireRole as Mock).mockResolvedValue({
       id: "user-1",
       role: "STUDENT",
       studentId: "stu-1",
     });
-    (listStudentMaterials as any).mockResolvedValue({ success: true, data: [] });
-    (db.student.findUnique as any).mockResolvedValue({
+    (listStudentMaterials as Mock).mockResolvedValue({ success: true, data: [] });
+    (db.student.findUnique as Mock).mockResolvedValue({
       id: "stu-1",
       enrolments: [{ status: "ACTIVE" }],
     });
@@ -151,13 +151,13 @@ describe("StudentCoursePage Server Component", () => {
   });
 
   it("renders zero active enrolments state", async () => {
-    (requireRole as any).mockResolvedValue({
+    (requireRole as Mock).mockResolvedValue({
       id: "user-1",
       role: "STUDENT",
       studentId: "stu-1",
     });
-    (listStudentMaterials as any).mockResolvedValue({ success: true, data: [] });
-    (db.student.findUnique as any).mockResolvedValue({
+    (listStudentMaterials as Mock).mockResolvedValue({ success: true, data: [] });
+    (db.student.findUnique as Mock).mockResolvedValue({
       id: "stu-1",
       enrolments: [],
     });

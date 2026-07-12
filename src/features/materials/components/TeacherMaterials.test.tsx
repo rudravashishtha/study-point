@@ -22,7 +22,11 @@ vi.mock("@/app/teacher/batches/[batchId]/actions", () => ({
 }));
 
 vi.mock("@/components/upload/StudyMaterialUpload", () => ({
-  StudyMaterialUpload: ({ onUploadSuccess }: any) => (
+  StudyMaterialUpload: ({
+    onUploadSuccess,
+  }: {
+    onUploadSuccess: (assetId: string) => void;
+  }) => (
     <button
       data-testid="mock-upload"
       type="button"

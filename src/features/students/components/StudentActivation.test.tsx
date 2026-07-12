@@ -69,11 +69,13 @@ describe("StudentActivationQueue", () => {
 
   it("duplicate submission is prevented while pending", async () => {
     // We can simulate a pending state by making the mock return a slow promise
-    let resolvePromise: any;
-    const promise = new Promise((resolve) => {
+    let resolvePromise!: (value: { success: true; data: undefined }) => void;
+    const promise = new Promise<{ success: true; data: undefined }>((resolve) => {
       resolvePromise = resolve;
     });
-    vi.mocked(actions.inviteStudentAction).mockReturnValueOnce(promise as any);
+    vi.mocked(actions.inviteStudentAction).mockReturnValueOnce(
+      promise as ReturnType<typeof actions.inviteStudentAction>,
+    );
 
     render(<StudentActivationQueue candidates={[candidates[0]]} />);
 
@@ -88,7 +90,7 @@ describe("StudentActivationQueue", () => {
     fireEvent.click(button);
     expect(actions.inviteStudentAction).toHaveBeenCalledTimes(1); // Only called once
 
-    resolvePromise({ success: true });
+    resolvePromise({ success: true, data: undefined });
   });
 
   it("no role or Supabase Auth ID is submitted by the client", async () => {

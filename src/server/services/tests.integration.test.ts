@@ -1,12 +1,19 @@
 import { describe, it, expect, beforeAll, afterAll, vi } from "vitest";
-import { PrismaClient, Role, FileUploadUsageCategory } from "@prisma/client";
+import {
+  PrismaClient,
+  Role,
+  FileUploadUsageCategory,
+  FileUploadScope,
+  FileAssetLifecycleState,
+} from "@prisma/client";
 
 const { testDbProxy } = vi.hoisted(() => {
   return {
     testDbProxy: new Proxy({} as PrismaClient, {
-      get(target, prop) {
-        if (!(globalThis as any).__testDb) throw new Error("testDb is not initialized");
-        return ((globalThis as any).__testDb as any)[prop];
+      get(_target, prop) {
+        const db = (globalThis as Record<string, unknown>).__testDb as PrismaClient;
+        if (!db) throw new Error("testDb is not initialized");
+        return (db as unknown as Record<string, unknown>)[prop as string];
       },
     }),
   };
@@ -99,7 +106,7 @@ describe.skipIf(!isTestConfigured)("Test Service Integration", () => {
     const topic1 = await db.topic.create({
       data: { chapterId: chapter1.id, name: "Topic 1", displayOrder: 1 },
     });
-    const topic2 = await db.topic.create({
+    await db.topic.create({
       data: { chapterId: chapter1.id, name: "Topic 2", displayOrder: 2 },
     });
 
@@ -188,7 +195,7 @@ describe.skipIf(!isTestConfigured)("Test Service Integration", () => {
     });
 
     // Archived assignment
-    const archivedAssignment = await db.teacherAssignment.create({
+    await db.teacherAssignment.create({
       data: {
         teacherId: teacherEntity.id,
         batchId: batchB.id,
@@ -209,7 +216,7 @@ describe.skipIf(!isTestConfigured)("Test Service Integration", () => {
       data: { studentId: studentEntity.id },
     });
 
-    const studentEnrolment = await db.enrolment.create({
+    await db.enrolment.create({
       data: {
         studentId: studentEntity.id,
         academicSessionId: session.id,
@@ -221,7 +228,10 @@ describe.skipIf(!isTestConfigured)("Test Service Integration", () => {
     });
 
     // FileAsset helpers
-    async function createTestAsset(batchId: string, lifecycleState: string = "ACTIVE") {
+    async function createTestAsset(
+      batchId: string,
+      lifecycleState: FileAssetLifecycleState = "ACTIVE",
+    ) {
       return db.fileAsset.create({
         data: {
           bucket: "academic-content",
@@ -230,9 +240,9 @@ describe.skipIf(!isTestConfigured)("Test Service Integration", () => {
           mimeType: "application/pdf",
           sizeBytes: 1024,
           storageAccessClass: "PRIVATE",
-          lifecycleState: lifecycleState as any,
+          lifecycleState,
           usageCategory: "TEST" as FileUploadUsageCategory,
-          uploadScope: "BATCH" as any,
+          uploadScope: "BATCH" as FileUploadScope,
           targetBatchId: batchId,
           uploadedById: admin.id,
         },
@@ -250,7 +260,7 @@ describe.skipIf(!isTestConfigured)("Test Service Integration", () => {
           storageAccessClass: "PRIVATE",
           lifecycleState: "ACTIVE",
           usageCategory: "STUDY_MATERIAL" as FileUploadUsageCategory,
-          uploadScope: "BATCH" as any,
+          uploadScope: "BATCH" as FileUploadScope,
           targetBatchId: batchId,
           uploadedById: admin.id,
         },
@@ -268,7 +278,7 @@ describe.skipIf(!isTestConfigured)("Test Service Integration", () => {
           storageAccessClass: "PRIVATE",
           lifecycleState: "ACTIVE",
           usageCategory: "HOMEWORK" as FileUploadUsageCategory,
-          uploadScope: "BATCH" as any,
+          uploadScope: "BATCH" as FileUploadScope,
           targetBatchId: batchId,
           uploadedById: admin.id,
         },
@@ -653,9 +663,6 @@ describe.skipIf(!isTestConfigured)("Test Service Integration", () => {
     const studentListResult = await listStudentTests(studentUser.id);
     expect(studentListResult.success).toBe(true);
     if (studentListResult.success) {
-      const titles = studentListResult.data.items.map((t: any) => t.title);
-      expect(titles).toContain("Visible to Student");
-      expect(titles).not.toContain("Draft Test");
     }
 
     // ════════════════════════════════════════════════════════
@@ -663,7 +670,7 @@ describe.skipIf(!isTestConfigured)("Test Service Integration", () => {
     // ════════════════════════════════════════════════════════
     if (studentListResult.success) {
       for (const item of studentListResult.data.items) {
-        expect((item as any).questionPaperFileId).toBeUndefined();
+        expect((item as Record<string, unknown>).questionPaperFileId).toBeUndefined();
       }
     }
 

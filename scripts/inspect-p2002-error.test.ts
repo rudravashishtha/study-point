@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeAll, afterAll, vi } from "vitest";
+import { describe, it, beforeAll, afterAll, vi } from "vitest";
 import { PrismaClient } from "@prisma/client";
 import {
   isTestConfigured,
@@ -9,9 +9,10 @@ import {
 const { testDbProxy } = vi.hoisted(() => {
   return {
     testDbProxy: new Proxy({} as PrismaClient, {
-      get(target, prop) {
-        if (!(globalThis as any).__testDb) throw new Error("testDb is not initialized");
-        return ((globalThis as any).__testDb as any)[prop];
+      get(_target, prop) {
+        const db = (globalThis as Record<string, unknown>).__testDb as PrismaClient;
+        if (!db) throw new Error("testDb is not initialized");
+        return (db as unknown as Record<string, unknown>)[prop as string];
       },
     }),
   };
@@ -39,7 +40,8 @@ describe.skipIf(!isTestConfigured)("Inspect P2002", () => {
   });
 
   afterAll(async () => {
-    const testDb = (globalThis as any).__testDb as PrismaClient | null;
+    const testDb = (globalThis as Record<string, unknown>)
+      .__testDb as PrismaClient | null;
     if (testDb) {
       await testDb.homework.deleteMany({});
       await testDb.fileAsset.deleteMany({});
@@ -58,7 +60,7 @@ describe.skipIf(!isTestConfigured)("Inspect P2002", () => {
   });
 
   it("logs P2002 structure", async () => {
-    const testDb = (globalThis as any).__testDb as PrismaClient;
+    const testDb = (globalThis as Record<string, unknown>).__testDb as PrismaClient;
     const board = await testDb.board.create({ data: { code: "TEST_B", name: "B" } });
     const subject = await testDb.subject.create({ data: { code: "TEST_S", name: "S" } });
 
@@ -80,15 +82,17 @@ describe.skipIf(!isTestConfigured)("Inspect P2002", () => {
           displayName: "T2", // Duplicate
         },
       });
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.log("=========================================");
-      console.log(
-        "P2002 ERROR CAUSE:",
-        JSON.stringify(err.meta?.driverAdapterError?.cause, null, 2),
-      );
+      const errRecord = err as Record<string, unknown>;
+      const meta = errRecord.meta as Record<string, unknown> | undefined;
+      const driverAdapterError = meta?.driverAdapterError as
+        Record<string, unknown> | undefined;
+      const cause = driverAdapterError?.cause as Record<string, unknown> | undefined;
+      console.log("P2002 ERROR CAUSE:", JSON.stringify(cause, null, 2));
       console.log(
         "P2002 ERROR ORIGINAL MSG:",
-        err.meta?.driverAdapterError?.cause?.originalMessage || err.message,
+        cause?.originalMessage || errRecord.message,
       );
       console.log("=========================================");
     }

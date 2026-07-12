@@ -37,7 +37,11 @@ vi.mock("@/app/teacher/batches/[batchId]/actions", () => ({
 }));
 
 vi.mock("@/components/upload/HomeworkUpload", () => ({
-  HomeworkUpload: ({ onUploadSuccess }: any) => (
+  HomeworkUpload: ({
+    onUploadSuccess,
+  }: {
+    onUploadSuccess: (assetId: string) => void;
+  }) => (
     <button
       data-testid="mock-hw-upload"
       type="button"
@@ -87,7 +91,7 @@ describe("Admin Homework UI", () => {
   const tracks = [{ id: "track-1", name: "Track 1" }];
 
   it("1. Admin can create homework", () => {
-    const { rerender } = render(
+    render(
       <HomeworkList
         homework={[]}
         sessions={sessions}
@@ -236,7 +240,11 @@ describe("Admin Homework UI", () => {
         }),
       );
       // Verify fileAssetId is not in the payload
-      const payload = (createAdminHomeworkAction as any).mock.calls[0][0];
+      const payload = (
+        createAdminHomeworkAction as unknown as {
+          mock: { calls: Array<Array<Record<string, unknown>>> };
+        }
+      ).mock.calls[0][0];
       expect(payload.fileAssetId).toBeUndefined();
     });
   });
@@ -329,8 +337,7 @@ describe("Teacher Homework UI", () => {
   });
 
   it("12. Duplicate submissions prevented while pending (submit button disabled)", async () => {
-    const { createTeacherHomeworkAction } =
-      await import("@/app/teacher/batches/[batchId]/actions");
+    await import("@/app/teacher/batches/[batchId]/actions");
 
     render(
       <TeacherHomeworkList

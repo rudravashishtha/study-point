@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 import "@testing-library/jest-dom/vitest";
-import { describe, it, expect, vi, afterEach } from "vitest";
+import { describe, it, expect, afterEach } from "vitest";
 import { render, screen, cleanup } from "@testing-library/react";
 import { StudentDashboard } from "./StudentDashboard";
 
@@ -8,8 +8,8 @@ afterEach(() => {
   cleanup();
 });
 
-function makeData(overrides: Record<string, any> = {}) {
-  return {
+function makeData(overrides: Record<string, unknown> = {}) {
+  const data = {
     timetable: {
       groups: [
         {
@@ -20,6 +20,7 @@ function makeData(overrides: Record<string, any> = {}) {
               id: "s-1",
               startTime: "09:00",
               endTime: "10:00",
+              dayLabel: "Today",
               batch: {
                 name: "Batch A",
                 curriculumTrack: { subject: { name: "Mathematics" } },
@@ -72,7 +73,33 @@ function makeData(overrides: Record<string, any> = {}) {
       ],
     },
     ...overrides,
+  } as {
+    timetable: {
+      groups: {
+        dayOfWeek: number;
+        dayLabel: string;
+        schedules: {
+          id: string;
+          startTime: string;
+          endTime: string;
+          dayLabel: string;
+          batch?: { name: string; curriculumTrack?: { subject?: { name: string } } };
+        }[];
+      }[];
+    };
+    announcements: {
+      items: { id: string; title: string; publishedAt: string | Date | null }[];
+    };
+    homework: { items: { id: string; title: string; dueDate: string | Date }[] };
+    tests: { items: { id: string; title: string; testDate: string | Date }[] };
+    fees: {
+      assignments: {
+        id: string;
+        dues: { id: string; status: string; amountDue: string; amountWaived: string }[];
+      }[];
+    };
   };
+  return data;
 }
 
 describe("StudentDashboard", () => {

@@ -305,10 +305,8 @@ describe("AssignTeacherDialog & PermissionSelector", () => {
 
   it("only the final explicit PermissionCapability[] reaches the mutation boundary", async () => {
     // This is implicitly tested by the assignment action which takes `permissions`
-    const { assignTeacherAction } =
-      await import("@/features/batches/actions/batch-actions");
+    await import("@/features/batches/actions/batch-actions");
 
-    let permissions: PermissionCapability[] = ["BATCH_VIEW", "BATCH_MANAGE"];
     render(
       <AssignTeacherDialog
         batchId="b1"
@@ -323,14 +321,20 @@ describe("AssignTeacherDialog & PermissionSelector", () => {
   });
 });
 
-import { AssignmentRowActions } from "./AssignmentRowActions";
+import { AssignmentRowActions, AssignmentRowActionsProps } from "./AssignmentRowActions";
 
 describe("AssignmentRowActions State", () => {
   it("archived Batch disables assignment removal and editing", () => {
     render(
       <AssignmentRowActions
         batchId="b1"
-        assignment={{ id: "a1", teacher: { displayName: "T1" }, permissions: [] } as any}
+        assignment={
+          {
+            id: "a1",
+            teacher: { displayName: "T1" },
+            permissions: [],
+          } as unknown as AssignmentRowActionsProps["assignment"]
+        }
         disabled={true}
       />,
     );
@@ -342,7 +346,13 @@ describe("AssignmentRowActions State", () => {
     render(
       <AssignmentRowActions
         batchId="b1"
-        assignment={{ id: "a1", teacher: { displayName: "T1" }, permissions: [] } as any}
+        assignment={
+          {
+            id: "a1",
+            teacher: { displayName: "T1" },
+            permissions: [],
+          } as unknown as AssignmentRowActionsProps["assignment"]
+        }
         disabled={false} // inactive batch but non-archived
       />,
     );

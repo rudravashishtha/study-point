@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeAll, beforeEach, vi } from "vitest";
-import { PrismaClient, ImportType, ImportJobStatus } from "@prisma/client";
+import { PrismaClient, ImportJobStatus } from "@prisma/client";
 import * as XLSX from "xlsx";
 
 const { testDbProxy, storageMap } = vi.hoisted(() => {
@@ -7,8 +7,9 @@ const { testDbProxy, storageMap } = vi.hoisted(() => {
   return {
     testDbProxy: new Proxy({} as PrismaClient, {
       get(_target, prop) {
-        if (!(globalThis as any).__testDb) throw new Error("testDb is not initialized");
-        return ((globalThis as any).__testDb as any)[prop];
+        const db = (globalThis as Record<string, unknown>).__testDb as PrismaClient;
+        if (!db) throw new Error("testDb is not initialized");
+        return (db as unknown as Record<string, unknown>)[prop as string];
       },
     }),
     storageMap: map,
@@ -241,7 +242,7 @@ describe.skipIf(!isTestConfigured)("Imports Service Integration", () => {
       where: { importJobId: jobId },
     });
     expect(rows).toHaveLength(3);
-    expect(rows.every((r: any) => r.status === "VALID")).toBe(true);
+    expect(rows.every((r: { status: string }) => r.status === "VALID")).toBe(true);
 
     const job = await prisma.importJob.findUnique({
       where: { id: jobId },
@@ -576,7 +577,7 @@ describe.skipIf(!isTestConfigured)("Imports Service Integration", () => {
     const students = await prisma.student.findMany();
     expect(students).toHaveLength(6);
 
-    const codes = students.map((s: any) => s.studentCode);
+    const codes = students.map((s: { studentCode: string }) => s.studentCode);
     const uniqueCodes = new Set(codes);
     expect(uniqueCodes.size).toBe(6);
   });

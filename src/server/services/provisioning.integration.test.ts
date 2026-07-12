@@ -7,9 +7,10 @@ import { db } from "../../lib/db";
 const { testDbProxy } = vi.hoisted(() => {
   return {
     testDbProxy: new Proxy({} as PrismaClient, {
-      get(target, prop) {
-        if (!(globalThis as any).__testDb) throw new Error("testDb is not initialized");
-        return ((globalThis as any).__testDb as any)[prop];
+      get(_target, prop) {
+        const gDb = (globalThis as Record<string, unknown>).__testDb as PrismaClient;
+        if (!gDb) throw new Error("testDb is not initialized");
+        return (gDb as unknown as Record<string, unknown>)[prop as string];
       },
     }),
   };
@@ -42,7 +43,7 @@ vi.mock("../../lib/supabase/admin", async (importOriginal) => {
   };
 });
 
-import { createAdminClient, findAuthUserByEmail } from "../../lib/supabase/admin";
+import { findAuthUserByEmail } from "../../lib/supabase/admin";
 import {
   isTestConfigured,
   initializeTestDb,
@@ -56,21 +57,6 @@ describe("Provisioning Service Integration Tests", () => {
   afterAll(async () => {
     if (isTestConfigured) await teardownTestDb();
   });
-  const unauthorizedActor: ActorContext = {
-    userId: "none",
-    role: "STUDENT",
-    metadata: { role: "STUDENT", status: "ACTIVE" },
-  };
-  const noEmailActor: ActorContext = {
-    userId: "none",
-    role: "ADMIN",
-    metadata: { role: "ADMIN", status: "ACTIVE" },
-  };
-  const noRoleActor: ActorContext = {
-    userId: "none",
-    role: "ADMIN",
-    metadata: { role: "ADMIN", status: "ACTIVE" },
-  };
   const adminActor: ActorContext = {
     userId: "admin1",
     role: "ADMIN",
@@ -138,16 +124,17 @@ describe("Provisioning Service Integration Tests", () => {
         },
       });
 
-      const mockSupabase = createAdminClient();
       mockInviteUserByEmail.mockResolvedValue({
         data: { user: null },
         error: {
           name: "AuthApiError",
           status: 422,
           message: "user already exists",
-        } as any,
-      });
-      vi.mocked(findAuthUserByEmail).mockResolvedValue({ id: dupAuthId } as any);
+        } as unknown as Record<string, unknown>,
+      } as unknown as Record<string, unknown>);
+      vi.mocked(findAuthUserByEmail).mockResolvedValue({
+        id: dupAuthId,
+      } as unknown as Awaited<ReturnType<typeof findAuthUserByEmail>>);
 
       await expect(inviteStudent(adminActor, student2.id)).rejects.toThrow(
         /already linked/i,
@@ -255,11 +242,10 @@ describe("Provisioning Service Integration Tests", () => {
         },
       });
 
-      const mockSupabase = createAdminClient();
       mockInviteUserByEmail.mockResolvedValue({
         data: { user: { id: `auth-${Date.now()}` } },
         error: null,
-      } as any);
+      } as unknown as Record<string, unknown>);
 
       await inviteStudent(adminActor, student.id);
       await expect(inviteStudent(adminActor, student.id)).rejects.toThrow(
@@ -281,11 +267,10 @@ describe("Provisioning Service Integration Tests", () => {
         },
       });
 
-      const mockSupabase = createAdminClient();
       mockInviteUserByEmail.mockResolvedValue({
         data: { user: { id: `auth-${Date.now()}` } },
         error: null,
-      } as any);
+      } as unknown as Record<string, unknown>);
 
       await inviteStudent(adminActor, s1.id);
       await expect(inviteStudent(adminActor, s2.id)).rejects.toThrow(
@@ -302,11 +287,10 @@ describe("Provisioning Service Integration Tests", () => {
           email: `role-${Date.now()}@a.com`,
         },
       });
-      const mockSupabase = createAdminClient();
       mockInviteUserByEmail.mockResolvedValue({
         data: { user: { id: `auth-${Date.now()}` } },
         error: null,
-      } as any);
+      } as unknown as Record<string, unknown>);
 
       const appUser = await inviteStudent(adminActor, student.id);
       expect(appUser.role).toBe("STUDENT");
@@ -321,12 +305,11 @@ describe("Provisioning Service Integration Tests", () => {
           email: `auth-${Date.now()}@a.com`,
         },
       });
-      const mockSupabase = createAdminClient();
       const newAuthId = `new-auth-${Date.now()}`;
       mockInviteUserByEmail.mockResolvedValue({
         data: { user: { id: newAuthId } },
         error: null,
-      } as any);
+      } as unknown as Record<string, unknown>);
 
       const appUser = await inviteStudent(adminActor, student.id);
       expect(appUser.supabaseAuthUserId).toBe(newAuthId);
@@ -341,11 +324,10 @@ describe("Provisioning Service Integration Tests", () => {
           email: `fail-${Date.now()}@a.com`,
         },
       });
-      const mockSupabase = createAdminClient();
       mockInviteUserByEmail.mockResolvedValue({
         data: { user: null },
         error: { name: "AuthApiError", status: 429, message: "rate limit" },
-      } as any);
+      } as unknown as Record<string, unknown>);
 
       await expect(inviteStudent(adminActor, student.id)).rejects.toThrow(/rate limit/i);
 
@@ -371,7 +353,7 @@ describe("Provisioning Service Integration Tests", () => {
       mockInviteUserByEmail.mockResolvedValue({
         data: { user: null },
         error: { name: "AuthApiError", status: 422, message: "Password is too weak" },
-      } as any);
+      } as unknown as Record<string, unknown>);
 
       await expect(inviteStudent(adminActor, student.id)).rejects.toThrow(
         /Password is too weak/i,
@@ -405,7 +387,7 @@ describe("Provisioning Service Integration Tests", () => {
       mockInviteUserByEmail.mockResolvedValue({
         data: { user: null },
         error: { message: "Network timeout" },
-      } as any);
+      } as unknown as Record<string, unknown>);
 
       await expect(inviteStudent(adminActor, student.id)).rejects.toThrow(
         /Network timeout/i,
@@ -424,7 +406,6 @@ describe("Provisioning Service Integration Tests", () => {
       });
       const dupAuthId = `auth-rec-${Date.now()}`;
 
-      const mockSupabase = createAdminClient();
       // Mock failure due to already exists
       mockInviteUserByEmail.mockResolvedValue({
         data: { user: null },
@@ -432,10 +413,12 @@ describe("Provisioning Service Integration Tests", () => {
           name: "AuthApiError",
           status: 422,
           message: "User already exists",
-        } as any,
-      });
+        } as unknown as Record<string, unknown>,
+      } as unknown as Record<string, unknown>);
       // Mock find returns the ID
-      vi.mocked(findAuthUserByEmail).mockResolvedValue({ id: dupAuthId } as any);
+      vi.mocked(findAuthUserByEmail).mockResolvedValue({
+        id: dupAuthId,
+      } as unknown as Awaited<ReturnType<typeof findAuthUserByEmail>>);
 
       const appUser = await inviteStudent(adminActor, student.id);
       expect(appUser.supabaseAuthUserId).toBe(dupAuthId);
@@ -485,11 +468,10 @@ describe("Provisioning Service Integration Tests", () => {
           email: `s-link-${Date.now()}@a.com`,
         },
       });
-      const mockSupabase = createAdminClient();
       mockInviteUserByEmail.mockResolvedValue({
         data: { user: { id: `auth-s-${Date.now()}` } },
         error: null,
-      } as any);
+      } as unknown as Record<string, unknown>);
       const appUser = await inviteStudent(adminActor, s.id);
       expect(appUser.studentId).toBe(s.id);
       expect(appUser.teacherId).toBeNull();
@@ -500,11 +482,10 @@ describe("Provisioning Service Integration Tests", () => {
       const t = await db.teacher.create({
         data: { displayName: "T", email: `t-link-${Date.now()}@a.com` },
       });
-      const mockSupabase = createAdminClient();
       mockInviteUserByEmail.mockResolvedValue({
         data: { user: { id: `auth-t-${Date.now()}` } },
         error: null,
-      } as any);
+      } as unknown as Record<string, unknown>);
       const appUser = await inviteTeacher(adminActor, t.id);
       expect(appUser.teacherId).toBe(t.id);
       expect(appUser.studentId).toBeNull();
@@ -523,11 +504,10 @@ describe("Provisioning Service Integration Tests", () => {
         data: { displayName: "T2", email: `t-role-${Date.now()}@a.com` },
       });
 
-      const mockSupabase = createAdminClient();
       mockInviteUserByEmail.mockResolvedValue({
         data: { user: { id: `auth-${Date.now()}` } },
         error: null,
-      } as any);
+      } as unknown as Record<string, unknown>);
 
       const u1 = await inviteStudent(adminActor, s.id);
       expect(u1.role).toBe("STUDENT");
@@ -536,7 +516,7 @@ describe("Provisioning Service Integration Tests", () => {
       mockInviteUserByEmail.mockResolvedValue({
         data: { user: { id: `auth2-${Date.now()}` } },
         error: null,
-      } as any);
+      } as unknown as Record<string, unknown>);
       const u2 = await inviteTeacher(adminActor, t.id);
       expect(u2.role).toBe("TEACHER");
       expect(u2.role).not.toBe("STUDENT");
@@ -547,11 +527,10 @@ describe("Provisioning Service Integration Tests", () => {
       const t = await db.teacher.create({
         data: { displayName: "Audit", email: `audit-${Date.now()}@a.com` },
       });
-      const mockSupabase = createAdminClient();
       mockInviteUserByEmail.mockResolvedValue({
         data: { user: { id: `auth-aud-${Date.now()}` } },
         error: null,
-      } as any);
+      } as unknown as Record<string, unknown>);
       await inviteTeacher(adminActor, t.id);
 
       const logs = await db.auditLog.findMany({
@@ -559,7 +538,7 @@ describe("Provisioning Service Integration Tests", () => {
       });
       expect(logs).toHaveLength(1);
 
-      const metadata = logs[0].metadata as any;
+      const metadata = logs[0].metadata as Record<string, unknown>;
       expect(metadata.role).toBe("TEACHER");
       // ensure no secrets
       expect(JSON.stringify(metadata)).not.toMatch(/secret|token|password/i);

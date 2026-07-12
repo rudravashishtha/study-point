@@ -4,9 +4,10 @@ import { PrismaClient, PermissionCapability, Role } from "@prisma/client";
 const { testDbProxy } = vi.hoisted(() => {
   return {
     testDbProxy: new Proxy({} as PrismaClient, {
-      get(target, prop) {
-        if (!(globalThis as any).__testDb) throw new Error("testDb is not initialized");
-        return ((globalThis as any).__testDb as any)[prop];
+      get(_target, prop) {
+        const db = (globalThis as Record<string, unknown>).__testDb as PrismaClient;
+        if (!db) throw new Error("testDb is not initialized");
+        return (db as unknown as Record<string, unknown>)[prop as string];
       },
     }),
   };
@@ -17,7 +18,7 @@ vi.mock("../../lib/db", () => ({
 }));
 
 // Mock the upstream getAppUser to simulate different auth sessions
-let mockAppUser: any = null;
+let mockAppUser: Record<string, unknown> | null = null;
 vi.mock("../../lib/auth/permissions", () => ({
   getAppUser: vi.fn().mockImplementation(async () => mockAppUser),
 }));
@@ -53,7 +54,7 @@ beforeAll(async () => {
 });
 
 afterAll(async () => {
-  const testDb = (globalThis as any).__testDb;
+  const testDb = (globalThis as Record<string, unknown>).__testDb as PrismaClient;
   if (testDb) {
     await testDb.teacherAssignment.deleteMany({});
     await testDb.homework.deleteMany({});
@@ -83,7 +84,7 @@ describe.skipIf(!isTestConfigured)("Teacher Authorization Core Integration", () 
   let inactiveTeacherId: string;
 
   beforeAll(async () => {
-    testDb = (globalThis as any).__testDb;
+    testDb = (globalThis as Record<string, unknown>).__testDb as PrismaClient;
     if (!testDb) return;
 
     // Create prerequisites

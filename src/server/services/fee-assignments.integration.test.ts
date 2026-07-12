@@ -1,12 +1,13 @@
 import { describe, it, expect, beforeAll, afterAll, beforeEach, vi } from "vitest";
-import { PrismaClient, Role, FeeAssignmentStatus } from "@prisma/client";
+import { PrismaClient, Prisma, Role, FeeAssignmentStatus } from "@prisma/client";
 
 const { testDbProxy } = vi.hoisted(() => {
   return {
     testDbProxy: new Proxy({} as PrismaClient, {
-      get(target, prop) {
-        if (!(globalThis as any).__testDb) throw new Error("testDb is not initialized");
-        return ((globalThis as any).__testDb as any)[prop];
+      get(_target, prop) {
+        const db = (globalThis as Record<string, unknown>).__testDb as PrismaClient;
+        if (!db) throw new Error("testDb is not initialized");
+        return (db as unknown as Record<string, unknown>)[prop as string];
       },
     }),
   };
@@ -66,20 +67,24 @@ describe.skipIf(!isTestConfigured)("Fee Assignment Service Integration", () => {
   // ── Shared fixtures ──────────────────────────────────────────────
   const db = prisma;
 
-  let admin: any;
-  let studentUser1: any;
-  let studentUser2: any;
-  let studentUser3: any;
-  let student1: any;
-  let student2: any;
-  let student3: any;
-  let enrolmentA: any;
-  let enrolmentB: any;
-  let enrolmentC: any; // archived
-  let session: any;
-  let batch: any;
-  let feePlan: any; // active, 3 installments
-  let archivedFeePlan: any; // archived
+  let admin: Awaited<ReturnType<typeof db.appUser.create>>;
+  let studentUser1: Awaited<ReturnType<typeof db.appUser.create>>;
+  let studentUser2: Awaited<ReturnType<typeof db.appUser.create>>;
+  let studentUser3: Awaited<ReturnType<typeof db.appUser.create>>;
+  let student1: Awaited<ReturnType<typeof db.student.create>>;
+  let student2: Awaited<ReturnType<typeof db.student.create>>;
+  let student3: Awaited<ReturnType<typeof db.student.create>>;
+  let enrolmentA: Awaited<ReturnType<typeof db.enrolment.create>>;
+  let enrolmentB: Awaited<ReturnType<typeof db.enrolment.create>>;
+  let enrolmentC: Awaited<ReturnType<typeof db.enrolment.create>>; // archived
+  let session: Awaited<ReturnType<typeof db.academicSession.create>>;
+  let batch: Awaited<ReturnType<typeof db.batch.create>>;
+  let feePlan!: NonNullable<
+    Prisma.FeePlanGetPayload<{
+      include: { instalments: { orderBy: { displayOrder: "asc" } } };
+    }>
+  >;
+  let archivedFeePlan: Awaited<ReturnType<typeof db.feePlan.create>>; // archived
 
   const adminActor: ActorContext = {
     userId: "",
@@ -188,7 +193,7 @@ describe.skipIf(!isTestConfigured)("Fee Assignment Service Integration", () => {
       },
     });
 
-    feePlan = await db.feePlan.create({
+    feePlan = (await db.feePlan.create({
       data: {
         academicSessionId: session.id,
         curriculumTrackId: track.id,
@@ -197,8 +202,7 @@ describe.skipIf(!isTestConfigured)("Fee Assignment Service Integration", () => {
         frequency: "CUSTOM",
         isActive: true,
       },
-      include: { instalments: true },
-    });
+    })) as unknown as typeof feePlan;
     await db.feePlanInstallment.createMany({
       data: [
         {
@@ -224,10 +228,10 @@ describe.skipIf(!isTestConfigured)("Fee Assignment Service Integration", () => {
         },
       ],
     });
-    feePlan = await db.feePlan.findUnique({
+    feePlan = (await db.feePlan.findUnique({
       where: { id: feePlan.id },
       include: { instalments: { orderBy: { displayOrder: "asc" } } },
-    });
+    })) as unknown as typeof feePlan;
 
     archivedFeePlan = await db.feePlan.create({
       data: {
@@ -258,7 +262,7 @@ describe.skipIf(!isTestConfigured)("Fee Assignment Service Integration", () => {
   });
 
   const input = (enrolmentIds: string[], startsOn = "2026-08-01") => ({
-    feePlanId: feePlan.id,
+    feePlanId: feePlan!.id,
     enrolmentIds,
     startsOn,
     endsOn: null,
@@ -309,7 +313,7 @@ describe.skipIf(!isTestConfigured)("Fee Assignment Service Integration", () => {
     expect(res.success).toBe(true);
     if (!res.success) return;
     const sum = feePlan.instalments.reduce(
-      (s: number, i: any) => s + i.amount.toNumber(),
+      (s: number, i: { amount: { toNumber: () => number } }) => s + i.amount.toNumber(),
       0,
     );
     expect(res.data.totals.totalAmount).toBe(sum);
@@ -499,7 +503,12 @@ describe.skipIf(!isTestConfigured)("Fee Assignment Service Integration", () => {
     });
     expect(dues.length).toBe(0);
     const all = await db.studentFeeDue.findMany();
-    expect(all.every((d: any) => d.amountWaived.toNumber() === 0)).toBe(true);
+    expect(
+      all.every(
+        (d: { amountWaived: { toNumber: () => number } }) =>
+          d.amountWaived.toNumber() === 0,
+      ),
+    ).toBe(true);
   });
 
   // ── 16. Status defaults ─────────────────────────────────────────
@@ -515,7 +524,7 @@ describe.skipIf(!isTestConfigured)("Fee Assignment Service Integration", () => {
     const dues = await db.studentFeeDue.findMany({
       where: { feeAssignmentId: assignmentId },
     });
-    expect(dues.every((d: any) => d.status === "PENDING")).toBe(true);
+    expect(dues.every((d: { status: string }) => d.status === "PENDING")).toBe(true);
   });
 
   // ── 17. Audit log creation ──────────────────────────────────────

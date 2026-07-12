@@ -3,7 +3,33 @@ import "@testing-library/jest-dom/vitest";
 import { describe, it, expect, vi, afterEach } from "vitest";
 import { render, screen, fireEvent, cleanup } from "@testing-library/react";
 import { FeeAssignmentList } from "./FeeAssignmentList";
-import { FeeAssignmentStatus } from "@prisma/client";
+import { FeeAssignmentStatus, Prisma } from "@prisma/client";
+
+type AssignmentRow = Prisma.StudentFeeAssignmentGetPayload<{
+  include: {
+    enrolment: { include: { student: true } };
+    feePlan: true;
+    _count: { select: { dues: true } };
+  };
+}>;
+
+type FeePlanRow = Prisma.FeePlanGetPayload<{
+  include: {
+    instalments: true;
+    academicSession: true;
+    curriculumTrack: true;
+    batch: true;
+  };
+}>;
+
+type EnrolmentRow = Prisma.EnrolmentGetPayload<{
+  include: {
+    student: true;
+    batch: true;
+    academicSession: true;
+    curriculumTrack: true;
+  };
+}>;
 
 vi.mock("next/navigation", () => ({
   useRouter: () => ({ push: vi.fn(), refresh: vi.fn() }),
@@ -144,7 +170,7 @@ const batches = [
   { id: "batch-1", name: "Batch A", archivedAt: null },
   { id: "batch-2", name: "Batch B", archivedAt: new Date() },
 ];
-const feePlans: any[] = [
+const feePlans = [
   {
     id: "fp-1",
     name: "Annual Fee",
@@ -180,8 +206,8 @@ const feePlans: any[] = [
       },
     ],
   },
-];
-const enrolments: any[] = [
+] as unknown as FeePlanRow[];
+const enrolments = [
   {
     id: "e-1",
     studentId: "stu-1",
@@ -224,7 +250,7 @@ const enrolments: any[] = [
     academicSession: { id: "session-1", name: "2026-27" },
     curriculumTrack: { id: "track-1", displayName: "CBSE XI" },
   },
-];
+] as unknown as EnrolmentRow[];
 
 describe("FeeAssignmentList UI", () => {
   it("1. shows empty state when no assignments exist", () => {
@@ -254,7 +280,7 @@ describe("FeeAssignmentList UI", () => {
     ];
     render(
       <FeeAssignmentList
-        assignments={data as any}
+        assignments={data as unknown as AssignmentRow[]}
         feePlans={feePlans}
         sessions={sessions}
         tracks={tracks}
@@ -272,7 +298,7 @@ describe("FeeAssignmentList UI", () => {
     const data = [createMockAssignment("a1")];
     render(
       <FeeAssignmentList
-        assignments={data as any}
+        assignments={data as unknown as AssignmentRow[]}
         feePlans={feePlans}
         sessions={sessions}
         tracks={tracks}
@@ -287,7 +313,7 @@ describe("FeeAssignmentList UI", () => {
   it("4. archive button is present for active assignments", () => {
     render(
       <FeeAssignmentList
-        assignments={[createMockAssignment("a1") as any]}
+        assignments={[createMockAssignment("a1") as unknown as AssignmentRow]}
         feePlans={feePlans}
         sessions={sessions}
         tracks={tracks}
@@ -308,7 +334,7 @@ describe("FeeAssignmentList UI", () => {
               archivedAt: new Date(),
               studentName: "Bob",
             }),
-          ] as any
+          ] as unknown as AssignmentRow[]
         }
         feePlans={feePlans}
         sessions={sessions}
@@ -325,7 +351,7 @@ describe("FeeAssignmentList UI", () => {
   it("6. active assignment does not show Restore", () => {
     render(
       <FeeAssignmentList
-        assignments={[createMockAssignment("a1") as any]}
+        assignments={[createMockAssignment("a1") as unknown as AssignmentRow]}
         feePlans={feePlans}
         sessions={sessions}
         tracks={tracks}
@@ -347,7 +373,7 @@ describe("FeeAssignmentList UI", () => {
     ];
     render(
       <FeeAssignmentList
-        assignments={data as any}
+        assignments={data as unknown as AssignmentRow[]}
         feePlans={feePlans}
         sessions={sessions}
         tracks={tracks}
@@ -405,7 +431,7 @@ describe("FeeAssignmentList UI", () => {
     ];
     render(
       <FeeAssignmentList
-        assignments={data as any}
+        assignments={data as unknown as AssignmentRow[]}
         feePlans={feePlans}
         sessions={sessions}
         tracks={tracks}

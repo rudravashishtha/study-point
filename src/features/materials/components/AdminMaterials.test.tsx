@@ -1,10 +1,9 @@
 // @vitest-environment jsdom
 import { describe, it, expect, beforeEach, vi, afterEach } from "vitest";
 import "@testing-library/jest-dom/vitest";
-import { render, screen, fireEvent, cleanup, waitFor } from "@testing-library/react";
+import { render, screen, fireEvent, cleanup } from "@testing-library/react";
 
 import { MaterialFormDialog } from "./MaterialFormDialog";
-import * as actions from "@/app/admin/materials/actions";
 
 afterEach(() => {
   cleanup();
@@ -16,7 +15,11 @@ vi.mock("@/app/admin/materials/actions", () => ({
 }));
 
 vi.mock("@/components/upload/StudyMaterialUpload", () => ({
-  StudyMaterialUpload: ({ onUploadSuccess }: any) => (
+  StudyMaterialUpload: ({
+    onUploadSuccess,
+  }: {
+    onUploadSuccess: (assetId: string) => void;
+  }) => (
     <button data-testid="mock-upload" onClick={() => onUploadSuccess("mock-asset-123")}>
       Mock Upload
     </button>
@@ -30,7 +33,13 @@ describe("AdminMaterialFormDialog", () => {
 
   const sessions = [{ id: "s1", name: "2026-27" }];
   const batches = [
-    { id: "b1", name: "Class 10 A", academicSessionId: "s1", curriculumTrackId: "t1" },
+    {
+      id: "b1",
+      name: "Class 10 A",
+      academicSessionId: "s1",
+      curriculumTrackId: "t1",
+      archivedAt: null,
+    },
   ];
   const tracks = [{ id: "t1", name: "CBSE Class 10" }];
 

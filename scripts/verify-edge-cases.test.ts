@@ -16,17 +16,16 @@ import {
   updateEnrolment,
   archiveEnrolment,
   restoreEnrolment,
-  assignToBatch,
   removeFromBatch,
 } from "../src/server/services/enrolments";
 
 vi.mock("../src/lib/db", () => ({
   get db() {
-    return (globalThis as any).__testDb;
+    return (globalThis as unknown as Record<string, unknown>).__testDb;
   },
 }));
 
-const testDb = setupIsolatedTestDb();
+setupIsolatedTestDb();
 
 it("verifies edge cases", async () => {
   if (!isTestConfigured) return;
