@@ -21,20 +21,57 @@ import {
 } from "@/app/admin/homework/actions";
 import { HomeworkUpload } from "@/components/upload/HomeworkUpload";
 
+interface HomeworkFormBatch {
+  id: string;
+  name: string;
+  archivedAt?: Date | string | null;
+}
+
+interface HomeworkFormSession {
+  id: string;
+  name: string;
+}
+
+interface HomeworkFormTrack {
+  id: string;
+  name?: string | null;
+}
+
+export interface HomeworkFormData {
+  id: string;
+  title: string;
+  description?: string | null;
+  batchId: string;
+  assignedDate: string | Date;
+  dueDate: string | Date;
+  chapterId?: string | null;
+  topicId?: string | null;
+  fileAssetId?: string | null;
+}
+
+interface HomeworkFormPayload {
+  batchId: string;
+  title: string;
+  description: string | null;
+  assignedDate: string;
+  dueDate: string;
+  chapterId: string | null;
+  topicId: string | null;
+  fileAssetId?: string;
+}
+
 export function HomeworkFormDialog({
   open,
   onOpenChange,
   homework,
-  sessions,
   batches,
-  tracks,
 }: {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  homework?: any;
-  sessions: any[];
-  batches: any[];
-  tracks: any[];
+  homework?: HomeworkFormData | null;
+  sessions: HomeworkFormSession[];
+  batches: HomeworkFormBatch[];
+  tracks: HomeworkFormTrack[];
 }) {
   const [loading, setLoading] = useState(false);
 
@@ -85,7 +122,7 @@ export function HomeworkFormDialog({
       if (!assignedDate) throw new Error("Assigned date is required");
       if (!dueDate) throw new Error("Due date is required");
 
-      const payload: any = {
+      const payload: HomeworkFormPayload = {
         batchId,
         title: title.trim(),
         description: description.trim() || null,
@@ -106,8 +143,9 @@ export function HomeworkFormDialog({
       }
       toast.success("Success", { description: "Homework saved" });
       onOpenChange(false);
-    } catch (e: any) {
-      toast.error("Error", { description: e.message });
+    } catch (e: unknown) {
+      const message = e instanceof Error ? e.message : "Unknown error";
+      toast.error("Error", { description: message });
     } finally {
       setLoading(false);
     }

@@ -38,9 +38,6 @@ type EnrolmentWithRelations = Prisma.EnrolmentGetPayload<{
 export function FeeAssignmentList({
   assignments,
   feePlans,
-  sessions,
-  tracks,
-  batches,
   enrolments,
   defaultArchiveFilter = "active",
 }: {
@@ -90,7 +87,7 @@ export function FeeAssignmentList({
     return { total, active, archived };
   }, [assignments]);
 
-  const formatAmount = (amount: any) => {
+  const formatAmount = (amount: number | string | null | undefined) => {
     if (!amount) return "\u20B90.00";
     const num = typeof amount === "number" ? amount : parseFloat(amount);
     return `\u20B9${num.toFixed(2)}`;
@@ -246,7 +243,7 @@ export function FeeAssignmentList({
                   </div>
                 </td>
                 <td className="p-4 text-sm text-right">
-                  {formatAmount(a.assignedTotalAmount)}
+                  {formatAmount(a.assignedTotalAmount.toString())}
                 </td>
                 <td className="p-4 text-center">{statusBadge(a.status)}</td>
                 <td className="p-4 text-center text-sm text-muted-foreground">
@@ -280,7 +277,7 @@ export function FeeAssignmentList({
                   </div>
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Amount</span>
-                    <span>{formatAmount(a.assignedTotalAmount)}</span>
+                    <span>{formatAmount(a.assignedTotalAmount.toString())}</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Code</span>

@@ -34,18 +34,45 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
+export interface TeacherHomeworkItem {
+  id: string;
+  title: string;
+  description?: string | null;
+  lifecycleState: string;
+  batchId: string;
+  assignedDate: string | Date;
+  dueDate: string;
+  fileAssetId?: string | null;
+  chapterId?: string | null;
+  topicId?: string | null;
+  chapter?: { name: string } | null;
+  topic?: { name: string } | null;
+}
+
+interface TeacherChapterItem {
+  id: string;
+  name: string;
+}
+
+interface ActionResult {
+  success: boolean;
+  error?: { message: string };
+}
+
 export function TeacherHomeworkList({
   homework,
   chapters,
   batchId,
   canManage,
 }: {
-  homework: any[];
-  chapters: any[];
+  homework: TeacherHomeworkItem[];
+  chapters: TeacherChapterItem[];
   batchId: string;
   canManage: boolean;
 }) {
-  const [editingHomework, setEditingHomework] = useState<any>(null);
+  const [editingHomework, setEditingHomework] = useState<TeacherHomeworkItem | null>(
+    null,
+  );
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [search, setSearch] = useState("");
   const [filterState, setFilterState] = useState<string>("ALL");
@@ -56,16 +83,20 @@ export function TeacherHomeworkList({
     return true;
   });
 
-  const handleAction = async (action: () => Promise<any>, successMsg: string) => {
+  const handleAction = async (
+    action: () => Promise<ActionResult>,
+    successMsg: string,
+  ) => {
     try {
       const res = await action();
       if (!res.success) {
-        toast.error("Error", { description: res.error.message });
+        toast.error("Error", { description: res.error?.message });
         return;
       }
       toast.success("Success", { description: successMsg });
-    } catch (e: any) {
-      toast.error("Error", { description: e.message });
+    } catch (e: unknown) {
+      const message = e instanceof Error ? e.message : "Unknown error";
+      toast.error("Error", { description: message });
     }
   };
 

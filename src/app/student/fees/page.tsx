@@ -2,10 +2,37 @@ import { redirect } from "next/navigation";
 import { WalletCards } from "lucide-react";
 import { requireRole } from "@/lib/auth/permissions";
 import { Role } from "@prisma/client";
-import { listStudentFeeDues } from "@/server/services/fee-assignments";
-import { StudentFeeStatus } from "@/features/fees/components/StudentFeeStatus";
+import {
+  listStudentFeeDues,
+  type StudentFeeDuesResult,
+} from "@/server/services/fee-assignments";
+import {
+  StudentFeeStatus,
+  type FeeAssignment,
+} from "@/features/fees/components/StudentFeeStatus";
 import { EmptyState } from "@/components/feedback/empty-state";
 import { db } from "@/lib/db";
+
+function toFeeAssignmentView(
+  assignments: StudentFeeDuesResult["assignments"],
+): FeeAssignment[] {
+  return assignments.map((a) => ({
+    id: a.id,
+    feePlan: a.feePlan ? { name: a.feePlan.name } : null,
+    enrolment: {
+      batch: a.enrolment?.batch ? { name: a.enrolment.batch.name } : null,
+      curriculumTrack: null,
+    },
+    dues: a.dues.map((d) => ({
+      id: d.id,
+      label: d.label,
+      dueDate: d.dueDate,
+      amountDue: d.amountDue.toString(),
+      amountWaived: d.amountWaived.toString(),
+      status: d.status,
+    })),
+  }));
+}
 
 export default async function StudentFeesPage() {
   const appUser = await requireRole(Role.STUDENT);
@@ -55,6 +82,8 @@ export default async function StudentFeesPage() {
 
   const { assignments } = result.data;
 
+  const feeAssignments = toFeeAssignmentView(assignments);
+
   if (assignments.length === 0) {
     return (
       <EmptyState
@@ -72,7 +101,7 @@ export default async function StudentFeesPage() {
         <p className="text-muted-foreground">Your fee plans, dues, and payment status.</p>
       </div>
 
-      <StudentFeeStatus assignments={assignments} />
+      <StudentFeeStatus assignments={feeAssignments} />
     </div>
   );
 }

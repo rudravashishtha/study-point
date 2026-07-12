@@ -254,8 +254,11 @@ export async function updateFeePlan(
 
   try {
     return await db.$transaction(async (tx) => {
-      const updateData: any = {};
-      if (data.batchId !== undefined) updateData.batchId = data.batchId || null;
+      const updateData: Prisma.FeePlanUpdateInput = {};
+      if (data.batchId !== undefined)
+        updateData.batch = data.batchId
+          ? { connect: { id: data.batchId } }
+          : { disconnect: true };
       if (data.name !== undefined) updateData.name = data.name;
       if (data.description !== undefined) updateData.description = data.description;
       if (data.totalAmount !== undefined)

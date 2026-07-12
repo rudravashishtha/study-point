@@ -15,14 +15,37 @@ import { Download, ExternalLink, FileText } from "lucide-react";
 import { buttonVariants } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
+interface MaterialItem {
+  id: string;
+  title: string;
+  description?: string | null;
+  resourceType: string;
+  textContent?: string | null;
+  fileAssetId?: string | null;
+  publishedAt?: string | Date | null;
+  chapterId?: string | null;
+  topicId?: string | null;
+  externalLinkUrl?: string | null;
+}
+
+interface ChapterItem {
+  id: string;
+  name: string;
+}
+
+interface TopicItem {
+  id: string;
+  name: string;
+}
+
 export function StudentMaterialList({
   materials,
   chapters,
   topics,
 }: {
-  materials: any[];
-  chapters: any[];
-  topics: any[];
+  materials: MaterialItem[];
+  chapters: ChapterItem[];
+  topics: TopicItem[];
 }) {
   const [search, setSearch] = useState("");
 

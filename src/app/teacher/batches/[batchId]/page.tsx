@@ -2,14 +2,16 @@ import { notFound, redirect } from "next/navigation";
 import { requireAuth } from "@/lib/auth/permissions";
 import { getTeacherContext } from "@/server/auth/teacher";
 import { getBatchById } from "@/server/services/batches";
-import { getTrackById as getCurriculumTrackById } from "@/server/services/curriculum/tracks";
 import { listChapters } from "@/server/services/curriculum/chapters";
 import { db } from "@/lib/db";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { BookOpen, AlertCircle, ClipboardCheck } from "lucide-react";
 import { TeacherMaterialList } from "@/features/materials/components/TeacherMaterialList";
-import { TeacherHomeworkList } from "@/features/homework/components/TeacherHomeworkList";
+import {
+  TeacherHomeworkList,
+  type TeacherHomeworkItem,
+} from "@/features/homework/components/TeacherHomeworkList";
 
 export default async function TeacherBatchDetailPage({
   params,
@@ -31,7 +33,6 @@ export default async function TeacherBatchDetailPage({
   }
 
   // Find the track and chapters
-  const track = await getCurriculumTrackById(batch.curriculumTrackId);
   const chapters = await listChapters(batch.curriculumTrackId, {
     archiveState: "active",
   });
@@ -47,7 +48,7 @@ export default async function TeacherBatchDetailPage({
   });
 
   // Fetch homework for this batch
-  const homework = await db.homework.findMany({
+  const homeworkRecords = await db.homework.findMany({
     where: { batchId },
     orderBy: [{ dueDate: "asc" }, { createdAt: "desc" }],
     include: {
@@ -56,6 +57,21 @@ export default async function TeacherBatchDetailPage({
       fileAsset: true,
     },
   });
+
+  const homework: TeacherHomeworkItem[] = homeworkRecords.map((h) => ({
+    id: h.id,
+    title: h.title,
+    description: h.description,
+    lifecycleState: h.lifecycleState,
+    batchId: h.batchId,
+    assignedDate: h.assignedDate,
+    dueDate: h.dueDate.toISOString(),
+    fileAssetId: h.fileAssetId,
+    chapterId: h.chapterId,
+    topicId: h.topicId,
+    chapter: h.chapter ? { name: h.chapter.name } : null,
+    topic: h.topic ? { name: h.topic.name } : null,
+  }));
 
   const canManageMaterials = context.effectivePermissions.includes("MATERIALS_MANAGE");
   const canManageHomework = context.effectivePermissions.includes("HOMEWORK_MANAGE");

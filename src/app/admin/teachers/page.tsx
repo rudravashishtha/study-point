@@ -1,5 +1,5 @@
 import { requireAdmin } from "@/lib/auth/permissions";
-import { listTeachers } from "@/server/services/teachers";
+import { listTeachers, type ListTeachersOptions } from "@/server/services/teachers";
 import { TeacherList } from "@/features/teachers/components/TeacherList";
 import { Button } from "@/components/ui/button";
 import { DataListSearch } from "@/components/admin/data-list/DataListSearch";
@@ -28,10 +28,10 @@ export default async function TeachersPage({
   await requireAdmin();
 
   const q = searchParams.q || "";
-  const status = (searchParams.status as any) || "active";
+  const status = (searchParams.status as ListTeachersOptions["status"]) || "active";
   const page = searchParams.page ? parseInt(searchParams.page, 10) : 1;
-  const sort = (searchParams.sort as any) || "displayName";
-  const direction = (searchParams.direction as any) || "asc";
+  const sort = (searchParams.sort as ListTeachersOptions["sort"]) || "displayName";
+  const direction = (searchParams.direction as ListTeachersOptions["direction"]) || "asc";
 
   const { items, total, limit } = await listTeachers({
     q,
@@ -82,7 +82,7 @@ export default async function TeachersPage({
             defaultValue={status}
             onValueChange={(val) => {
               const url = new URL(window.location.href);
-              url.searchParams.set("status", val);
+              url.searchParams.set("status", val ?? "");
               url.searchParams.set("page", "1");
               window.location.href = url.pathname + url.search;
             }}

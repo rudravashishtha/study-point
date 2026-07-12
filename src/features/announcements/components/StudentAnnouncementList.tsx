@@ -10,7 +10,21 @@ const priorityMeta: Record<AnnouncementPriority, { label: string; className: str
   URGENT: { label: "Urgent", className: "bg-red-100 text-red-800" },
 };
 
-export function StudentAnnouncementList({ announcements }: { announcements: any[] }) {
+interface StudentAnnouncementItem {
+  id: string;
+  title: string;
+  content: string;
+  priority: string;
+  publishedAt?: string | Date | null;
+  archivedAt?: string | Date | null;
+  expiresAt?: string | Date | null;
+}
+
+export function StudentAnnouncementList({
+  announcements,
+}: {
+  announcements: StudentAnnouncementItem[];
+}) {
   const visible = announcements.filter((a) => {
     if (!a.publishedAt) return false;
     if (a.archivedAt) return false;
@@ -45,14 +59,16 @@ export function StudentAnnouncementList({ announcements }: { announcements: any[
             </p>
 
             <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-muted-foreground">
-              <span>
-                Published{" "}
-                {new Date(a.publishedAt).toLocaleDateString("en-IN", {
-                  year: "numeric",
-                  month: "short",
-                  day: "numeric",
-                })}
-              </span>
+              {a.publishedAt && (
+                <span>
+                  Published{" "}
+                  {new Date(a.publishedAt).toLocaleDateString("en-IN", {
+                    year: "numeric",
+                    month: "short",
+                    day: "numeric",
+                  })}
+                </span>
+              )}
               {a.expiresAt && (
                 <span>
                   Expires{" "}

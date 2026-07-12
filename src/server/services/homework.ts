@@ -1,4 +1,4 @@
-import { Homework, HomeworkLifecycleState, Role } from "@prisma/client";
+import { Homework, HomeworkLifecycleState, Prisma } from "@prisma/client";
 import { z } from "zod";
 import { db as prisma } from "../../lib/db";
 import { ServiceResult, success, failure } from "./types";
@@ -87,13 +87,6 @@ async function loadTeacherAuth(
     permissions: effectivePerms,
     hasActiveAssignment: !!assignment,
   });
-}
-
-async function checkBatchNotArchived(batchId: string): Promise<ServiceResult<null>> {
-  const batch = await prisma.batch.findUnique({ where: { id: batchId } });
-  if (!batch) return failure("NOT_FOUND", "Batch not found");
-  if (batch.archivedAt) return failure("ARCHIVED_BATCH", "Batch is archived");
-  return success(null);
 }
 
 async function validateChapterAndTopic(
@@ -333,12 +326,21 @@ export async function updateHomework(
   );
   if (!ctResult.success) return ctResult;
 
-  const updateData: any = {};
+  const updateData: Prisma.HomeworkUpdateInput = {};
   if (data.title !== undefined) updateData.title = data.title;
   if (data.description !== undefined) updateData.description = data.description;
-  if (data.chapterId !== undefined) updateData.chapterId = data.chapterId || null;
-  if (data.topicId !== undefined) updateData.topicId = data.topicId || null;
-  if (data.fileAssetId !== undefined) updateData.fileAssetId = data.fileAssetId || null;
+  if (data.chapterId !== undefined)
+    updateData.chapter = data.chapterId
+      ? { connect: { id: data.chapterId } }
+      : { disconnect: true };
+  if (data.topicId !== undefined)
+    updateData.topic = data.topicId
+      ? { connect: { id: data.topicId } }
+      : { disconnect: true };
+  if (data.fileAssetId !== undefined)
+    updateData.fileAsset = data.fileAssetId
+      ? { connect: { id: data.fileAssetId } }
+      : { disconnect: true };
   if (data.assignedDate !== undefined)
     updateData.assignedDate = dateFromString(data.assignedDate);
   if (data.dueDate !== undefined) updateData.dueDate = dateFromString(data.dueDate);
@@ -511,7 +513,7 @@ export async function listAdminHomework(
   const page = Math.max(1, params.page || 1);
   const pageSize = Math.min(50, Math.max(1, params.pageSize || 20));
 
-  const where: any = {};
+  const where: Prisma.HomeworkWhereInput = {};
   if (params.batchId) where.batchId = params.batchId;
   if (params.academicSessionId) where.academicSessionId = params.academicSessionId;
   if (params.curriculumTrackId) where.curriculumTrackId = params.curriculumTrackId;
@@ -562,7 +564,7 @@ export async function listTeacherBatchHomework(
   const page = Math.max(1, params.page || 1);
   const pageSize = Math.min(50, Math.max(1, params.pageSize || 20));
 
-  const where: any = { batchId };
+  const where: Prisma.HomeworkWhereInput = { batchId };
   if (params.lifecycleState) where.lifecycleState = params.lifecycleState;
 
   const [total, items] = await prisma.$transaction([
@@ -688,7 +690,7 @@ export async function getHomeworkDownloadUrl(
     authorized = true;
   } else if (actor.role === "TEACHER" && actor.teacher) {
     const assignment = actor.teacher.teacherAssignments.find(
-      (a: any) => a.batchId === homework.batchId,
+      (a) => a.batchId === homework.batchId,
     );
     if (assignment) {
       const perms = resolveEffectivePermissions(assignment.permissions);
@@ -699,7 +701,7 @@ export async function getHomeworkDownloadUrl(
   } else if (actor.role === "STUDENT" && actor.student) {
     if (homework.lifecycleState === "PUBLISHED" && !homework.batch.archivedAt) {
       authorized = actor.student.enrolments.some(
-        (e: any) => e.batchId === homework.batchId && e.batch && !e.batch.archivedAt,
+        (e) => e.batchId === homework.batchId && e.batch && !e.batch.archivedAt,
       );
     }
   }

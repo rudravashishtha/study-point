@@ -91,10 +91,10 @@ export function HomeworkUpload({
 
       setStatus("success");
       onUploadSuccess(fileAssetId);
-    } catch (err: any) {
+    } catch (err: unknown) {
       setStatus("error");
-      setErrorMsg(err.message);
-      onUploadError(err.message);
+      setErrorMsg(err instanceof Error ? err.message : "Upload failed");
+      onUploadError(err instanceof Error ? err.message : "Upload failed");
     } finally {
       setUploading(false);
     }

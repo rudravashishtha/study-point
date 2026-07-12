@@ -12,9 +12,31 @@ import {
 import { buttonVariants } from "@/components/ui/button";
 import { Download } from "lucide-react";
 
-export function StudentHomeworkList({ homework }: { homework: any[] }) {
+export interface StudentHomeworkItem {
+  id: string;
+  title: string;
+  description?: string | null;
+  dueDate: string;
+  batchId: string;
+  fileAssetId?: string | null;
+  assignedDate: string | Date;
+  batch?: { name: string } | null;
+  chapter?: { name: string } | null;
+  topic?: { name: string } | null;
+}
+
+export function StudentHomeworkList({ homework }: { homework: StudentHomeworkItem[] }) {
   const isOverdue = (dueDate: string) => {
     return isPast(startOfDay(parseISO(dueDate)));
+  };
+
+  const formatDate = (value: string | Date) => {
+    const date = typeof value === "string" ? parseISO(value) : value;
+    return date.toLocaleDateString("en-IN", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+    });
   };
 
   if (homework.length === 0) {
@@ -54,7 +76,7 @@ export function StudentHomeworkList({ homework }: { homework: any[] }) {
                 </TableCell>
                 <TableCell className="text-sm">{h.batch?.name}</TableCell>
                 <TableCell className="text-sm whitespace-nowrap">
-                  {h.assignedDate}
+                  {formatDate(h.assignedDate)}
                 </TableCell>
                 <TableCell className="text-sm whitespace-nowrap">
                   <span className={overdue ? "text-red-600 font-semibold" : ""}>

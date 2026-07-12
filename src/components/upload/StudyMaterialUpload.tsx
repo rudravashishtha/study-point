@@ -26,7 +26,6 @@ export function StudyMaterialUpload({
 }: StudyMaterialUploadProps) {
   const [file, setFile] = useState<File | null>(null);
   const [uploading, setUploading] = useState(false);
-  const [progress, setProgress] = useState(0);
   const [status, setStatus] = useState<
     "idle" | "intent" | "uploading" | "finalizing" | "success" | "error"
   >("idle");
@@ -103,10 +102,10 @@ export function StudyMaterialUpload({
 
       setStatus("success");
       onUploadSuccess(fileAssetId);
-    } catch (err: any) {
+    } catch (err: unknown) {
       setStatus("error");
-      setErrorMsg(err.message);
-      onUploadError(err.message);
+      setErrorMsg(err instanceof Error ? err.message : "Upload failed");
+      onUploadError(err instanceof Error ? err.message : "Upload failed");
     } finally {
       setUploading(false);
     }

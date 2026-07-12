@@ -7,6 +7,25 @@ import {
   Megaphone,
   WalletCards,
 } from "lucide-react";
+import {
+  type DashboardAnnouncementItem,
+  type DashboardHomeworkItem,
+  type DashboardTestItem,
+  type DashboardFeeAssignment,
+  type DashboardFeeDue,
+} from "@/server/services/student-dashboard";
+
+interface DashboardTimetableGroup {
+  dayOfWeek: number;
+  dayLabel: string;
+  schedules: {
+    startTime: string;
+    batch?: {
+      name: string;
+      curriculumTrack?: { subject?: { name: string } | null } | null;
+    } | null;
+  }[];
+}
 
 function WidgetCard({
   title,
@@ -67,11 +86,11 @@ export function StudentDashboard({
   data,
 }: {
   data: {
-    timetable: { groups: { dayOfWeek: number; dayLabel: string; schedules: any[] }[] };
-    announcements: { items: any[] };
-    homework: { items: any[] };
-    tests: { items: any[] };
-    fees: { assignments: any[] };
+    timetable: { groups: DashboardTimetableGroup[] };
+    announcements: { items: DashboardAnnouncementItem[] };
+    homework: { items: DashboardHomeworkItem[] };
+    tests: { items: DashboardTestItem[] };
+    fees: { assignments: DashboardFeeAssignment[] };
   };
 }) {
   const today = new Date().getDay();
@@ -84,13 +103,13 @@ export function StudentDashboard({
     null;
 
   const pendingTotal = data.fees.assignments
-    .flatMap((a: any) => a.dues || [])
+    .flatMap((a: DashboardFeeAssignment) => a.dues || [])
     .filter(
-      (d: any) =>
+      (d: DashboardFeeDue) =>
         d.status === "PENDING" || d.status === "OVERDUE" || d.status === "PARTIALLY_PAID",
     )
     .reduce(
-      (sum: number, d: any) =>
+      (sum: number, d: DashboardFeeDue) =>
         sum + (parseFloat(d.amountDue) - parseFloat(d.amountWaived)),
       0,
     );
@@ -116,7 +135,7 @@ export function StudentDashboard({
             <div className="text-right">
               <p className="text-sm font-semibold">{formatTime(nextClass.startTime)}</p>
               <p className="text-xs text-muted-foreground">
-                {todayGroup ? "Today" : (nextClass.dayLabel as string) || "Upcoming"}
+                {todayGroup ? "Today" : "Upcoming"}
               </p>
             </div>
           </div>
@@ -146,7 +165,7 @@ export function StudentDashboard({
         emptyText="No homework assigned."
       >
         <ul className="space-y-2">
-          {data.homework.items.slice(0, 3).map((h: any) => (
+          {data.homework.items.slice(0, 3).map((h: DashboardHomeworkItem) => (
             <li
               key={h.id}
               className="flex items-center justify-between gap-3 text-sm border-b last:border-0 pb-2 last:pb-0"
@@ -169,7 +188,7 @@ export function StudentDashboard({
         emptyText="No tests scheduled."
       >
         <ul className="space-y-2">
-          {data.tests.items.slice(0, 3).map((t: any) => (
+          {data.tests.items.slice(0, 3).map((t: DashboardTestItem) => (
             <li
               key={t.id}
               className="flex items-center justify-between gap-3 text-sm border-b last:border-0 pb-2 last:pb-0"
@@ -192,7 +211,7 @@ export function StudentDashboard({
         emptyText="No notices yet."
       >
         <ul className="space-y-2">
-          {data.announcements.items.slice(0, 3).map((a: any) => (
+          {data.announcements.items.slice(0, 3).map((a: DashboardAnnouncementItem) => (
             <li
               key={a.id}
               className="flex items-center justify-between gap-3 text-sm border-b last:border-0 pb-2 last:pb-0"

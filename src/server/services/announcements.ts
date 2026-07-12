@@ -201,7 +201,7 @@ export async function updateAnnouncement(
   if (existing.archivedAt)
     return failure("INVALID_LIFECYCLE", "Cannot edit an archived announcement");
 
-  const data: any = {};
+  const data: Prisma.AnnouncementUpdateInput = {};
   if (input.title !== undefined) data.title = input.title;
   if (input.content !== undefined) data.content = input.content;
   if (input.priority !== undefined) data.priority = input.priority;
@@ -209,7 +209,7 @@ export async function updateAnnouncement(
   data.updatedBy = actor.userId;
 
   // publishedAt must never be modified by an edit
-  delete (data as any).publishedAt;
+  delete data.publishedAt;
 
   const announcement = await db.$transaction(async (tx) => {
     const updated = await tx.announcement.update({
@@ -363,7 +363,7 @@ export async function listAdminAnnouncements(
 ): Promise<ServiceResult<AnnouncementListResult>> {
   if (actor.role !== "ADMIN") return failure("UNAUTHORIZED", "Admin access required");
 
-  const where: any = {};
+  const where: Prisma.AnnouncementWhereInput = {};
 
   if (params.archiveState === "active") {
     where.archivedAt = null;

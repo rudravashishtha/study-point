@@ -23,7 +23,26 @@ function formatDate(date: Date | string): string {
   });
 }
 
-export function StudentFeeStatus({ assignments }: { assignments: any[] }) {
+export interface FeeDue {
+  id: string;
+  label: string;
+  dueDate: string | Date;
+  amountDue: string;
+  amountWaived: string;
+  status: string;
+}
+
+export interface FeeAssignment {
+  id: string;
+  feePlan?: { name: string } | null;
+  enrolment?: {
+    batch?: { name: string } | null;
+    curriculumTrack?: { subject?: { name: string } | null } | null;
+  } | null;
+  dues: FeeDue[];
+}
+
+export function StudentFeeStatus({ assignments }: { assignments: FeeAssignment[] }) {
   if (assignments.length === 0) return null;
 
   const pendingTotal = assignments
@@ -32,7 +51,10 @@ export function StudentFeeStatus({ assignments }: { assignments: any[] }) {
       (d) =>
         d.status === "PENDING" || d.status === "OVERDUE" || d.status === "PARTIALLY_PAID",
     )
-    .reduce((sum, d) => sum + (parseFloat(d.amountDue) - parseFloat(d.amountWaived)), 0);
+    .reduce<number>(
+      (sum, d) => sum + (parseFloat(d.amountDue) - parseFloat(d.amountWaived)),
+      0,
+    );
 
   return (
     <div className="space-y-6">
@@ -51,18 +73,16 @@ export function StudentFeeStatus({ assignments }: { assignments: any[] }) {
       {/* Assignment cards */}
       {assignments.map((a) => {
         const plannedTotal = a.dues
-          .filter((d: any) => d.status !== "CANCELLED")
-          .reduce(
-            (sum: number, d: any) =>
-              sum + (parseFloat(d.amountDue) - parseFloat(d.amountWaived)),
+          .filter((d) => d.status !== "CANCELLED")
+          .reduce<number>(
+            (sum, d) => sum + (parseFloat(d.amountDue) - parseFloat(d.amountWaived)),
             0,
           );
 
         const settledTotal = a.dues
-          .filter((d: any) => d.status === "PAID" || d.status === "WAIVED")
-          .reduce(
-            (sum: number, d: any) =>
-              sum + (parseFloat(d.amountDue) - parseFloat(d.amountWaived)),
+          .filter((d) => d.status === "PAID" || d.status === "WAIVED")
+          .reduce<number>(
+            (sum, d) => sum + (parseFloat(d.amountDue) - parseFloat(d.amountWaived)),
             0,
           );
 
@@ -87,7 +107,7 @@ export function StudentFeeStatus({ assignments }: { assignments: any[] }) {
             </div>
 
             <div className="space-y-2">
-              {a.dues.map((due: any) => {
+              {a.dues.map((due) => {
                 const meta = dueStatusMeta[due.status] || dueStatusMeta.PENDING;
                 return (
                   <div

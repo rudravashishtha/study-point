@@ -56,10 +56,15 @@ export async function createChapterAction(trackId: string, data: unknown) {
     await createChapter(actor, parsed);
     revalidatePath(`/admin/curriculum/curriculum-tracks/${trackId}`);
     return { success: true };
-  } catch (error: any) {
-    if (error.name === "ZodError")
-      return { success: false, error: error.errors[0].message };
-    return { success: false, error: error.message || "Failed to create chapter" };
+  } catch (error: unknown) {
+    if (error instanceof Error && error.name === "ZodError") {
+      const issues = (error as unknown as { errors: Array<{ message: string }> }).errors;
+      return { success: false, error: issues[0]?.message ?? "Validation failed" };
+    }
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : "Failed to create chapter",
+    };
   }
 }
 
@@ -80,10 +85,15 @@ export async function updateChapterAction(
     await updateChapter(actor, chapterId, parsed);
     revalidatePath(`/admin/curriculum/curriculum-tracks/${trackId}`);
     return { success: true };
-  } catch (error: any) {
-    if (error.name === "ZodError")
-      return { success: false, error: error.errors[0].message };
-    return { success: false, error: error.message || "Failed to update chapter" };
+  } catch (error: unknown) {
+    if (error instanceof Error && error.name === "ZodError") {
+      const issues = (error as unknown as { errors: Array<{ message: string }> }).errors;
+      return { success: false, error: issues[0]?.message ?? "Validation failed" };
+    }
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : "Failed to update chapter",
+    };
   }
 }
 
@@ -98,8 +108,11 @@ export async function archiveChapterAction(trackId: string, chapterId: string) {
     await archiveChapter(actor, chapterId);
     revalidatePath(`/admin/curriculum/curriculum-tracks/${trackId}`);
     return { success: true };
-  } catch (error: any) {
-    return { success: false, error: error.message || "Failed to archive chapter" };
+  } catch (error: unknown) {
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : "Failed to archive chapter",
+    };
   }
 }
 
@@ -114,8 +127,11 @@ export async function restoreChapterAction(trackId: string, chapterId: string) {
     await restoreChapter(actor, chapterId);
     revalidatePath(`/admin/curriculum/curriculum-tracks/${trackId}`);
     return { success: true };
-  } catch (error: any) {
-    return { success: false, error: error.message || "Failed to restore chapter" };
+  } catch (error: unknown) {
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : "Failed to restore chapter",
+    };
   }
 }
 
@@ -130,8 +146,11 @@ export async function moveChapterAction(
     await moveChapter(actor, trackId, chapterId, direction);
     revalidatePath(`/admin/curriculum/curriculum-tracks/${trackId}`);
     return { success: true };
-  } catch (error: any) {
-    return { success: false, error: error.message || "Failed to move chapter" };
+  } catch (error: unknown) {
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : "Failed to move chapter",
+    };
   }
 }
 
@@ -160,10 +179,15 @@ export async function createTopicAction(
     await createTopic(actor, parsed);
     revalidatePath(`/admin/curriculum/curriculum-tracks/${trackId}`);
     return { success: true };
-  } catch (error: any) {
-    if (error.name === "ZodError")
-      return { success: false, error: error.errors[0].message };
-    return { success: false, error: error.message || "Failed to create topic" };
+  } catch (error: unknown) {
+    if (error instanceof Error && error.name === "ZodError") {
+      const issues = (error as unknown as { errors: Array<{ message: string }> }).errors;
+      return { success: false, error: issues[0]?.message ?? "Validation failed" };
+    }
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : "Failed to create topic",
+    };
   }
 }
 
@@ -187,10 +211,15 @@ export async function updateTopicAction(
     await updateTopic(actor, topicId, parsed);
     revalidatePath(`/admin/curriculum/curriculum-tracks/${trackId}`);
     return { success: true };
-  } catch (error: any) {
-    if (error.name === "ZodError")
-      return { success: false, error: error.errors[0].message };
-    return { success: false, error: error.message || "Failed to update topic" };
+  } catch (error: unknown) {
+    if (error instanceof Error && error.name === "ZodError") {
+      const issues = (error as unknown as { errors: Array<{ message: string }> }).errors;
+      return { success: false, error: issues[0]?.message ?? "Validation failed" };
+    }
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : "Failed to update topic",
+    };
   }
 }
 
@@ -211,8 +240,11 @@ export async function archiveTopicAction(
     await archiveTopic(actor, topicId);
     revalidatePath(`/admin/curriculum/curriculum-tracks/${trackId}`);
     return { success: true };
-  } catch (error: any) {
-    return { success: false, error: error.message || "Failed to archive topic" };
+  } catch (error: unknown) {
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : "Failed to archive topic",
+    };
   }
 }
 
@@ -233,8 +265,11 @@ export async function restoreTopicAction(
     await restoreTopic(actor, topicId);
     revalidatePath(`/admin/curriculum/curriculum-tracks/${trackId}`);
     return { success: true };
-  } catch (error: any) {
-    return { success: false, error: error.message || "Failed to restore topic" };
+  } catch (error: unknown) {
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : "Failed to restore topic",
+    };
   }
 }
 
@@ -250,7 +285,10 @@ export async function moveTopicAction(
     await moveTopic(actor, trackId, chapterId, topicId, direction);
     revalidatePath(`/admin/curriculum/curriculum-tracks/${trackId}`);
     return { success: true };
-  } catch (error: any) {
-    return { success: false, error: error.message || "Failed to move topic" };
+  } catch (error: unknown) {
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : "Failed to move topic",
+    };
   }
 }

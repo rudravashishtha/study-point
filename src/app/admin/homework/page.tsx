@@ -27,6 +27,21 @@ export default async function AdminHomeworkPage() {
     db.curriculumTrack.findMany({ orderBy: { createdAt: "asc" } }),
   ]);
 
+  const homeworkItems = homework.map((h) => ({
+    id: h.id,
+    title: h.title,
+    lifecycleState: h.lifecycleState,
+    academicSessionId: h.academicSessionId,
+    curriculumTrackId: h.curriculumTrackId,
+    batchId: h.batchId,
+    assignedDate: h.assignedDate,
+    dueDate: h.dueDate.toISOString().split("T")[0],
+    fileAssetId: h.fileAssetId,
+    batch: h.batch ? { name: h.batch.name, archivedAt: h.batch.archivedAt } : null,
+    chapter: h.chapter ? { name: h.chapter.name } : null,
+    topic: h.topic ? { name: h.topic.name } : null,
+  }));
+
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
@@ -34,7 +49,7 @@ export default async function AdminHomeworkPage() {
       </div>
 
       <HomeworkList
-        homework={homework}
+        homework={homeworkItems}
         sessions={sessions}
         batches={batches}
         tracks={tracks}

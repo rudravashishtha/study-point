@@ -1,4 +1,3 @@
-import { PrismaClient } from "@prisma/client";
 import { initializeTestDb, teardownTestDb } from "../src/lib/test/db-isolation";
 
 async function run() {
@@ -26,11 +25,21 @@ async function run() {
         displayName: "T2",
       },
     });
-  } catch (err: any) {
-    console.log("P2002 ERROR CAUSE:", err.meta?.driverAdapterError?.cause);
+  } catch (err: unknown) {
+    const e = err as {
+      message?: string;
+      meta?: {
+        driverAdapterError?: {
+          cause?: {
+            originalMessage?: string;
+          };
+        };
+      };
+    };
+    console.log("P2002 ERROR CAUSE:", e.meta?.driverAdapterError?.cause);
     console.log(
       "P2002 ERROR ORIGINAL MSG:",
-      err.meta?.driverAdapterError?.cause?.originalMessage || err.message,
+      e.meta?.driverAdapterError?.cause?.originalMessage || e.message,
     );
   } finally {
     await testDb.curriculumTrack.deleteMany({});

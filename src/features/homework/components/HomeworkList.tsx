@@ -24,7 +24,7 @@ import {
   publishAdminHomeworkAction,
   archiveAdminHomeworkAction,
 } from "@/app/admin/homework/actions";
-import { HomeworkFormDialog } from "./HomeworkFormDialog";
+import { HomeworkFormDialog, type HomeworkFormData } from "./HomeworkFormDialog";
 import { Input } from "@/components/ui/input";
 import {
   Select,
@@ -34,18 +34,65 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
+interface HomeworkListItem {
+  id: string;
+  title: string;
+  lifecycleState: string;
+  academicSessionId: string;
+  curriculumTrackId: string;
+  batchId: string;
+  assignedDate: string | Date;
+  dueDate: string;
+  fileAssetId?: string | null;
+  batch?: { name: string; archivedAt?: Date | string | null } | null;
+  chapter?: { name: string } | null;
+  topic?: { name: string } | null;
+}
+
+interface HomeworkListSession {
+  id: string;
+  name: string;
+}
+
+interface HomeworkListBatch {
+  id: string;
+  name: string;
+  archivedAt?: Date | string | null;
+}
+
+interface HomeworkListTrack {
+  id: string;
+  name?: string | null;
+}
+
+interface HomeworkActionResult {
+  success: boolean;
+  error?: { message: string };
+}
+
+function toHomeworkFormData(item: HomeworkListItem): HomeworkFormData {
+  return {
+    id: item.id,
+    title: item.title,
+    batchId: item.batchId,
+    assignedDate: item.assignedDate,
+    dueDate: item.dueDate,
+    fileAssetId: item.fileAssetId ?? null,
+  };
+}
+
 export function HomeworkList({
   homework,
   sessions,
   batches,
   tracks,
 }: {
-  homework: any[];
-  sessions: any[];
-  batches: any[];
-  tracks: any[];
+  homework: HomeworkListItem[];
+  sessions: HomeworkListSession[];
+  batches: HomeworkListBatch[];
+  tracks: HomeworkListTrack[];
 }) {
-  const [editingHomework, setEditingHomework] = useState<any>(null);
+  const [editingHomework, setEditingHomework] = useState<HomeworkListItem | null>(null);
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [search, setSearch] = useState("");
   const [filterSession, setFilterSession] = useState<string>("ALL");
@@ -67,16 +114,21 @@ export function HomeworkList({
     return true;
   });
 
-  const handleAction = async (action: () => Promise<any>, successMsg: string) => {
+  const handleAction = async (
+    action: () => Promise<HomeworkActionResult>,
+    successMsg: string,
+  ) => {
     try {
       const res = await action();
       if (!res.success) {
-        toast.error("Error", { description: res.error.message });
+        toast.error("Error", { description: res.error?.message });
         return;
       }
       toast.success("Success", { description: successMsg });
-    } catch (e: any) {
-      toast.error("Error", { description: e.message });
+    } catch (e: unknown) {
+      toast.error("Error", {
+        description: e instanceof Error ? e.message : "Unknown error",
+      });
     }
   };
 
@@ -305,7 +357,7 @@ export function HomeworkList({
       <HomeworkFormDialog
         open={isFormOpen}
         onOpenChange={setIsFormOpen}
-        homework={editingHomework}
+        homework={editingHomework ? toHomeworkFormData(editingHomework) : null}
         sessions={sessions}
         batches={batches}
         tracks={tracks}

@@ -34,18 +34,54 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
+interface TestListItem {
+  id: string;
+  title: string;
+  batchId: string;
+  academicSessionId: string;
+  curriculumTrackId: string;
+  testType: string;
+  testDate: string | Date;
+  maximumMarks: number;
+  durationMinutes?: number | null;
+  lifecycleState: string;
+  fileAssetId?: string | null;
+  batch?: { name: string; archivedAt?: Date | string | null } | null;
+  chapter?: { name: string } | null;
+  topic?: { name: string } | null;
+}
+
+interface ListSession {
+  id: string;
+  name: string;
+}
+interface ListBatch {
+  id: string;
+  name: string;
+  archivedAt?: Date | string | null;
+}
+interface ListTrack {
+  id: string;
+  name?: string;
+}
+
+interface ActionResult {
+  success: boolean;
+  error?: { message: string };
+}
+
 export function TestList({
   tests,
   sessions,
   batches,
   tracks,
 }: {
-  tests: any[];
-  sessions: any[];
-  batches: any[];
-  tracks: any[];
+  tests: TestListItem[];
+  sessions: ListSession[];
+  batches: ListBatch[];
+  tracks: ListTrack[];
 }) {
-  const [editingTest, setEditingTest] = useState<any>(null);
+  const [editingTest, setEditingTest] = useState<TestListItem | null>(null);
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [search, setSearch] = useState("");
   const [filterSession, setFilterSession] = useState<string>("ALL");
@@ -67,16 +103,21 @@ export function TestList({
     return true;
   });
 
-  const handleAction = async (action: () => Promise<any>, successMsg: string) => {
+  const handleAction = async (
+    action: () => Promise<ActionResult>,
+    successMsg: string,
+  ) => {
     try {
       const res = await action();
       if (!res.success) {
-        toast.error("Error", { description: res.error.message });
+        toast.error("Error", { description: res.error?.message ?? "Unknown error" });
         return;
       }
       toast.success("Success", { description: successMsg });
-    } catch (e: any) {
-      toast.error("Error", { description: e.message });
+    } catch (e: unknown) {
+      toast.error("Error", {
+        description: e instanceof Error ? e.message : "Unknown error",
+      });
     }
   };
 
@@ -132,7 +173,7 @@ export function TestList({
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="ALL">All Sessions</SelectItem>
-              {sessions.map((s: any) => (
+              {sessions.map((s) => (
                 <SelectItem key={s.id} value={s.id}>
                   {s.name}
                 </SelectItem>
@@ -145,7 +186,7 @@ export function TestList({
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="ALL">All Tracks</SelectItem>
-              {tracks.map((t: any) => (
+              {tracks.map((t) => (
                 <SelectItem key={t.id} value={t.id}>
                   {t.name || "Track"}
                 </SelectItem>
@@ -158,7 +199,7 @@ export function TestList({
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="ALL">All Batches</SelectItem>
-              {batches.map((b: any) => (
+              {batches.map((b) => (
                 <SelectItem key={b.id} value={b.id}>
                   {b.name}
                 </SelectItem>
@@ -315,7 +356,7 @@ export function TestList({
       <TestFormDialog
         open={isFormOpen}
         onOpenChange={setIsFormOpen}
-        test={editingTest}
+        test={editingTest ?? undefined}
         sessions={sessions}
         batches={batches}
         tracks={tracks}

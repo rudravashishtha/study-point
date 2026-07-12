@@ -21,6 +21,33 @@ import {
 } from "@/app/teacher/batches/[batchId]/actions";
 import { HomeworkUpload } from "@/components/upload/HomeworkUpload";
 
+interface TeacherHomeworkFormData {
+  id: string;
+  title: string;
+  description?: string | null;
+  chapterId?: string | null;
+  topicId?: string | null;
+  assignedDate: string | Date;
+  dueDate: string | Date;
+  fileAssetId?: string | null;
+}
+
+interface TeacherChapterItem {
+  id: string;
+  name: string;
+  topics?: { id: string; name: string }[];
+}
+
+interface TeacherHomeworkFormPayload {
+  title: string;
+  description: string | null;
+  assignedDate: string;
+  dueDate: string;
+  chapterId: string | null;
+  topicId: string | null;
+  fileAssetId?: string;
+}
+
 export function TeacherHomeworkFormDialog({
   open,
   onOpenChange,
@@ -30,9 +57,9 @@ export function TeacherHomeworkFormDialog({
 }: {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  homework?: any;
+  homework?: TeacherHomeworkFormData | null;
   batchId: string;
-  chapters: any[];
+  chapters: TeacherChapterItem[];
 }) {
   const [loading, setLoading] = useState(false);
 
@@ -80,7 +107,7 @@ export function TeacherHomeworkFormDialog({
       if (!assignedDate) throw new Error("Assigned date is required");
       if (!dueDate) throw new Error("Due date is required");
 
-      const payload: any = {
+      const payload: TeacherHomeworkFormPayload = {
         title: title.trim(),
         description: description.trim() || null,
         assignedDate,
@@ -100,14 +127,16 @@ export function TeacherHomeworkFormDialog({
       }
       toast.success("Success", { description: "Homework saved" });
       onOpenChange(false);
-    } catch (e: any) {
-      toast.error("Error", { description: e.message });
+    } catch (e: unknown) {
+      toast.error("Error", {
+        description: e instanceof Error ? e.message : "Unknown error",
+      });
     } finally {
       setLoading(false);
     }
   };
 
-  const selectedChapter = chapters.find((c: any) => c.id === chapterId);
+  const selectedChapter = chapters.find((c) => c.id === chapterId);
   const topics = selectedChapter?.topics || [];
 
   return (
@@ -181,7 +210,7 @@ export function TeacherHomeworkFormDialog({
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="none">-- No Chapter --</SelectItem>
-                  {chapters.map((c: any) => (
+                  {chapters.map((c) => (
                     <SelectItem key={c.id} value={c.id}>
                       {c.name}
                     </SelectItem>
@@ -201,7 +230,7 @@ export function TeacherHomeworkFormDialog({
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="none">-- No Topic --</SelectItem>
-                  {topics.map((t: any) => (
+                  {topics.map((t) => (
                     <SelectItem key={t.id} value={t.id}>
                       {t.name}
                     </SelectItem>

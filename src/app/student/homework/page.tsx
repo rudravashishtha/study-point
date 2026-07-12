@@ -1,11 +1,22 @@
 import { redirect } from "next/navigation";
 import { ClipboardCheck } from "lucide-react";
 import { requireRole } from "@/lib/auth/permissions";
-import { Role } from "@prisma/client";
+import { Homework, Role } from "@prisma/client";
 import { listStudentHomework } from "@/server/services/homework";
-import { StudentHomeworkList } from "@/features/homework/components/StudentHomeworkList";
+import {
+  StudentHomeworkList,
+  type StudentHomeworkItem,
+} from "@/features/homework/components/StudentHomeworkList";
 import { EmptyState } from "@/components/feedback/empty-state";
 import { db } from "@/lib/db";
+
+function toStudentHomeworkItems(items: Homework[]): StudentHomeworkItem[] {
+  return items.map((h) => ({
+    ...h,
+    dueDate: h.dueDate.toISOString().slice(0, 10),
+    assignedDate: h.assignedDate.toISOString().slice(0, 10),
+  }));
+}
 
 export default async function StudentHomeworkPage() {
   const appUser = await requireRole(Role.STUDENT);
@@ -44,7 +55,7 @@ export default async function StudentHomeworkPage() {
     );
   }
 
-  const homework = homeworkResult.data.items;
+  const homework = toStudentHomeworkItems(homeworkResult.data.items);
 
   if (homework.length === 0) {
     return (

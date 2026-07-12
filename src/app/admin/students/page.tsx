@@ -1,7 +1,7 @@
 import React from "react";
 import { requireAdmin } from "@/lib/auth/permissions";
 import { parseListParams } from "@/lib/url/search-params";
-import { listStudents } from "@/server/services/students";
+import { listStudents, type ListStudentsInput } from "@/server/services/students";
 import { StudentList } from "@/features/students/components/StudentList";
 import { DataListSearch } from "@/components/admin/data-list/DataListSearch";
 import { DataListArchiveFilter } from "@/components/admin/data-list/DataListArchiveFilter";
@@ -50,7 +50,7 @@ export default async function StudentsPage({
           : "ALL",
     q: params.query,
     accountStatus: accountStatus,
-    sort: params.sortField as any,
+    sort: params.sortField as ListStudentsInput["sort"],
     direction: params.sortDir,
   });
 
@@ -58,7 +58,7 @@ export default async function StudentsPage({
     throw new Error(listResult.error.message);
   }
 
-  const { data: students, total } = listResult.data;
+  const { items: students, totalCount: total } = listResult.data;
 
   return (
     <div className="space-y-6">

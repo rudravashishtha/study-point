@@ -65,7 +65,7 @@ export function FeePlanList({
     setIsFormOpen(true);
   };
 
-  const formatAmount = (amount: any) => {
+  const formatAmount = (amount: number | string | null | undefined) => {
     if (!amount) return "₹0.00";
     const num = typeof amount === "number" ? amount : parseFloat(amount);
     return `₹${num.toFixed(2)}`;
@@ -174,7 +174,9 @@ export function FeePlanList({
                     )}
                   </div>
                 </td>
-                <td className="p-4 text-sm">{formatAmount(plan.totalAmount)}</td>
+                <td className="p-4 text-sm">
+                  {formatAmount(plan.totalAmount.toString())}
+                </td>
                 <td className="p-4 text-sm">
                   <span className="rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-medium text-blue-800">
                     {frequencyLabel(plan.frequency)}
@@ -216,7 +218,9 @@ export function FeePlanList({
                 <div className="text-sm space-y-1 mb-3">
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Amount</span>
-                    <span className="font-medium">{formatAmount(plan.totalAmount)}</span>
+                    <span className="font-medium">
+                      {formatAmount(plan.totalAmount.toString())}
+                    </span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Track</span>
