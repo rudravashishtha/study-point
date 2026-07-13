@@ -1,6 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import { db } from "@/lib/db";
-import { Role } from "@prisma/client";
+import { AppUserStatus, Role } from "@prisma/client";
 import { redirect } from "next/navigation";
 
 /**
@@ -48,8 +48,16 @@ export async function requireAuth() {
  */
 export async function requireAppUser() {
   const appUser = await getAppUser();
-  if (!appUser || appUser.status !== "ACTIVE") {
-    redirect("/login"); // or /unauthorized
+  if (!appUser) {
+    redirect("/login");
+  }
+  // INVITED users must complete the password-set gate before any portal access.
+  // Authorization stays on the database AppUser state, never the JWT claim.
+  if (appUser.status === AppUserStatus.INVITED) {
+    redirect("/reset-password");
+  }
+  if (appUser.status !== AppUserStatus.ACTIVE) {
+    redirect("/login");
   }
   return appUser;
 }

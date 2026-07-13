@@ -21,6 +21,18 @@ export function hasAuthCookie(request: NextRequest): boolean {
     .some((cookie) => cookie.name.startsWith("sb-") && cookie.name.includes("auth"));
 }
 
+/**
+ * Returns a same-origin relative redirect target, or the fallback when the
+ * provided value is missing, not relative, or a protocol-relative `//` URL.
+ * Used to safely consume the `next` param from `/auth/callback`.
+ */
+export function safeRedirectTarget(next?: string | null, fallback = "/"): string {
+  if (!next || !next.startsWith("/") || next.startsWith("//")) {
+    return fallback;
+  }
+  return next;
+}
+
 const PORTALS: { prefix: string; role: AppRole }[] = [
   { prefix: "/admin", role: "ADMIN" },
   { prefix: "/student", role: "STUDENT" },
