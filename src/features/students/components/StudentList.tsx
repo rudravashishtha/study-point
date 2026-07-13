@@ -2,8 +2,9 @@
 
 import React, { useState } from "react";
 import { Student } from "@prisma/client";
-import { Archive, ArchiveRestore, Pencil } from "lucide-react";
+import { Archive, ArchiveRestore, Pencil, Power } from "lucide-react";
 import { archiveStudentAction, restoreStudentAction } from "@/app/admin/students/actions";
+import { inviteStudentAction } from "@/app/admin/students/activate/actions";
 import { toast } from "sonner";
 import { StudentFormDialog } from "./StudentFormDialog";
 
@@ -26,6 +27,15 @@ export function StudentList({ students }: { students: Student[] }) {
       toast.error(res.error);
     } else {
       toast.success("Student restored successfully.");
+    }
+  };
+
+  const handleActivate = async (id: string) => {
+    const res = await inviteStudentAction(id);
+    if (!res.success) {
+      toast.error(res.error);
+    } else {
+      toast.success("Invitation sent successfully.");
     }
   };
 
@@ -85,6 +95,16 @@ export function StudentList({ students }: { students: Student[] }) {
                   <td className="p-4 flex items-center justify-end space-x-2">
                     {!student.archivedAt ? (
                       <>
+                        {student.accountStatus === "none" && (
+                          <button
+                            onClick={() => handleActivate(student.id)}
+                            className="flex h-8 w-8 items-center justify-center rounded-md text-emerald-600 hover:bg-emerald-100 dark:hover:bg-emerald-900/30"
+                            title="Activate account"
+                          >
+                            <Power className="h-4 w-4" />
+                            <span className="sr-only">Activate account</span>
+                          </button>
+                        )}
                         <button
                           onClick={() => setEditingStudent(student)}
                           className="flex h-8 w-8 items-center justify-center rounded-md hover:bg-muted"

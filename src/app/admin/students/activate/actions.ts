@@ -29,3 +29,29 @@ export async function inviteStudentAction(studentId: string): Promise<ActionResu
     return handleActionError(error);
   }
 }
+
+export async function bulkInviteStudentsAction(ids: string[]): Promise<ActionResult> {
+  try {
+    const actor = await getActor();
+    let invited = 0;
+    let failed = 0;
+    for (const id of ids) {
+      try {
+        await inviteStudent(actor, id);
+        invited += 1;
+      } catch {
+        failed += 1;
+      }
+    }
+    revalidatePath("/admin/students/activate");
+    if (failed > 0) {
+      return {
+        success: false,
+        error: `Invited ${invited} of ${ids.length}; ${failed} failed.`,
+      };
+    }
+    return { success: true, data: undefined };
+  } catch (error: unknown) {
+    return handleActionError(error);
+  }
+}

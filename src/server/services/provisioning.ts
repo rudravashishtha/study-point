@@ -92,7 +92,7 @@ export async function inviteStudent(actor: ActorContext, studentId: string) {
   // 8. Attempt inviteUserByEmail
   const { data, error } = await supabase.auth.admin.inviteUserByEmail(normalizedEmail, {
     data: { role: "STUDENT" },
-    redirectTo: `${publicEnv.NEXT_PUBLIC_APP_URL}/auth/callback`,
+    redirectTo: `${publicEnv.NEXT_PUBLIC_APP_URL}/auth/callback?next=/reset-password`,
   });
 
   let supabaseAuthUserId: string;
@@ -203,7 +203,7 @@ export async function inviteTeacher(actor: ActorContext, teacherId: string) {
   // 8. Attempt inviteUserByEmail
   const { data, error } = await supabase.auth.admin.inviteUserByEmail(normalizedEmail, {
     data: { role: "TEACHER" },
-    redirectTo: `${publicEnv.NEXT_PUBLIC_APP_URL}/auth/callback`,
+    redirectTo: `${publicEnv.NEXT_PUBLIC_APP_URL}/auth/callback?next=/reset-password`,
   });
 
   let supabaseAuthUserId: string;

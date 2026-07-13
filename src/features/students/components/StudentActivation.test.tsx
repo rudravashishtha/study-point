@@ -12,6 +12,7 @@ afterEach(() => {
 
 vi.mock("@/app/admin/students/activate/actions", () => ({
   inviteStudentAction: vi.fn(),
+  bulkInviteStudentsAction: vi.fn(),
 }));
 
 describe("StudentActivationQueue", () => {
