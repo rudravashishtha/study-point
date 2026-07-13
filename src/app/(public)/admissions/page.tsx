@@ -21,6 +21,8 @@ export const metadata: Metadata = {
   title: "Admissions | Study Point Mathematics",
   description:
     "Admissions open for Classes IX–XII (CBSE & CISCE). Enquire about mathematics coaching at Study Point. Simple admission process, free demo class, and personal counselling.",
+  alternates: { canonical: "/admissions" },
+  openGraph: { url: "/admissions" },
 };
 
 const highlights = [

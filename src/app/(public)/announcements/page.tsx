@@ -1,9 +1,18 @@
 export const dynamic = "force-dynamic";
 
+import type { Metadata } from "next";
 import { Megaphone } from "lucide-react";
 import { listPublicAnnouncements } from "@/server/services/announcements";
 import { PublicAnnouncementList } from "@/features/announcements/components/PublicAnnouncementList";
 import { EmptyState } from "@/components/feedback/empty-state";
+
+export const metadata: Metadata = {
+  title: "Announcements | Study Point Mathematics",
+  description:
+    "Latest announcements, notices, and updates from Study Point Mathematics for students and parents.",
+  alternates: { canonical: "/announcements" },
+  openGraph: { url: "/announcements" },
+};
 
 export default async function AnnouncementsPage() {
   const result = await listPublicAnnouncements();

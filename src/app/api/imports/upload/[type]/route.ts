@@ -9,7 +9,7 @@ import { ImportType } from "@prisma/client";
 
 export async function POST(
   req: NextRequest,
-  { params }: { params: Promise<{ jobId: string }> },
+  { params }: { params: Promise<{ type: string }> },
 ) {
   try {
     const actor = await getAppUser();

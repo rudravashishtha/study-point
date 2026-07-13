@@ -11,6 +11,8 @@ export const metadata: Metadata = {
   title: "About | Study Point Mathematics",
   description:
     "Learn about Study Point Mathematics — the teacher, the teaching philosophy, and why students trust us for Classes IX to XII.",
+  alternates: { canonical: "/about" },
+  openGraph: { url: "/about" },
 };
 
 const APPROACH = [

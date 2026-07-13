@@ -13,6 +13,8 @@ export const metadata: Metadata = {
   title: "Free Study Resources | Study Point Mathematics",
   description:
     "Download free mathematics study materials, formula sheets, and practice resources for Classes IX–XII. No sign-up required.",
+  alternates: { canonical: "/resources" },
+  openGraph: { url: "/resources" },
 };
 
 const GROUP_ORDER = ["DOCUMENT", "PRESENTATION", "IMAGE", "LINK", "TEXT"];

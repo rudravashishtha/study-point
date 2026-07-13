@@ -77,7 +77,7 @@ export function QuestionImportWizard() {
 
   const handleDownloadTemplate = async () => {
     try {
-      const res = await fetch("/api/imports/question/template");
+      const res = await fetch("/api/imports/template/question");
       if (!res.ok) {
         toast.error("Failed to download template");
         return;
@@ -123,7 +123,7 @@ export function QuestionImportWizard() {
       formData.append("file", file);
       formData.append("importType", "QUESTION");
 
-      const res = await fetch("/api/imports/question/upload", {
+      const res = await fetch("/api/imports/upload/question", {
         method: "POST",
         body: formData,
       });

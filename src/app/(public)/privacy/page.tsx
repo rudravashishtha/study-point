@@ -8,6 +8,8 @@ export const metadata: Metadata = {
   title: "Privacy Policy | Study Point Mathematics",
   description:
     "How Study Point Mathematics collects, uses, and protects your information.",
+  alternates: { canonical: "/privacy" },
+  openGraph: { url: "/privacy" },
 };
 
 export default async function PrivacyPage() {

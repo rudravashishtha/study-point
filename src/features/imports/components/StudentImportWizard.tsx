@@ -77,7 +77,7 @@ export function StudentImportWizard() {
 
   const handleDownloadTemplate = async () => {
     try {
-      const res = await fetch("/api/imports/student/template");
+      const res = await fetch("/api/imports/template/student");
       if (!res.ok) {
         toast.error("Failed to download template");
         return;
@@ -122,7 +122,7 @@ export function StudentImportWizard() {
       const formData = new FormData();
       formData.append("file", file);
 
-      const res = await fetch("/api/imports/student/upload", {
+      const res = await fetch("/api/imports/upload/student", {
         method: "POST",
         body: formData,
       });

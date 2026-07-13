@@ -10,6 +10,8 @@ export const metadata: Metadata = {
   title: "Contact | Study Point Mathematics",
   description:
     "Get in touch with Study Point Mathematics. Call, WhatsApp, or visit us. Find our address, map, directions, and opening hours.",
+  alternates: { canonical: "/contact" },
+  openGraph: { url: "/contact" },
 };
 
 const socialIcons: Record<string, React.ComponentType<{ className?: string }>> = {

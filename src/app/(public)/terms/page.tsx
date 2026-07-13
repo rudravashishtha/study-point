@@ -8,6 +8,8 @@ export const metadata: Metadata = {
   title: "Terms of Use | Study Point Mathematics",
   description:
     "The terms that govern your use of the Study Point Mathematics website and services.",
+  alternates: { canonical: "/terms" },
+  openGraph: { url: "/terms" },
 };
 
 export default async function TermsPage() {

@@ -1,5 +1,6 @@
 import { PublicHeader } from "@/components/public/PublicHeader";
 import { PublicFooter } from "@/components/public/PublicFooter";
+import { OrganizationJsonLd } from "@/components/public/OrganizationJsonLd";
 import { getSiteSettings } from "@/server/services/site-settings";
 
 export default async function PublicShell({ children }: { children: React.ReactNode }) {
@@ -13,6 +14,8 @@ export default async function PublicShell({ children }: { children: React.ReactN
       <main className="flex-1 w-full">{children}</main>
 
       <PublicFooter settings={settings} />
+
+      <OrganizationJsonLd settings={settings} />
     </div>
   );
 }

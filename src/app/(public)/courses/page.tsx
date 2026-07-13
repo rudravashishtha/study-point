@@ -11,6 +11,8 @@ export const metadata: Metadata = {
   title: "Courses | Study Point Mathematics",
   description:
     "Mathematics coaching for Classes IX-XII across CBSE and CISCE boards. Structured curriculum, expert faculty, and proven results.",
+  alternates: { canonical: "/courses" },
+  openGraph: { url: "/courses" },
 };
 
 export default async function CoursesPage() {
