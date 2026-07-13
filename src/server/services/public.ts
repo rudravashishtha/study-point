@@ -157,7 +157,7 @@ async function getPublicBatches() {
   });
 }
 
-async function getPublicTeacherProfile() {
+export async function getPublicTeacherProfile() {
   const teacher = await db.teacher.findFirst({
     where: { active: true },
     select: {

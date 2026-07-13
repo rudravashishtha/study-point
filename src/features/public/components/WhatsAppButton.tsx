@@ -1,3 +1,5 @@
+"use client";
+
 import type { ReactNode } from "react";
 
 export function buildWhatsAppHref(phoneNumber?: string | null, message?: string): string {
@@ -6,6 +8,32 @@ export function buildWhatsAppHref(phoneNumber?: string | null, message?: string)
   const base = `https://wa.me/${digits}`;
   if (!message) return base;
   return `${base}?text=${encodeURIComponent(message)}`;
+}
+
+export interface AdmissionsEnquiryInput {
+  instituteName: string;
+  name?: string;
+  phone?: string;
+  classLevel?: string;
+  board?: string;
+  message?: string;
+}
+
+export function buildAdmissionsEnquiryMessage(input: AdmissionsEnquiryInput): string {
+  const lines = [
+    `Hello ${input.instituteName}, I would like to enquire about admissions.`,
+  ];
+  const name = input.name?.trim();
+  const phone = input.phone?.trim();
+  const classLevel = input.classLevel?.trim();
+  const board = input.board?.trim();
+  const message = input.message?.trim();
+  if (name) lines.push(`Name: ${name}`);
+  if (phone) lines.push(`Phone: ${phone}`);
+  if (classLevel) lines.push(`Class: ${classLevel}`);
+  if (board) lines.push(`Board: ${board}`);
+  if (message) lines.push(message);
+  return lines.join("\n");
 }
 
 interface WhatsAppButtonProps {

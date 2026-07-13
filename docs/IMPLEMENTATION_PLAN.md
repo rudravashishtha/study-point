@@ -535,7 +535,8 @@ E2E tests:
   - 9A.3 (Public Home page): Completed — `0961926`.
   - 9A.4 (Public Courses page): Completed — `f495a9b`.
   - 9A.5 (Public Resources page): Completed and pushed — `11d3273`. Design reconciled to the implemented schema (no `PUBLIC` visibility / `expiresAt`); public-resource query unified into `listPublicResources` (CURRICULUM_TRACK + PUBLISHED); added `PublicResourceCard` unit test; deleted stray `scripts/verify-slice4a-db.ts`.
-  - 9A.6 (Public Contact page): In progress — Contact page rewrites against `SiteSettings`, ISR `revalidate = 3600` added to all ISR public pages, and a reusable `WhatsAppButton` (single `wa.me` implementation) replaces duplicated links in `PublicHeader`, `PublicFooter`, and `HeroSection`. Pending commit approval.
+  - 9A.6 (Public Contact page): Completed and pushed — `b300c72`. Contact page renders real `SiteSettings` (phone, WhatsApp prefilled CTA, email, address, landmark, hours, social, Google Maps embed + directions); `revalidate = 3600` added to `/`, `/courses`, `/resources`, `/contact` (announcements stays `force-dynamic`); `WhatsAppButton` is the single `wa.me` implementation and replaced duplicated links in `PublicHeader`, `PublicFooter`, `HeroSection`.
+  - 9A.7 (Public Admissions page): In progress — New `/admissions` page (premium hero, "why choose us", 5-step process, classes IX–XII, enquiry form, direct phone/WhatsApp CTA, address/hours/map). WhatsApp-only best-effort flow (no `AdmissionsEnquiry` persistence). `AdmissionsForm` client component (validation, pre-filled wa.me redirect, duplicate-submit guard) uses the shared `buildWhatsAppHref` + new `buildAdmissionsEnquiryMessage` helper. New `LocationMap` shared component extracted and reused by Contact. `revalidate = 3600` on `/admissions`. Pending commit approval.
 
 ## Phase 0 Stop
 
@@ -546,19 +547,22 @@ Stop here and wait for human approval before application initialization or Phase
 ## Status Block
 
 ```text
-Phase: 9A.6
+Phase: 9A.7
 Status: Implementation complete; pending commit approval (do not commit without explicit request)
-Working tree: Dirty (Contact page rewrite, WhatsAppButton component + test, ISR revalidate on 4 public pages, header/footer/hero refactor, planning-doc update)
-Commit: 11d3273 (9A.5) pushed to origin/main
+Working tree: Dirty (new /admissions page + AdmissionsForm, WhatsAppButton message helper + "use client", LocationMap shared component + Contact refactor, unit tests, planning-doc update)
+Commit: b300c72 (9A.6) pushed to origin/main
 Push: pending
 
 Completed in this slice:
-- Contact page renders real SiteSettings (phone, WhatsApp prefilled CTA, email, address, landmark, hours, social, Google Maps embed + directions)
-- export const revalidate = 3600 added to /, /courses, /resources, /contact (announcements stays force-dynamic)
-- WhatsAppButton (src/features/public/components/WhatsAppButton.tsx) is the single wa.me implementation; PublicHeader/PublicFooter/HeroSection refactored to use it
+- New /admissions page: hero CTA, "why choose us", 5-step admission process, classes IX–XII, enquiry form, direct phone/WhatsApp CTA, address/hours/map summary
+- WhatsApp-only best-effort flow (no AdmissionsEnquiry persistence); AdmissionsForm validates and redirects to a pre-filled wa.me chat
+- buildAdmissionsEnquiryMessage helper centralizes enquiry message construction (derived from SiteSettings.instituteName)
+- LocationMap shared component extracted; reused by Contact and Admissions (single map-embed implementation)
+- export const revalidate = 3600 added to /admissions
+- Single wa.me implementation preserved (WhatsAppButton/buildWhatsAppHref); no duplication
 
 Next planned phase:
-Phase 10 — Authentication & Account Experience (scheduled after Public Website completes), then Phase 11 — PWA And Production Hardening
+Phase 9A.8 — About page (teacher profile), then Phase 9A.9 — SEO (metadata/sitemap/robots/structured data), then Phase 9A.10 — Public Website Polish (ISR consistency, image optimization, a11y/Lighthouse), then Phase 10 — Authentication & Account Experience, then Phase 11 — PWA And Production Hardening
 
 Outstanding blockers:
 - None

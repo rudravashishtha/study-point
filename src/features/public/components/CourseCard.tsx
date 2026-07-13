@@ -131,10 +131,10 @@ export function CourseCard({ track, batches, showFees }: CourseCardProps) {
         )}
 
         <Link
-          href={`/courses/${track.id}`}
+          href="/admissions"
           className="inline-flex items-center gap-2 w-full justify-center rounded-lg border border-border/60 bg-muted/50 px-4 py-2.5 text-sm font-medium text-muted-foreground transition-colors hover:border-brand-glow/30 hover:bg-muted hover:text-foreground"
         >
-          View Details
+          Enquire / Admissions
           <svg
             className="size-4"
             xmlns="http://www.w3.org/2000/svg"

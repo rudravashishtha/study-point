@@ -1,7 +1,8 @@
 import { Metadata } from "next";
-import { Phone, Mail, MapPin, Clock, MessageSquare, Navigation, Share2 } from "lucide-react";
+import { Phone, Mail, MapPin, Clock, MessageSquare, Share2 } from "lucide-react";
 import { getSiteSettings } from "@/server/services/site-settings";
 import { WhatsAppButton } from "@/features/public/components/WhatsAppButton";
+import { LocationMap } from "@/features/public/components/LocationMap";
 
 export const revalidate = 3600;
 
@@ -38,12 +39,6 @@ export default async function ContactPage() {
 
   const whatsappMessage = `Hello ${instituteName}, I would like to enquire about mathematics coaching admissions.`;
 
-  const mapQuery = address || mapUrl || instituteName;
-  const mapEmbedSrc = mapUrl?.includes("/embed")
-    ? mapUrl
-    : `https://maps.google.com/maps?q=${encodeURIComponent(mapQuery)}&output=embed`;
-  const directionsHref = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(mapQuery)}`;
-
   const hasContactDetails = Boolean(
     phone || whatsappNumber || email || address || landmark || openingHours,
   );
@@ -63,8 +58,8 @@ export default async function ContactPage() {
               Contact Us
             </h1>
             <p className="mt-4 text-lg text-muted-foreground">
-              Have questions about admissions, batches, or classes? Reach out and we&apos;ll
-              be happy to help.
+              Have questions about admissions, batches, or classes? Reach out and
+              we&apos;ll be happy to help.
             </p>
           </header>
 
@@ -87,7 +82,9 @@ export default async function ContactPage() {
                       <span className="block text-xs font-medium uppercase tracking-wide text-muted-foreground">
                         Phone
                       </span>
-                      <span className="text-base font-semibold text-foreground">{phone}</span>
+                      <span className="text-base font-semibold text-foreground">
+                        {phone}
+                      </span>
                     </span>
                   </a>
                 )}
@@ -125,7 +122,9 @@ export default async function ContactPage() {
                       <span className="block text-xs font-medium uppercase tracking-wide text-muted-foreground">
                         Email
                       </span>
-                      <span className="text-base font-semibold text-foreground">{email}</span>
+                      <span className="text-base font-semibold text-foreground">
+                        {email}
+                      </span>
                     </span>
                   </a>
                 )}
@@ -141,7 +140,9 @@ export default async function ContactPage() {
                       </span>
                       <span className="text-base font-semibold text-foreground">
                         {address}
-                        {landmark ? <span className="font-normal"> (Near {landmark})</span> : null}
+                        {landmark ? (
+                          <span className="font-normal"> (Near {landmark})</span>
+                        ) : null}
                       </span>
                     </span>
                   </div>
@@ -188,41 +189,11 @@ export default async function ContactPage() {
               </div>
 
               <div className="space-y-3">
-                {mapUrl ? (
-                  <>
-                    <iframe
-                      src={mapEmbedSrc}
-                      title={`${instituteName} location map`}
-                      loading="lazy"
-                      className="h-72 w-full rounded-xl border border-border"
-                      allowFullScreen
-                    />
-                    <div className="flex flex-wrap gap-3 text-sm">
-                      <a
-                        href={mapUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-flex items-center gap-1.5 rounded-full bg-primary px-4 py-2 font-semibold text-primary-foreground transition-colors hover:bg-primary/90"
-                      >
-                        <MapPin className="size-4" aria-hidden="true" />
-                        Open in Google Maps
-                      </a>
-                      <a
-                        href={directionsHref}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-flex items-center gap-1.5 rounded-full border border-border px-4 py-2 font-semibold text-foreground transition-colors hover:bg-accent"
-                      >
-                        <Navigation className="size-4" aria-hidden="true" />
-                        Get Directions
-                      </a>
-                    </div>
-                  </>
-                ) : (
-                  <div className="flex h-72 items-center justify-center rounded-xl border border-dashed border-border text-muted-foreground">
-                    Map not configured
-                  </div>
-                )}
+                <LocationMap
+                  instituteName={instituteName}
+                  address={address}
+                  mapUrl={mapUrl}
+                />
               </div>
             </div>
           )}
