@@ -11,6 +11,7 @@ import "./globals.css";
 import { siteConfig } from "@/config/site";
 import { siteUrl } from "@/lib/seo";
 import { Toaster } from "@/components/ui/toaster";
+import { SerwistProvider } from "./serwist";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
@@ -44,7 +45,12 @@ export default function RootLayout({
   return (
     <html lang="en" className="h-full antialiased">
       <body className="min-h-full flex flex-col font-sans">
-        {children}
+        <SerwistProvider
+          swUrl="/serwist/sw.js"
+          disable={process.env.NODE_ENV === "development"}
+        >
+          {children}
+        </SerwistProvider>
         <Toaster />
       </body>
     </html>
