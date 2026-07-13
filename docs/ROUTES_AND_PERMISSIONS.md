@@ -72,17 +72,17 @@ Public routes must not expose private batch live links, unpublished content, pri
 
 Implemented in Phase 10A (commit 8e1669d). Routes marked Deferred are planned for Phase 10B.
 
-| Route              | Access                                         | Notes                                                                                 | Status          |
-| ------------------ | ---------------------------------------------- | ------------------------------------------------------------------------------------- | --------------- |
-| `/login`           | Anonymous; authenticated users redirected away | Supabase email/password login entry.                                                  | Implemented 10A |
-| `/login/[role]`    | Anonymous; `role` ∈ {student,teacher,admin}    | Themed login; invalid role falls back to default-themed login (no redirect).          | Implemented 10A |
-| `/unauthorized`    | Any                                            | Access denied / no-permission status page.                                            | Implemented 10A |
-| `/session-expired` | Any                                            | Session expired / invalid-token status page.                                          | Implemented 10A |
-| `/teacher`         | `TEACHER` (`requireRole`)                      | Placeholder "coming soon" page; teacher authentication is fully functional.           | Implemented 10A |
-| `/logout`          | Authenticated                                  | Server Action `signOut` (clears cookies, redirects `/login`); not a standalone route. | Implemented 10A |
-| `/forgot-password` | Anonymous                                      | Password reset request.                                                               | Deferred 10B    |
-| `/reset-password`  | Token/session dependent                        | Password update flow.                                                                 | Deferred 10B    |
-| `/auth/callback`   | Supabase callback                              | Invitation/reset callback; must validate safe redirect targets.                       | Deferred 10B    |
+| Route              | Access                                         | Notes                                                                                      | Status          |
+| ------------------ | ---------------------------------------------- | ------------------------------------------------------------------------------------------ | --------------- |
+| `/login`           | Anonymous; authenticated users redirected away | Supabase email/password login entry.                                                       | Implemented 10A |
+| `/login/[role]`    | Anonymous; `role` ∈ {student,teacher,admin}    | Themed login; invalid role falls back to default-themed login (no redirect).               | Implemented 10A |
+| `/unauthorized`    | Any                                            | Access denied / no-permission status page.                                                 | Implemented 10A |
+| `/session-expired` | Any                                            | Session expired / invalid-token status page.                                               | Implemented 10A |
+| `/teacher`         | `TEACHER` (`requireRole`)                      | Placeholder "coming soon" page; teacher authentication is fully functional.                | Implemented 10A |
+| `/logout`          | Authenticated                                  | Server Action `signOut` (clears cookies, redirects `/login`); not a standalone route.      | Implemented 10A |
+| `/forgot-password` | Anonymous                                      | Password reset request; returns a generic response to avoid email enumeration.             | Deferred 10B    |
+| `/reset-password`  | Invite/recovery session                        | Unified set-password (invite) and reset-password (recovery); reached via `/auth/callback`. | Deferred 10B    |
+| `/auth/callback`   | Supabase callback                              | PKCE code exchange for invite/recovery (and future OAuth); validates safe `next`.          | Deferred 10B    |
 
 There is no public student registration route. Student account activation uses a secure Supabase invitation flow initiated by admin (deferred to Phase 10B).
 
