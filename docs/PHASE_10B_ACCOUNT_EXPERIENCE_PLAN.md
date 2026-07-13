@@ -107,12 +107,12 @@ rate limiter.
 
 ## 6. Authorization Hardening Checklist
 
-- [ ] `requireRole` / `requireAdmin` redirect `AppUser.status === INVITED` to `/reset-password` (server-side, no client trust).
-- [ ] Audit every existing `/admin/*` and `/student/*` page to confirm it calls `requireAdmin` / `requireRole` (grep already shows all do; verify none rely on proxy only).
-- [ ] Audit every existing Server Action that mutates data to confirm it resolves `getAppUser` and checks role/scope before the mutation.
-- [ ] `/reset-password` rejects when no valid invite/recovery session is present (redirect `/login` or `/forgot-password`).
-- [ ] `updatePassword` re-checks auth session + `AppUser` existence before flipping `INVITED`→`ACTIVE`.
-- [ ] `/auth/callback` hardcodes/strictly validates `next`; never trusts client-supplied absolute URLs.
+- [x] `requireRole` / `requireAdmin` redirect `AppUser.status === INVITED` to `/reset-password` (server-side, no client trust).
+- [x] Audit every existing `/admin/*` and `/student/*` page to confirm it calls `requireAdmin` / `requireRole` (grep confirms all do).
+- [x] Audit every existing Server Action that mutates data to confirm it resolves `getAppUser` and checks role/scope before the mutation.
+- [x] `/reset-password` rejects when no valid invite/recovery session is present (redirect `/login` or `/forgot-password`).
+- [x] `updatePassword` re-checks auth session + `AppUser` existence before flipping `INVITED`→`ACTIVE`.
+- [x] `/auth/callback` hardcodes/strictly validates `next`; never trusts client-supplied absolute URLs.
 
 ---
 

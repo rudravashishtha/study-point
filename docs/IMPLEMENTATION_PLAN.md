@@ -420,7 +420,7 @@ Architecture rule: the JWT `app_metadata.role` claim is a routing cache only, sy
 
 Validation gate (all green): prettier, eslint (0/0), `next build` (`ƒ Proxy`), `npm test` (327 passed / 155 skipped), `next start` smoke.
 
-### Phase 10B — Account Experience (Next)
+### Phase 10B — Account Experience (Complete)
 
 Deferred from 10A; builds on the 10A foundation:
 

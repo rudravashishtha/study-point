@@ -1,6 +1,6 @@
 # Phase 10 — Authentication & Account Experience: Plan
 
-Status: Phase 10A complete (commit 8e1669d, pushed); Phase 10B planned / not started.
+Status: Phase 10A complete (commit 8e1669d, pushed); Phase 10B complete (commits bf73ca7, 636b8e1, pushed).
 Depends on: Phase 9A (complete, pushed), existing `src/lib/auth/permissions.ts`, `src/lib/supabase/*`, `docs/ROUTES_AND_PERMISSIONS.md`.
 Last reviewed: 2026-07-13.
 

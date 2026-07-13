@@ -70,7 +70,7 @@ Public routes must not expose private batch live links, unpublished content, pri
 
 ## Auth Routes
 
-Implemented in Phase 10A (commit 8e1669d). Routes marked Deferred are planned for Phase 10B.
+Implemented across Phase 10A (commit 8e1669d) and Phase 10B (account activation, invitation flow, forgot/reset password, password strength, rate limiting, INVITED gate).
 
 | Route              | Access                                         | Notes                                                                                      | Status          |
 | ------------------ | ---------------------------------------------- | ------------------------------------------------------------------------------------------ | --------------- |
@@ -80,11 +80,11 @@ Implemented in Phase 10A (commit 8e1669d). Routes marked Deferred are planned fo
 | `/session-expired` | Any                                            | Session expired / invalid-token status page.                                               | Implemented 10A |
 | `/teacher`         | `TEACHER` (`requireRole`)                      | Placeholder "coming soon" page; teacher authentication is fully functional.                | Implemented 10A |
 | `/logout`          | Authenticated                                  | Server Action `signOut` (clears cookies, redirects `/login`); not a standalone route.      | Implemented 10A |
-| `/forgot-password` | Anonymous                                      | Password reset request; returns a generic response to avoid email enumeration.             | Deferred 10B    |
-| `/reset-password`  | Invite/recovery session                        | Unified set-password (invite) and reset-password (recovery); reached via `/auth/callback`. | Deferred 10B    |
-| `/auth/callback`   | Supabase callback                              | PKCE code exchange for invite/recovery (and future OAuth); validates safe `next`.          | Deferred 10B    |
+| `/forgot-password` | Anonymous                                      | Password reset request; returns a generic response to avoid email enumeration.             | Implemented 10B |
+| `/reset-password`  | Invite/recovery session                        | Unified set-password (invite) and reset-password (recovery); reached via `/auth/callback`. | Implemented 10B |
+| `/auth/callback`   | Supabase callback                              | PKCE code exchange for invite/recovery (and future OAuth); validates safe `next`.          | Implemented 10B |
 
-There is no public student registration route. Student account activation uses a secure Supabase invitation flow initiated by admin (deferred to Phase 10B).
+There is no public student registration route. Student account activation uses a secure Supabase invitation flow initiated by admin (implemented in Phase 10B).
 
 ### Authentication Proxy (`src/proxy.ts`)
 
