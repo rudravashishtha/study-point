@@ -583,22 +583,30 @@ Stop here and wait for human approval before application initialization or Phase
 ## Status Block
 
 ```text
-Phase: 10A
-Status: Implementation complete (commit 8e1669d, pushed to origin/main)
+Phase: 10 (10A + 10B)
+Status: Implementation complete — Phase 10 officially CLOSED
 Working tree: Clean
-Commit: 8e1669d pushed (406b882..8e1669d)
-Push: done
 
-Completed in this slice (Phase 10A — Authentication Foundation):
+Completed (Phase 10A — Authentication Foundation):
 - src/proxy.ts (Next 16 proxy): session refresh + coarse role-aware optimistic routing only
 - Shared auth layout + themed /login and /login/[role] (student/teacher/admin)
 - Server-side signIn / signOut actions (signIn syncs JWT role claim best-effort; DB AppUser.role is source of truth)
 - /unauthorized, /session-expired, /teacher (placeholder) pages
 - Logout wired into AdminShell and StudentShell
-- Docs: ROUTES_AND_PERMISSIONS.md auth routes + proxy.ts architecture; this plan's Phase 10A/10B split
+
+Completed (Phase 10B — Account Experience):
+- /auth/callback PKCE exchange + safe `next` validation
+- /reset-password (unified invite + recovery) with password strength meter + Referrer-Policy
+- /forgot-password + generic (non-enumerating) requestPasswordReset
+- Admin activation: inviteStudent + bulkInviteStudents actions (Supabase invite, INVITED -> ACTIVE)
+- INVITED gate in requireAppUser -> /reset-password
+- Rate limiting on signIn, requestPasswordReset, and activation actions (existing in-memory limiter)
+
+Commits: 8e1669d (10A), bf73ca7 + 636b8e1 (10B), 5ba5ede (docs cleanup), <this commit> (activation rate-limit closure)
+Push: done
 
 Next planned phase:
-Phase 10B — Account Experience (completed: activation, invitation flow, forgot/reset password, password strength, rate limiting, authorization hardening). Next: Phase 11 — PWA And Production Hardening.
+Phase 11 — PWA And Production Hardening (PWA, accessibility, performance, security, monitoring, deployment).
 
 Outstanding blockers:
 - None

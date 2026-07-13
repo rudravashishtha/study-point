@@ -5,6 +5,7 @@ import { requireAdmin } from "@/lib/auth/permissions";
 import { ActorContext } from "@/lib/domain/actor";
 import { inviteStudent } from "@/server/services/provisioning";
 import { ActionResult, handleActionError } from "@/lib/actions/types";
+import { rateLimit } from "@/lib/rate-limit";
 
 async function getActor(): Promise<ActorContext> {
   const appUser = await requireAdmin();
@@ -22,6 +23,10 @@ async function getActor(): Promise<ActorContext> {
 export async function inviteStudentAction(studentId: string): Promise<ActionResult> {
   try {
     const actor = await getActor();
+    const { success: inviteOk } = rateLimit(`invite:${actor.userId}`, 20, 60 * 60_000);
+    if (!inviteOk) {
+      return { success: false, error: "Too many invitations. Please try again later." };
+    }
     await inviteStudent(actor, studentId);
     revalidatePath("/admin/students/activate");
     return { success: true, data: undefined };
@@ -33,6 +38,10 @@ export async function inviteStudentAction(studentId: string): Promise<ActionResu
 export async function bulkInviteStudentsAction(ids: string[]): Promise<ActionResult> {
   try {
     const actor = await getActor();
+    const { success: inviteOk } = rateLimit(`invite:${actor.userId}`, 20, 60 * 60_000);
+    if (!inviteOk) {
+      return { success: false, error: "Too many invitations. Please try again later." };
+    }
     let invited = 0;
     let failed = 0;
     for (const id of ids) {
