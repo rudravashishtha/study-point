@@ -2,7 +2,7 @@
 
 Phase: 0 research and planning.
 Status: Draft for human review.
-Last reviewed: 2026-07-11.
+Last reviewed: 2026-07-13.
 
 ## Phase 0 Findings
 
@@ -403,6 +403,37 @@ Validation gate:
 - Accessibility review for auth forms and error states.
 - Lint, type check, unit/integration tests, production build.
 
+### Phase 10A — Authentication Foundation (Complete)
+
+Commit `8e1669d` (pushed to `origin/main`). Builds on the existing Phase 2 auth/permission architecture (`AppUser`/role model, `permissions.ts` helpers, Supabase SSR). No schema changes.
+
+Delivered:
+
+- `src/proxy.ts` (Next.js 16 proxy, **not** `middleware.ts`): session refresh via `supabase.auth.getUser()` and coarse role-aware **optimistic routing** only. No Prisma, no `getAppUser`, no DB queries, no ownership checks.
+- Shared auth layout (`app/(auth)/layout.tsx`) with per-role theming.
+- Themed login: `/login` and `/login/[role]` for `student`/`teacher`/`admin` (invalid role falls back to default theme).
+- Server-side `signIn` and `signOut` actions (`src/features/auth/actions.ts`).
+- Status/placeholder pages: `/unauthorized`, `/session-expired`, `/teacher` (placeholder; uses `requireRole`).
+- Logout wired into `AdminShell` and `StudentShell`.
+
+Architecture rule: the JWT `app_metadata.role` claim is a routing cache only, synced best-effort at sign-in. Database `AppUser.role` via `getAppUser` / `requireRole` / `requireAdmin` is the single authorization source of truth. A stale JWT claim can mis-route at most, never escalate privilege.
+
+Validation gate (all green): prettier, eslint (0/0), `next build` (`ƒ Proxy`), `npm test` (327 passed / 155 skipped), `next start` smoke.
+
+### Phase 10B — Account Experience (Next)
+
+Deferred from 10A; builds on the 10A foundation:
+
+- Account activation (Supabase invitation wired to Phase 4 provisioning).
+- Invitation flow, including `/auth/callback`.
+- Forgot password (Supabase built-in email reset).
+- Reset password (`/reset-password`; distinguishes invite vs reset context from session/token state).
+- Password strength meter (activation/reset UI).
+- Rate limiting on login, forgot-password, and activation (Supabase email limits + lightweight route-level limiter; no Redis initially).
+- Authorization hardening of existing `/admin/*` and `/student/*` pages (permission helpers already exist; ensure every server action and page enforces server-side checks).
+
+Validation gate (planned): E2E for role-specific login, first-time activation, forgot/reset password, session expiry, and logout; authorization tests for role-aware redirects and Access Denied; mobile viewport and accessibility checks for every auth surface; lint, type check, unit/integration tests, production build.
+
 ## Phase 11: PWA And Production Hardening
 
 Scope:
@@ -539,6 +570,10 @@ E2E tests:
   - 9A.7 (Public Admissions page + About/Privacy/Terms nav fixes): Completed and pushed — `ac12010`. `/admissions` page (premium hero, "why choose us", 5-step process, classes IX–XII, enquiry form, direct phone/WhatsApp CTA, address/hours/map); WhatsApp-only best-effort flow (no `AdmissionsEnquiry` persistence); `AdmissionsForm` client component (validation, pre-filled wa.me redirect, duplicate-submit guard) using `buildWhatsAppHref` + `buildAdmissionsEnquiryMessage`; `LocationMap` shared component reused by Contact and Admissions; `revalidate = 3600`. Also resolved broken public nav: new `/about` (teacher profile), `/privacy`, `/terms` pages; repointed `CourseCard` dead `/courses/[trackId]` link to `/admissions`. History rewrite removed `Co-authored-by` trailers (`--force-with-lease`); version-controlled pre-push hygiene hook added (`3fd1c8c`).
   - 9A.8 (SEO & Public Website Polish): Completed (pending push) — Global SEO: `metadataBase`, default Open Graph + Twitter cards, `robots` index/follow in root layout; per-page `alternates.canonical` on all 9 public routes; explicit `metadata` added to `/` and `/announcements` (the only pages previously missing it). `app/sitemap.ts` (9 routes) and `app/robots.ts` added. Organization JSON-LD (`OrganizationJsonLd`, using `SiteSettings` values where available, falling back to `siteConfig`) injected in `PublicShell` on every public page. No raster images in public site (no `next/image` gap); fonts self-hosted via `@fontsource`; H1/landmark/a11y verified. Deferred: Course / FAQ / Breadcrumb JSON-LD — no course-detail pages, FAQ page, or breadcrumb UI exist yet.
 
+- Phase 10: In progress (Authentication & Account Experience).
+  - Phase 10A (Authentication Foundation): Completed and pushed — `8e1669d`. Next.js 16 `src/proxy.ts` session refresh + coarse role-aware routing; shared themed `/login` and `/login/[role]`; server-side `signIn`/`signOut` actions; `/unauthorized`, `/session-expired`, `/teacher` placeholder; logout wired into admin/student shells. JWT role claim used for routing only; DB `AppUser.role` via `getAppUser`/`requireRole`/`requireAdmin` remains the authorization source of truth.
+  - Phase 10B (Account Experience): Next — account activation, invitation flow, forgot/reset password, password strength meter, rate limiting, authorization hardening of existing admin/student pages.
+
 ## Phase 0 Stop
 
 Stop here and wait for human approval before application initialization or Phase 1 implementation.
@@ -548,21 +583,22 @@ Stop here and wait for human approval before application initialization or Phase
 ## Status Block
 
 ```text
-Phase: 9A.8
-Status: Implementation complete; pending commit approval (do not commit without explicit request)
-Working tree: Dirty (new src/lib/seo.ts, app/sitemap.ts, app/robots.ts, components/public/OrganizationJsonLd.tsx; metadata + canonical on all public pages; PublicShell JSON-LD; planning-doc update)
-Commit: 3fd1c8c (hook) pushed to origin/main
-Push: pending
+Phase: 10A
+Status: Implementation complete (commit 8e1669d, pushed to origin/main)
+Working tree: Clean
+Commit: 8e1669d pushed (406b882..8e1669d)
+Push: done
 
-Completed in this slice:
-- Root layout: metadataBase, default Open Graph (website) + Twitter summary_large_image, robots index/follow
-- Per-page alternates.canonical on all 9 public routes; explicit metadata added to / and /announcements
-- app/sitemap.ts (9 static routes, weekly, priority) and app/robots.ts (allow all + sitemap + host)
-- Organization JSON-LD injected via PublicShell on every public page
-- Verified: no raster images (no next/image gap), self-hosted fonts, single H1 per page, landmark regions present
+Completed in this slice (Phase 10A — Authentication Foundation):
+- src/proxy.ts (Next 16 proxy): session refresh + coarse role-aware optimistic routing only
+- Shared auth layout + themed /login and /login/[role] (student/teacher/admin)
+- Server-side signIn / signOut actions (signIn syncs JWT role claim best-effort; DB AppUser.role is source of truth)
+- /unauthorized, /session-expired, /teacher (placeholder) pages
+- Logout wired into AdminShell and StudentShell
+- Docs: ROUTES_AND_PERMISSIONS.md auth routes + proxy.ts architecture; this plan's Phase 10A/10B split
 
 Next planned phase:
-Phase 9A.7 delivered About/Privacy/Terms + nav fixes; Phase 9A.8 delivered SEO & Public Website Polish (metadata, canonical, Open Graph/Twitter, sitemap, robots, Organization JSON-LD). Next: Phase 10 — Authentication & Account Experience, then Phase 11 — PWA And Production Hardening.
+Phase 10B — Account Experience (activation, invitation flow, forgot/reset password, password strength, rate limiting, authorization hardening). Then Phase 11 — PWA And Production Hardening.
 
 Outstanding blockers:
 - None

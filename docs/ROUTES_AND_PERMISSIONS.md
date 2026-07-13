@@ -2,7 +2,7 @@
 
 Phase: 0 research and planning.
 Status: Draft for human review.
-Last reviewed: 2026-07-11.
+Last reviewed: 2026-07-13.
 
 ## Permission Principles
 
@@ -70,15 +70,38 @@ Public routes must not expose private batch live links, unpublished content, pri
 
 ## Auth Routes
 
-| Route              | Access                                         | Notes                                           |
-| ------------------ | ---------------------------------------------- | ----------------------------------------------- |
-| `/login`           | Anonymous only or redirect authenticated users | Supabase email/password or supported auth flow. |
-| `/forgot-password` | Anonymous                                      | Password reset request.                         |
-| `/reset-password`  | Token/session dependent                        | Password update flow.                           |
-| `/logout`          | Authenticated                                  | Server-side logout.                             |
-| `/auth/callback`   | Supabase callback                              | Must validate safe redirect targets.            |
+Implemented in Phase 10A (commit 8e1669d). Routes marked Deferred are planned for Phase 10B.
 
-There is no public student registration route. Student account activation uses a secure Supabase invitation flow initiated by admin.
+| Route              | Access                                         | Notes                                                                                 | Status          |
+| ------------------ | ---------------------------------------------- | ------------------------------------------------------------------------------------- | --------------- |
+| `/login`           | Anonymous; authenticated users redirected away | Supabase email/password login entry.                                                  | Implemented 10A |
+| `/login/[role]`    | Anonymous; `role` ∈ {student,teacher,admin}    | Themed login; invalid role falls back to default-themed login (no redirect).          | Implemented 10A |
+| `/unauthorized`    | Any                                            | Access denied / no-permission status page.                                            | Implemented 10A |
+| `/session-expired` | Any                                            | Session expired / invalid-token status page.                                          | Implemented 10A |
+| `/teacher`         | `TEACHER` (`requireRole`)                      | Placeholder "coming soon" page; teacher authentication is fully functional.           | Implemented 10A |
+| `/logout`          | Authenticated                                  | Server Action `signOut` (clears cookies, redirects `/login`); not a standalone route. | Implemented 10A |
+| `/forgot-password` | Anonymous                                      | Password reset request.                                                               | Deferred 10B    |
+| `/reset-password`  | Token/session dependent                        | Password update flow.                                                                 | Deferred 10B    |
+| `/auth/callback`   | Supabase callback                              | Invitation/reset callback; must validate safe redirect targets.                       | Deferred 10B    |
+
+There is no public student registration route. Student account activation uses a secure Supabase invitation flow initiated by admin (deferred to Phase 10B).
+
+### Authentication Proxy (`src/proxy.ts`)
+
+Next.js 16 uses `src/proxy.ts` (function exported as `proxy`) as the Middleware/proxy file — **not** `middleware.ts`. It is confirmed executing (production build output shows `ƒ Proxy`).
+
+Responsibilities (edge-safe, no database, no authorization):
+
+- Refresh the Supabase session via `supabase.auth.getUser()` and rotate auth cookies.
+- Redirect authenticated users away from `/login*` and `/forgot-password`.
+- Coarse role-aware **optimistic routing** only, reading the verified JWT `app_metadata.role` claim:
+  - `/admin` → requires `ADMIN`, else `/login` (or `/session-expired` if a stale auth cookie is present).
+  - `/student` → requires `STUDENT`.
+  - `/teacher` → requires `TEACHER`.
+  - Wrong role redirects to the user's own portal root.
+- API routes are refreshed only and never redirected.
+
+Authorization stays server-side: every protected page calls `getAppUser` / `requireRole` / `requireAdmin`, and every server action resolves the database `AppUser.role`. The JWT role claim is treated as a routing cache only and is synced best-effort at sign-in; a stale claim can at most mis-route, never escalate privilege.
 
 ## Admin Routes
 

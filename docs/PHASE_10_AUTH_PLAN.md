@@ -1,6 +1,6 @@
 # Phase 10 — Authentication & Account Experience: Plan
 
-Status: Draft for human review.
+Status: Phase 10A complete (commit 8e1669d, pushed); Phase 10B planned / not started.
 Depends on: Phase 9A (complete, pushed), existing `src/lib/auth/permissions.ts`, `src/lib/supabase/*`, `docs/ROUTES_AND_PERMISSIONS.md`.
 Last reviewed: 2026-07-13.
 
@@ -286,9 +286,10 @@ All four resolved by stakeholder (approved recommended options):
    `/unauthorized` reserved for genuinely-no-destination / no-permission cases.
 4. **Teacher destination:** `/teacher` placeholder ("Coming Soon"); teacher auth fully functional.
 
-**10A status (implementation complete, pending review):** `proxy.ts` extended (session refresh +
+**10A status (Complete — commit 8e1669d):** `proxy.ts` extended (session refresh +
 coarse role-aware guards, no DB authz); shared auth layout + themed `/login` and `/login/[role]`;
 server-side `signIn` (syncs JWT `role` claim from `AppUser`, role-aware redirect) and `signOut`;
 `/unauthorized`, `/session-expired`, `/teacher` placeholder; logout wired into `AdminShell` and
-`StudentShell`. Out of scope for 10A (deferred to 10B): activation, forgot/reset UI, password strength,
-rate limiting, invitation flow.
+`StudentShell`. Out of scope for 10A (deferred to 10B): account activation, invitation flow, forgot password, reset
+password, password strength, rate limiting, and authorization hardening of existing `/admin/*` and
+`/student/*` pages (permission helpers already exist).
