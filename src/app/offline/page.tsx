@@ -9,8 +9,8 @@ export default function OfflinePage() {
         </div>
         <h1 className="mb-3 text-2xl font-bold">You are offline</h1>
         <p className="mb-6 text-muted-foreground">
-          Please check your internet connection and try again. Your study
-          materials and courses will be available once you reconnect.
+          Please check your internet connection and try again. Your study materials and
+          courses will be available once you reconnect.
         </p>
         <button
           onClick={() => window.location.reload()}

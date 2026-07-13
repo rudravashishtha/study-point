@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import "@fontsource/outfit/400.css";
 import "@fontsource/outfit/600.css";
 import "@fontsource/outfit/700.css";
@@ -14,6 +14,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { SerwistProvider } from "./serwist";
 
 export const metadata: Metadata = {
+  applicationName: siteConfig.name,
   metadataBase: new URL(siteUrl),
   title: {
     default: siteConfig.name,
@@ -22,6 +23,14 @@ export const metadata: Metadata = {
   description: siteConfig.description,
   alternates: {
     canonical: "/",
+  },
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: siteConfig.name,
+  },
+  formatDetection: {
+    telephone: false,
   },
   openGraph: {
     type: "website",
@@ -35,6 +44,10 @@ export const metadata: Metadata = {
     index: true,
     follow: true,
   },
+};
+
+export const viewport: Viewport = {
+  themeColor: "#000000",
 };
 
 export default function RootLayout({
