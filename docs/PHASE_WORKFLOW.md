@@ -114,8 +114,37 @@ A phase is complete when:
 
 - Push only after explicit push approval.
 - Push to `origin/main` only.
-- Never force-push without explicit recovery approval.
+- Never force-push without explicit approval. When a history rewrite is explicitly approved, use `git push --force-with-lease origin main` — never plain `--force`. `--force-with-lease` aborts if the local remote-tracking ref is stale, protecting against overwriting unrelated remote work.
 - Verify local HEAD == remote HEAD after push.
+
+## Git Hygiene (Pre-push Hook)
+
+This repository ships a self-enforcing pre-push hook at `.githooks/pre-push`. It is version-controlled, so every clone inherits the same safeguards automatically.
+
+### Install (one time, per clone)
+
+```bash
+git config core.hooksPath .githooks
+```
+
+### What the hook enforces before every push
+
+- `git config user.name` is set.
+- `git config user.email` is set.
+- No `Co-authored-by:` trailers.
+- No `Signed-off-by:` trailers.
+- No `Reviewed-by:` trailers.
+- No `Suggested-by:` trailers.
+- No `Generated-by:` / `AI-` trailers.
+- Working tree is clean (`git status --porcelain` is empty).
+
+### Force-push policy (convention, not hook-enforced)
+
+The hook cannot reliably detect push flags, so the rule is a documented convention:
+
+- Prefer `git push --force-with-lease` over `--force`.
+- Never use plain `--force` for this repository.
+- Only force-push after explicit approval for a defined reason (e.g. removing attribution trailers from history).
 
 ## Migration Protocol
 

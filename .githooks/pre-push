@@ -1,0 +1,55 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Pre-push hygiene gate for study-point.
+#
+# Enforces, before every push:
+#   - git identity (user.name + user.email) is configured
+#   - working tree is clean
+#   - no unwanted attribution trailers in any commit being pushed
+#
+# Force-push policy (prefer --force-with-lease over --force) is documented
+# in docs/PHASE_WORKFLOW.md; it cannot be reliably detected from this hook.
+
+# 1. Git identity must be configured.
+if [ -z "$(git config --get user.name)" ]; then
+  echo "PRE-PUSH HOOK FAILED: git config user.name is not set." >&2
+  echo "  Set it with: git config --global user.name \"Your Name\"" >&2
+  exit 1
+fi
+
+if [ -z "$(git config --get user.email)" ]; then
+  echo "PRE-PUSH HOOK FAILED: git config user.email is not set." >&2
+  echo "  Set it with: git config --global user.email \"you@example.com\"" >&2
+  exit 1
+fi
+
+# 2. Working tree must be clean before pushing.
+if [ -n "$(git status --porcelain)" ]; then
+  echo "PRE-PUSH HOOK FAILED: working tree is not clean. Commit or stash changes before pushing." >&2
+  git status --short >&2
+  exit 1
+fi
+
+# 3. No unwanted attribution trailers in the commits being pushed.
+TRAILER_RE='^(Co-authored-by|Signed-off-by|Reviewed-by|Suggested-by|Generated-by):|AI-'
+ZERO='0000000000000000000000000000000000000000'
+
+while read -r local_ref local_sha remote_ref remote_sha; do
+  # Skip branch deletions.
+  [ "$local_sha" = "$ZERO" ] && continue
+
+  if [ "$remote_sha" = "$ZERO" ]; then
+    range="$local_sha"
+  else
+    range="$remote_sha..$local_sha"
+  fi
+
+  if git log --format='%B' "$range" | grep -Eq "$TRAILER_RE"; then
+    echo "PRE-PUSH HOOK FAILED: forbidden attribution trailer found in commits being pushed:" >&2
+    git log --format='  %H  %s' "$range" | grep -E "$TRAILER_RE" >&2 || true
+    exit 1
+  fi
+done
+
+exit 0
