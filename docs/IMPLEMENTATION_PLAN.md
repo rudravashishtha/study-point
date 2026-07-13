@@ -572,7 +572,7 @@ E2E tests:
 
 - Phase 10: In progress (Authentication & Account Experience).
   - Phase 10A (Authentication Foundation): Completed and pushed — `8e1669d`. Next.js 16 `src/proxy.ts` session refresh + coarse role-aware routing; shared themed `/login` and `/login/[role]`; server-side `signIn`/`signOut` actions; `/unauthorized`, `/session-expired`, `/teacher` placeholder; logout wired into admin/student shells. JWT role claim used for routing only; DB `AppUser.role` via `getAppUser`/`requireRole`/`requireAdmin` remains the authorization source of truth.
-  - Phase 10B (Account Experience): Next — account activation, invitation flow, forgot/reset password, password strength meter, rate limiting, authorization hardening of existing admin/student pages.
+  - Phase 10B (Account Experience): Complete — account activation, invitation flow, forgot/reset password, password strength meter, rate limiting, authorization hardening of existing admin/student pages.
 
 ## Phase 0 Stop
 
@@ -598,7 +598,7 @@ Completed in this slice (Phase 10A — Authentication Foundation):
 - Docs: ROUTES_AND_PERMISSIONS.md auth routes + proxy.ts architecture; this plan's Phase 10A/10B split
 
 Next planned phase:
-Phase 10B — Account Experience (activation, invitation flow, forgot/reset password, password strength, rate limiting, authorization hardening). Then Phase 11 — PWA And Production Hardening.
+Phase 10B — Account Experience (completed: activation, invitation flow, forgot/reset password, password strength, rate limiting, authorization hardening). Next: Phase 11 — PWA And Production Hardening.
 
 Outstanding blockers:
 - None

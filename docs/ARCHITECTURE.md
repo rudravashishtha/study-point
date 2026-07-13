@@ -232,6 +232,8 @@ Student account activation uses a secure Supabase invitation flow:
 
 The service-role key, if needed for auth admin invitation, must be server-only and never available to the browser.
 
+Next.js 16 uses `src/proxy.ts` (the exported `proxy` function) as the Middleware/proxy file, not `middleware.ts`. The proxy performs session refresh and optimistic, coarse role-aware routing only: it reads the Supabase JWT `app_metadata.role` claim to decide routing and never performs fine-grained authorization. The database-backed `AppUser` record (resolved via `getAppUser` / `requireRole` / `requireAdmin`) remains the single source of truth for authorization, ownership, and scope checks. Never trust the JWT claim for anything beyond routing.
+
 ## Authorization Architecture
 
 Use centralized permission helpers in `src/lib/permissions`.
@@ -385,6 +387,14 @@ Question import templates must require board, programme where required, class le
 
 Parsing must not write to the database. Confirmation must be explicit.
 
+## Page Rendering Strategy
+
+Public website pages use Incremental Static Regeneration with `revalidate = 3600` (one-hour revalidation), so changes to batches, announcements, and site settings appear within the hour without a rebuild. This applies to `/`, `/about`, `/courses`, `/resources`, `/contact`, and `/admissions`.
+
+`/announcements` intentionally uses dynamic rendering (`force-dynamic`) because announcements are live content that must reflect the latest published records on every request.
+
+All public pages are Server Components by default; client components are used only for interactive elements (WhatsApp buttons, forms, maps). Admin and student portal pages are dynamically rendered and always server-authorized.
+
 ## PWA Architecture
 
 Use Serwist only after the app shell and route boundaries are stable. The service worker must avoid caching private student data carelessly.
@@ -425,6 +435,15 @@ Every protected operation must validate:
 - Ownership, batch, and curriculum scope.
 - Input schema.
 - Archive/published state as applicable.
+
+### Rate Limiting
+
+Login, password-reset requests, and account-activation are protected by a lightweight limiter in `src/lib/rate-limit.ts`:
+
+- Current implementation: in-memory sliding-window keyed by IP (and target where available) at module scope.
+- Fail-open behaviour: if the limiter throws, the request is allowed rather than blocked, so a limiter failure never breaks authentication.
+- Single-instance limitation: the in-memory store is not shared across serverless instances; under horizontal scaling each instance keeps its own counters, so limits are approximate rather than exact.
+- Planned migration path: when multi-instance production scaling is confirmed, replace the in-memory store with Redis/Upstash so limits are enforced globally. Do not block features on this migration.
 
 ## Architectural Risks
 
