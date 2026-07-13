@@ -7,6 +7,7 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { signOut } from "@/features/auth/actions";
 
 export function AdminShell({ children }: { children: React.ReactNode }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -37,10 +38,15 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
         </div>
 
         <div className="p-4 border-t border-border/40 shrink-0">
-          <button className="flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors w-full px-2 py-1.5 rounded-lg hover:bg-surface">
-            <LogOut className="size-4 opacity-70" />
-            <span>Sign out</span>
-          </button>
+          <form action={signOut}>
+            <button
+              type="submit"
+              className="flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors w-full px-2 py-1.5 rounded-lg hover:bg-surface"
+            >
+              <LogOut className="size-4 opacity-70" />
+              <span>Sign out</span>
+            </button>
+          </form>
         </div>
       </aside>
 

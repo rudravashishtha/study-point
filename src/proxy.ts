@@ -1,10 +1,9 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
+import { guardPortal, hasAuthCookie, roleHome } from "@/lib/auth/route-guards";
 
 export async function proxy(request: NextRequest) {
-  let supabaseResponse = NextResponse.next({
-    request,
-  });
+  let response = NextResponse.next({ request });
 
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -16,21 +15,49 @@ export async function proxy(request: NextRequest) {
         },
         setAll(cookiesToSet) {
           cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value));
-          supabaseResponse = NextResponse.next({
-            request,
-          });
+          response = NextResponse.next({ request });
           cookiesToSet.forEach(({ name, value, options }) =>
-            supabaseResponse.cookies.set(name, value, options),
+            response.cookies.set(name, value, options),
           );
         },
       },
     },
   );
 
-  // refreshing the auth token
-  await supabase.auth.getUser();
+  // Refresh the auth session.
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
-  return supabaseResponse;
+  const { pathname } = request.nextUrl;
+  const role = (user?.app_metadata?.role as string | undefined) ?? undefined;
+
+  // API routes: refresh the session only, never redirect.
+  if (pathname.startsWith("/api/")) {
+    return response;
+  }
+
+  // Authenticated users should not land on auth entry pages.
+  const isAuthEntry =
+    pathname === "/login" ||
+    pathname.startsWith("/login/") ||
+    pathname === "/forgot-password";
+
+  if (user && isAuthEntry) {
+    return NextResponse.redirect(new URL(role ? roleHome(role) : "/", request.url));
+  }
+
+  // Coarse role-aware portal guard (optimistic routing only).
+  // Real authorization stays server-side via getAppUser / requireRole.
+  const portalRedirect = guardPortal(pathname, user ? { role } : null);
+  if (portalRedirect) {
+    if (portalRedirect === "/login" && hasAuthCookie(request)) {
+      return NextResponse.redirect(new URL("/session-expired", request.url));
+    }
+    return NextResponse.redirect(new URL(portalRedirect, request.url));
+  }
+
+  return response;
 }
 
 export const config = {
