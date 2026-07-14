@@ -77,59 +77,69 @@ export function AssignTeacherDialog({
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       {trigger && <DialogTrigger render={trigger as React.ReactElement} />}
-      <DialogContent className="max-w-4xl w-[95vw] max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
+      <DialogContent className="sm:max-w-2xl p-0 flex flex-col overflow-hidden max-h-[90vh]">
+        <DialogHeader className="px-4 pt-4 pb-2 sm:px-6 sm:pt-6">
           <DialogTitle>Assign Teacher to Batch</DialogTitle>
         </DialogHeader>
 
-        <div className="space-y-6 py-4">
-          <div className="space-y-2">
-            <Label>
-              Select Teacher <span className="text-red-500">*</span>
-            </Label>
-            <Select
-              value={selectedTeacherId}
-              onValueChange={(val) => setSelectedTeacherId(val || "")}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Choose a teacher..." />
-              </SelectTrigger>
-              <SelectContent>
-                {availableTeachers.length === 0 ? (
-                  <SelectItem value="empty" disabled>
-                    No available teachers found
-                  </SelectItem>
-                ) : (
-                  availableTeachers.map((teacher) => (
-                    <SelectItem key={teacher.id} value={teacher.id}>
-                      {teacher.displayName} {teacher.email ? `(${teacher.email})` : ""}
+        <div className="flex-1 overflow-y-auto px-4 py-4 sm:px-6">
+          <div className="space-y-6">
+            <div className="space-y-2">
+              <Label>
+                Select Teacher <span className="text-red-500">*</span>
+              </Label>
+              <Select
+                value={selectedTeacherId}
+                onValueChange={(val) => setSelectedTeacherId(val || "")}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Choose a teacher..." />
+                </SelectTrigger>
+                <SelectContent>
+                  {availableTeachers.length === 0 ? (
+                    <SelectItem value="empty" disabled>
+                      No available teachers found
                     </SelectItem>
-                  ))
-                )}
-              </SelectContent>
-            </Select>
-          </div>
+                  ) : (
+                    availableTeachers.map((teacher) => (
+                      <SelectItem key={teacher.id} value={teacher.id}>
+                        {teacher.displayName} {teacher.email ? `(${teacher.email})` : ""}
+                      </SelectItem>
+                    ))
+                  )}
+                </SelectContent>
+              </Select>
+            </div>
 
-          <div className="space-y-2">
-            <Label>
-              Capabilities <span className="text-red-500">*</span>
-            </Label>
-            <PermissionSelector value={permissions} onChange={setPermissions} />
+            <div className="space-y-2">
+              <Label>
+                Capabilities <span className="text-red-500">*</span>
+              </Label>
+              <PermissionSelector value={permissions} onChange={setPermissions} />
+            </div>
           </div>
-
-          <div className="flex justify-end pt-4">
-            <Button
-              onClick={handleSubmit}
-              disabled={
-                isSubmitting ||
-                !selectedTeacherId ||
-                permissions.length === 0 ||
-                !permissions.includes("BATCH_VIEW")
-              }
-            >
-              {isSubmitting ? "Assigning..." : "Assign Teacher"}
-            </Button>
-          </div>
+        </div>
+        
+        <div className="m-0 p-4 sm:p-6 border-t bg-muted/40 flex justify-end gap-2">
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => setOpen(false)}
+            disabled={isSubmitting}
+          >
+            Cancel
+          </Button>
+          <Button
+            onClick={handleSubmit}
+            disabled={
+              isSubmitting ||
+              !selectedTeacherId ||
+              permissions.length === 0 ||
+              !permissions.includes("BATCH_VIEW")
+            }
+          >
+            {isSubmitting ? "Assigning..." : "Assign Teacher"}
+          </Button>
         </div>
       </DialogContent>
     </Dialog>

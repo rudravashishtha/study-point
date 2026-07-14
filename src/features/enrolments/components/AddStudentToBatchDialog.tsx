@@ -11,7 +11,6 @@ import {
   Dialog,
   DialogContent,
   DialogDescription,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
@@ -112,15 +111,15 @@ export function AddStudentToBatchDialog({
         else onOpenChange(val);
       }}
     >
-      <DialogContent className="sm:max-w-[425px]">
-        <DialogHeader>
+      <DialogContent className="sm:max-w-md p-0 flex flex-col overflow-hidden max-h-[90vh]">
+        <DialogHeader className="px-4 pt-4 pb-2 sm:px-6 sm:pt-6">
           <DialogTitle>Enrol Student in Batch</DialogTitle>
           <DialogDescription>
             Search for a student by their code to assign them to this batch.
           </DialogDescription>
         </DialogHeader>
 
-        <div className="grid gap-4 py-4">
+        <div className="flex-1 overflow-y-auto px-4 py-4 sm:px-6 space-y-4">
           <div className="flex items-end gap-2">
             <div className="grid gap-2 flex-1">
               <Label htmlFor="studentCode">Student Code</Label>
@@ -145,7 +144,7 @@ export function AddStudentToBatchDialog({
           </div>
 
           {foundStudent && membership && (
-            <div className="border rounded-md p-4 bg-muted/30 mt-2 space-y-3">
+            <div className="border rounded-md p-4 bg-muted/30 space-y-3">
               <div>
                 <p className="text-sm font-medium">Student Found</p>
                 <p className="text-lg">{foundStudent.fullName}</p>
@@ -207,8 +206,8 @@ export function AddStudentToBatchDialog({
             </div>
           )}
         </div>
-
-        <DialogFooter>
+        
+        <div className="m-0 p-4 sm:p-6 border-t bg-muted/40 flex justify-end gap-2">
           <Button variant="outline" onClick={resetAndClose} disabled={isPending}>
             Cancel
           </Button>
@@ -223,7 +222,7 @@ export function AddStudentToBatchDialog({
           >
             {isPending ? "Processing..." : "Confirm Enrolment"}
           </Button>
-        </DialogFooter>
+        </div>
       </DialogContent>
     </Dialog>
   );

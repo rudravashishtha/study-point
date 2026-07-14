@@ -4,7 +4,7 @@ import { useRef, useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Button } from "@/components/ui/button";
+import { SubmitButton } from "@/components/ui/submit-button";
 import {
   buildWhatsAppHref,
   buildAdmissionsEnquiryMessage,
@@ -221,9 +221,9 @@ export function AdmissionsForm({ whatsappNumber, instituteName }: AdmissionsForm
         />
       </div>
 
-      <Button type="submit" disabled={submitting} className="w-full sm:w-auto">
+      <SubmitButton type="submit" pending={submitting} className="w-full sm:w-auto">
         {submitting ? "Redirecting to WhatsApp…" : "Send Enquiry on WhatsApp"}
-      </Button>
+      </SubmitButton>
     </form>
   );
 }

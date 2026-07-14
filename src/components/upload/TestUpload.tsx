@@ -1,8 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Loader2, UploadCloud, XCircle } from "lucide-react";
+import { FileUploadDropzone } from "./FileUploadDropzone";
 
 interface TestUploadProps {
   targetBatchId: string;
@@ -22,14 +21,17 @@ export function TestUpload({
   >("idle");
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files.length > 0) {
-      const selected = e.target.files[0];
+  const handleFileChange = (selected: File | null) => {
+    if (selected) {
       if (selected.size > 50 * 1024 * 1024) {
         setErrorMsg("File exceeds 50MB limit");
         return;
       }
       setFile(selected);
+      setErrorMsg(null);
+      setStatus("idle");
+    } else {
+      setFile(null);
       setErrorMsg(null);
       setStatus("idle");
     }
@@ -101,46 +103,16 @@ export function TestUpload({
   };
 
   return (
-    <div className="border-2 border-dashed rounded-lg p-4 flex flex-col items-center justify-center space-y-3">
-      {status === "success" ? (
-        <div className="text-green-600 flex items-center space-x-2 text-sm">
-          <span>Upload complete!</span>
-        </div>
-      ) : (
-        <>
-          <div className="flex items-center justify-center w-10 h-10 rounded-full bg-primary/10 text-primary">
-            <UploadCloud className="w-5 h-5" />
-          </div>
-          <div className="text-center">
-            <p className="text-xs text-muted-foreground">
-              Select a file to upload (Max 50MB)
-            </p>
-          </div>
-          <input
-            type="file"
-            onChange={handleFileChange}
-            disabled={uploading}
-            className="text-sm w-full"
-          />
-          {file && (
-            <Button
-              onClick={handleUpload}
-              disabled={uploading}
-              size="sm"
-              className="w-full"
-            >
-              {uploading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              {uploading ? `Status: ${status}` : "Upload File"}
-            </Button>
-          )}
-          {errorMsg && (
-            <div className="text-red-500 text-xs flex items-center space-x-1">
-              <XCircle className="w-3 h-3" />
-              <span>{errorMsg}</span>
-            </div>
-          )}
-        </>
-      )}
-    </div>
+    <FileUploadDropzone
+      title="Upload Question Paper"
+      helperText="Click anywhere or drag & drop your file here.\nMaximum size: 50 MB"
+      file={file}
+      onFileChange={handleFileChange}
+      onUpload={handleUpload}
+      uploading={uploading}
+      status={status}
+      errorMsg={errorMsg}
+      disabled={uploading}
+    />
   );
 }

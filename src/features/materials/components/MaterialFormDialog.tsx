@@ -6,6 +6,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import {
   Select,
   SelectContent,
@@ -21,6 +22,7 @@ import {
   updateAdminMaterialAction,
 } from "@/app/admin/materials/actions";
 import { StudyMaterialUpload } from "@/components/upload/StudyMaterialUpload";
+import { SubmitButton } from "@/components/ui/submit-button";
 
 interface MaterialFormData {
   id: string;
@@ -167,177 +169,201 @@ export function MaterialFormDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
+      <DialogContent className="sm:max-w-2xl p-0 flex flex-col overflow-hidden max-h-[90vh]">
+        <DialogHeader className="px-4 pt-4 pb-2 sm:px-6 sm:pt-6">
           <DialogTitle>{material ? "Edit Material" : "Create Material"}</DialogTitle>
         </DialogHeader>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="space-y-2">
-            <Label>Visibility Scope</Label>
-            <Select
-              value={visibility}
-              onValueChange={(v) => {
-                setVisibility(v as StudyMaterialVisibility);
-                setBatchId("");
-              }}
-              disabled={!!material} // Prevent widening/swapping
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Select scope" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="CURRICULUM_TRACK">
-                  Curriculum Track (All Batches)
-                </SelectItem>
-                <SelectItem value="BATCH">Specific Batch</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          {visibility === "BATCH" && (
-            <div className="space-y-2">
-              <Label>Select Batch</Label>
-              <Select
-                value={batchId}
-                onValueChange={(v) => v && setBatchId(v)}
-                disabled={!!material}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Select batch" />
-                </SelectTrigger>
-                <SelectContent>
-                  {activeBatches.map((b) => (
-                    <SelectItem key={b.id} value={b.id}>
-                      {b.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-          )}
-
-          {visibility === "CURRICULUM_TRACK" && (
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label>Academic Session</Label>
-                <Select
-                  value={academicSessionId}
-                  onValueChange={(v) => v && setAcademicSessionId(v)}
-                  disabled={!!material}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Session" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {sessions.map((s) => (
-                      <SelectItem key={s.id} value={s.id}>
-                        {s.name}
+        
+        <div className="flex-1 overflow-y-auto px-4 py-4 sm:px-6">
+          <form id="material-form" onSubmit={handleSubmit} className="space-y-8">
+            
+            {/* Scope & Targeting */}
+            <section className="space-y-4">
+              <h3 className="text-sm font-medium text-muted-foreground border-b pb-2">Scope & Targeting</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2 col-span-1 md:col-span-2">
+                  <Label>Visibility Scope</Label>
+                  <Select
+                    value={visibility}
+                    onValueChange={(v) => {
+                      setVisibility(v as StudyMaterialVisibility);
+                      setBatchId("");
+                    }}
+                    disabled={!!material} // Prevent widening/swapping
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select scope" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="CURRICULUM_TRACK">
+                        Curriculum Track (All Batches)
                       </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="space-y-2">
-                <Label>Curriculum Track</Label>
-                <Select
-                  value={curriculumTrackId}
-                  onValueChange={(v) => v && setCurriculumTrackId(v)}
-                  disabled={!!material}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Track" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {tracks.map((t) => (
-                      <SelectItem key={t.id} value={t.id}>
-                        {t.name || "Track"}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-          )}
-
-          <div className="space-y-2">
-            <Label htmlFor="title">Title</Label>
-            <Input
-              id="title"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              required
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label>Description</Label>
-            <Input value={description} onChange={(e) => setDescription(e.target.value)} />
-          </div>
-
-          <div className="space-y-2">
-            <Label>Resource Type</Label>
-            <Select
-              value={resourceType}
-              onValueChange={(v) => setResourceType(v as StudyMaterialResourceType)}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Type" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="DOCUMENT">Document (PDF/Doc)</SelectItem>
-                <SelectItem value="PRESENTATION">Presentation</SelectItem>
-                <SelectItem value="IMAGE">Image</SelectItem>
-                <SelectItem value="LINK">External Link</SelectItem>
-                <SelectItem value="TEXT">Text Content</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          {isUploadRequired && (
-            <div className="space-y-2">
-              <Label>File Attachment</Label>
-              {material && material.fileAssetId && !fileAssetId && (
-                <div className="text-sm text-muted-foreground mb-2">
-                  Currently attached. Upload a new file below to replace it.
+                      <SelectItem value="BATCH">Specific Batch</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
-              )}
-              <StudyMaterialUpload
-                usageCategory="STUDY_MATERIAL"
-                uploadScope={visibility}
-                targetBatchId={visibility === "BATCH" ? batchId : null}
-                targetSessionId={
-                  visibility === "CURRICULUM_TRACK" ? academicSessionId : null
-                }
-                targetTrackId={
-                  visibility === "CURRICULUM_TRACK" ? curriculumTrackId : null
-                }
-                onUploadSuccess={setFileAssetId}
-                onUploadError={(e) => toast.error("Upload Failed", { description: e })}
-              />
-            </div>
-          )}
 
-          {resourceType === "LINK" && (
-            <div className="space-y-2">
-              <Label>HTTPS URL</Label>
-              <Input
-                type="url"
-                value={externalLinkUrl}
-                onChange={(e) => setExternalLinkUrl(e.target.value)}
-                required
-              />
-            </div>
-          )}
+                {visibility === "BATCH" && (
+                  <div className="space-y-2 col-span-1 md:col-span-2">
+                    <Label>Select Batch</Label>
+                    <Select
+                      value={batchId}
+                      onValueChange={(v) => v && setBatchId(v)}
+                      disabled={!!material}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select batch" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {activeBatches.map((b) => (
+                          <SelectItem key={b.id} value={b.id}>
+                            {b.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                )}
 
-          <div className="pt-4 flex justify-end gap-2">
-            <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
-              Cancel
-            </Button>
-            <Button type="submit" disabled={loading}>
-              {loading ? "Saving..." : "Save Material"}
-            </Button>
-          </div>
-        </form>
+                {visibility === "CURRICULUM_TRACK" && (
+                  <>
+                    <div className="space-y-2">
+                      <Label>Academic Session</Label>
+                      <Select
+                        value={academicSessionId}
+                        onValueChange={(v) => v && setAcademicSessionId(v)}
+                        disabled={!!material}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Session" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {sessions.map((s) => (
+                            <SelectItem key={s.id} value={s.id}>
+                              {s.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="space-y-2">
+                      <Label>Curriculum Track</Label>
+                      <Select
+                        value={curriculumTrackId}
+                        onValueChange={(v) => v && setCurriculumTrackId(v)}
+                        disabled={!!material}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Track" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {tracks.map((t) => (
+                            <SelectItem key={t.id} value={t.id}>
+                              {t.name || "Track"}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </>
+                )}
+              </div>
+            </section>
+
+            {/* Material Details */}
+            <section className="space-y-4">
+              <h3 className="text-sm font-medium text-muted-foreground border-b pb-2">Material Details</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2 col-span-1 md:col-span-2">
+                  <Label htmlFor="title">Title</Label>
+                  <Input
+                    id="title"
+                    value={title}
+                    onChange={(e) => setTitle(e.target.value)}
+                    required
+                  />
+                </div>
+                <div className="space-y-2 col-span-1 md:col-span-2">
+                  <Label>Description</Label>
+                  <Textarea
+                    value={description}
+                    onChange={(e) => setDescription(e.target.value)}
+                    rows={3}
+                  />
+                </div>
+                <div className="space-y-2 col-span-1 md:col-span-2">
+                  <Label>Resource Type</Label>
+                  <Select
+                    value={resourceType}
+                    onValueChange={(v) => setResourceType(v as StudyMaterialResourceType)}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Type" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="DOCUMENT">Document (PDF/Doc)</SelectItem>
+                      <SelectItem value="PRESENTATION">Presentation</SelectItem>
+                      <SelectItem value="IMAGE">Image</SelectItem>
+                      <SelectItem value="LINK">External Link</SelectItem>
+                      <SelectItem value="TEXT">Text Content</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {isUploadRequired && (
+                  <div className="space-y-2 col-span-1 md:col-span-2">
+                    <Label>File Attachment</Label>
+                    {material && material.fileAssetId && !fileAssetId && (
+                      <div className="text-sm text-muted-foreground mb-2">
+                        Currently attached. Upload a new file below to replace it.
+                      </div>
+                    )}
+                    <StudyMaterialUpload
+                      usageCategory="STUDY_MATERIAL"
+                      uploadScope={visibility}
+                      targetBatchId={visibility === "BATCH" ? batchId : null}
+                      targetSessionId={
+                        visibility === "CURRICULUM_TRACK" ? academicSessionId : null
+                      }
+                      targetTrackId={
+                        visibility === "CURRICULUM_TRACK" ? curriculumTrackId : null
+                      }
+                      onUploadSuccess={setFileAssetId}
+                      onUploadError={(e) => toast.error("Upload Failed", { description: e })}
+                    />
+                  </div>
+                )}
+
+                {resourceType === "LINK" && (
+                  <div className="space-y-2 col-span-1 md:col-span-2">
+                    <Label>HTTPS URL</Label>
+                    <Input
+                      type="url"
+                      value={externalLinkUrl}
+                      onChange={(e) => setExternalLinkUrl(e.target.value)}
+                      required
+                    />
+                  </div>
+                )}
+              </div>
+            </section>
+
+          </form>
+        </div>
+        
+        <div className="m-0 p-4 sm:p-6 border-t bg-muted/40 flex justify-end gap-2">
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => onOpenChange(false)}
+            disabled={loading}
+          >
+            Cancel
+          </Button>
+          <SubmitButton type="submit" form="material-form" pending={loading}>
+            {loading ? "Saving..." : "Save Material"}
+          </SubmitButton>
+        </div>
       </DialogContent>
     </Dialog>
   );

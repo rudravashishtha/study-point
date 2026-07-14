@@ -13,6 +13,14 @@ import {
 } from "@/components/ui/table";
 import { DataListEmpty } from "@/components/admin/data-list/DataListEmpty";
 import { FeeAssignmentRowActions } from "./FeeAssignmentRowActions";
+import { FilterField } from "@/components/filters/filter-field";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import dynamic from "next/dynamic";
 
 const FeeAssignmentPreviewDialog = dynamic(
@@ -142,8 +150,8 @@ export function FeeAssignmentList({
       </div>
 
       {/* Filters Bar */}
-      <div className="flex flex-col space-y-3 md:flex-row md:items-center md:justify-between md:space-y-0">
-        <div className="flex flex-1 flex-col space-y-2 md:flex-row md:space-x-2 md:space-y-0">
+      <div className="flex flex-col gap-4 items-start sm:items-end sm:flex-row justify-between md:space-y-0">
+        <div className="flex flex-1 flex-col gap-4 md:flex-row md:flex-wrap md:items-end w-full">
           <input
             type="text"
             placeholder="Search student or fee plan..."
@@ -152,39 +160,52 @@ export function FeeAssignmentList({
             className="flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm transition-colors placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring md:w-64"
           />
 
-          <select
-            value={feePlanFilter}
-            onChange={(e) => setFeePlanFilter(e.target.value)}
-            className="flex h-9 rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
-          >
-            <option value="">All Fee Plans</option>
-            {feePlans.map((fp) => (
-              <option key={fp.id} value={fp.id}>
-                {fp.name}
-              </option>
-            ))}
-          </select>
+          <FilterField label="Fee Plan">
+            <Select value={feePlanFilter} onValueChange={(v) => setFeePlanFilter(v || "")}>
+              <SelectTrigger className="h-9 w-[180px]">
+                <SelectValue placeholder="All Fee Plans" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="">All Fee Plans</SelectItem>
+                {feePlans.map((fp) => (
+                  <SelectItem key={fp.id} value={fp.id}>
+                    {fp.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </FilterField>
 
-          <select
-            value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value as FeeAssignmentStatus | "")}
-            className="flex h-9 rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
-          >
-            <option value="">All Status</option>
-            <option value="ACTIVE">Active</option>
-          </select>
+          <FilterField label="Status">
+            <Select
+              value={statusFilter}
+              onValueChange={(v) => setStatusFilter(v as FeeAssignmentStatus | "")}
+            >
+              <SelectTrigger className="h-9 w-[180px]">
+                <SelectValue placeholder="All Statuses" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="">All Statuses</SelectItem>
+                <SelectItem value="ACTIVE">Active</SelectItem>
+              </SelectContent>
+            </Select>
+          </FilterField>
 
-          <select
-            value={archiveFilter}
-            onChange={(e) =>
-              setArchiveFilter(e.target.value as "active" | "archived" | "all")
-            }
-            className="flex h-9 rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
-          >
-            <option value="active">Active</option>
-            <option value="archived">Archived</option>
-            <option value="all">All</option>
-          </select>
+          <FilterField label="Archive Status">
+            <Select
+              value={archiveFilter}
+              onValueChange={(v) => setArchiveFilter(v as "active" | "archived" | "all")}
+            >
+              <SelectTrigger className="h-9 w-[180px]">
+                <SelectValue placeholder="Status" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="active">Active Only</SelectItem>
+                <SelectItem value="archived">Archived Only</SelectItem>
+                <SelectItem value="all">All Records</SelectItem>
+              </SelectContent>
+            </Select>
+          </FilterField>
         </div>
 
         <button

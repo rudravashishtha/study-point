@@ -1,18 +1,18 @@
 "use client";
 
 import { signOut } from "@/features/auth/actions";
-import { useFormStatus } from "react-dom";
+import { SubmitButton } from "@/components/ui/submit-button";
 
 function LogoutSubmit() {
-  const { pending } = useFormStatus();
   return (
-    <button
+    <SubmitButton
       type="submit"
-      disabled={pending}
-      className="rounded-md px-3 py-1.5 text-sm font-medium text-muted-foreground transition hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+      variant="ghost"
+      className="text-muted-foreground"
+      loadingText="Logging out…"
     >
-      {pending ? "Logging out…" : "Log out"}
-    </button>
+      Log out
+    </SubmitButton>
   );
 }
 

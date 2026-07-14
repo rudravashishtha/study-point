@@ -174,3 +174,15 @@
     scroll-behavior: auto !important;
   }
 }
+
+/* Delay NProgress slightly so fast transitions (<100ms) feel instant without flashing */
+#nprogress {
+  opacity: 0;
+  animation: nprogressFadeIn 0.1s 100ms forwards;
+}
+
+@keyframes nprogressFadeIn {
+  to {
+    opacity: 1;
+  }
+}

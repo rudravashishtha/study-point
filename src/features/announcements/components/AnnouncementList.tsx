@@ -11,6 +11,14 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { DataListEmpty } from "@/components/admin/data-list/DataListEmpty";
+import { FilterField } from "@/components/filters/filter-field";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { AnnouncementRowActions } from "./AnnouncementRowActions";
 import dynamic from "next/dynamic";
 
@@ -108,8 +116,8 @@ export function AnnouncementList({
 
   return (
     <div className="space-y-4">
-      <div className="flex flex-col space-y-3 md:flex-row md:items-center md:justify-between md:space-y-0">
-        <div className="flex flex-1 flex-col space-y-2 md:flex-row md:space-x-2 md:space-y-0">
+      <div className="flex flex-col space-y-4 md:flex-row md:items-start md:justify-between md:space-y-0">
+        <div className="flex flex-1 flex-col gap-4 md:flex-row md:flex-wrap md:items-end">
           <input
             type="text"
             placeholder="Search notices..."
@@ -118,49 +126,67 @@ export function AnnouncementList({
             className="flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm transition-colors placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring md:w-64"
           />
 
-          <select
-            value={archiveFilter}
-            onChange={(e) =>
-              setArchiveFilter(e.target.value as "active" | "archived" | "all")
-            }
-            className="flex h-9 rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
-          >
-            <option value="active">Active</option>
-            <option value="archived">Archived</option>
-            <option value="all">All</option>
-          </select>
+          <FilterField label="Status">
+            <Select
+              value={archiveFilter}
+              onValueChange={(v) =>
+                setArchiveFilter(v as "active" | "archived" | "all")
+              }
+            >
+              <SelectTrigger className="h-9 w-[150px]">
+                <SelectValue placeholder="Status" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="active">Active Only</SelectItem>
+                <SelectItem value="archived">Archived Only</SelectItem>
+                <SelectItem value="all">All Statuses</SelectItem>
+              </SelectContent>
+            </Select>
+          </FilterField>
 
-          <select
-            value={audienceFilter}
-            onChange={(e) =>
-              setAudienceFilter(e.target.value as AnnouncementAudience | "")
-            }
-            className="flex h-9 rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
-          >
-            <option value="">All Audiences</option>
-            <option value="PUBLIC">Public</option>
-            <option value="ALL_STUDENTS">All Students</option>
-            <option value="CURRICULUM_TRACK">Track</option>
-            <option value="BATCH">Batch</option>
-          </select>
+          <FilterField label="Audience">
+            <Select
+              value={audienceFilter}
+              onValueChange={(v) =>
+                setAudienceFilter(v as AnnouncementAudience | "")
+              }
+            >
+              <SelectTrigger className="h-9 w-[180px]">
+                <SelectValue placeholder="Audience" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="">All Audiences</SelectItem>
+                <SelectItem value="PUBLIC">Public</SelectItem>
+                <SelectItem value="ALL_STUDENTS">All Students</SelectItem>
+                <SelectItem value="CURRICULUM_TRACK">Track</SelectItem>
+                <SelectItem value="BATCH">Batch</SelectItem>
+              </SelectContent>
+            </Select>
+          </FilterField>
 
-          <select
-            value={sessionFilter}
-            onChange={(e) => setSessionFilter(e.target.value)}
-            className="flex h-9 rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
-          >
-            <option value="">All Sessions</option>
-            {sessions.map((s) => (
-              <option key={s.id} value={s.id}>
-                {s.name}
-              </option>
-            ))}
-          </select>
+          <FilterField label="Session">
+            <Select
+              value={sessionFilter}
+              onValueChange={(v) => setSessionFilter(v || "")}
+            >
+              <SelectTrigger className="h-9 w-[180px]">
+                <SelectValue placeholder="Session" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="">All Sessions</SelectItem>
+                {sessions.map((s) => (
+                  <SelectItem key={s.id} value={s.id}>
+                    {s.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </FilterField>
         </div>
 
         <button
           onClick={handleCreate}
-          className="rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90"
+          className="rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90 mt-4 md:mt-0"
         >
           Create Notice
         </button>

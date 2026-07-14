@@ -3,10 +3,8 @@
 import { useState, useRef, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Input } from "@/components/ui/input";
 import {
   Download,
-  Upload,
   FileSpreadsheet,
   CheckCircle2,
   AlertCircle,
@@ -47,10 +45,14 @@ interface PreviewRow {
 
 type StatusFilter = "ALL" | "VALID" | "WARNING" | "ERROR";
 
+// Need to import FileUploadDropzone at the top
+import { FileUploadDropzone } from "@/components/upload/FileUploadDropzone";
+
+// ... skipping to the middle of the file ...
+
 export function QuestionImportWizard() {
   const [step, setStep] = useState<WizardStep>("template");
   const [file, setFile] = useState<File | null>(null);
-  const [dragOver, setDragOver] = useState(false);
   const [importJobId, setImportJobId] = useState<string | null>(null);
   const [summary, setSummary] = useState<ImportSummary | null>(null);
   const [rows, setRows] = useState<PreviewRow[]>([]);
@@ -58,7 +60,6 @@ export function QuestionImportWizard() {
   const [filter, setFilter] = useState<StatusFilter>("ALL");
   const [confirming, setConfirming] = useState(false);
   const [importing, setImporting] = useState(false);
-  const fileInputRef = useRef<HTMLInputElement>(null);
   const submitLockRef = useRef(false);
 
   const reset = useCallback(() => {
@@ -72,7 +73,6 @@ export function QuestionImportWizard() {
     setConfirming(false);
     setImporting(false);
     submitLockRef.current = false;
-    if (fileInputRef.current) fileInputRef.current.value = "";
   }, []);
 
   const handleDownloadTemplate = async () => {
@@ -95,7 +95,10 @@ export function QuestionImportWizard() {
   };
 
   const handleFileChange = (selectedFile: File | null) => {
-    if (!selectedFile) return;
+    if (!selectedFile) {
+      setFile(null);
+      return;
+    }
 
     const ext = selectedFile.name.split(".").pop()?.toLowerCase();
     if (!["xlsx", "xls", "csv"].includes(ext || "")) {
@@ -270,20 +273,6 @@ export function QuestionImportWizard() {
     }
   };
 
-  const handleDragOver = (e: React.DragEvent) => {
-    e.preventDefault();
-    setDragOver(true);
-  };
-
-  const handleDragLeave = () => setDragOver(false);
-
-  const handleDrop = (e: React.DragEvent) => {
-    e.preventDefault();
-    setDragOver(false);
-    const droppedFile = e.dataTransfer.files[0];
-    handleFileChange(droppedFile);
-  };
-
   const isReady = summary?.status === "READY";
   const validCount = summary?.validRows || 0;
   const errorCount = summary?.errorRows || 0;
@@ -335,56 +324,19 @@ export function QuestionImportWizard() {
       {/* Step 2: Upload */}
       {step === "upload" && (
         <div className="space-y-4">
-          <div
-            onDragOver={handleDragOver}
-            onDragLeave={handleDragLeave}
-            onDrop={handleDrop}
-            className={`rounded-md border-2 border-dashed p-8 text-center transition-colors cursor-pointer ${
-              dragOver
-                ? "border-primary bg-primary/5"
-                : "border-border hover:border-muted-foreground/40"
-            }`}
-            onClick={() => fileInputRef.current?.click()}
-          >
-            <Upload className="mx-auto size-10 text-muted-foreground mb-3" />
-            <p className="text-sm font-medium">
-              {file ? file.name : "Drop your file here, or click to browse"}
-            </p>
-            <p className="text-xs text-muted-foreground mt-1">
-              Supported formats: .xlsx, .xls, .csv (max 5 MB)
-            </p>
-            <Input
-              ref={fileInputRef}
-              type="file"
-              accept=".xlsx,.xls,.csv"
-              className="hidden"
-              onChange={(e) => handleFileChange(e.target.files?.[0] || null)}
-            />
-          </div>
+          <FileUploadDropzone
+            title="Upload Question Bank"
+            helperText="Supported formats: .xlsx, .xls, .csv (max 5 MB)"
+            accept=".xlsx,.xls,.csv"
+            file={file}
+            onFileChange={handleFileChange}
+            onUpload={handleUpload}
+            uploading={importing}
+            status={importing ? "uploading" : "idle"}
+            uploadButtonText="Upload & Validate"
+          />
 
-          {file && (
-            <div className="flex items-center justify-between rounded-md border bg-card p-3">
-              <div className="flex items-center gap-2">
-                <FileSpreadsheet className="size-5 text-muted-foreground" />
-                <div>
-                  <p className="text-sm font-medium">{file.name}</p>
-                  <p className="text-xs text-muted-foreground">
-                    {(file.size / 1024).toFixed(1)} KB
-                  </p>
-                </div>
-              </div>
-              <div className="flex gap-2">
-                <Button variant="outline" size="sm" onClick={() => setFile(null)}>
-                  Remove
-                </Button>
-                <Button size="sm" onClick={handleUpload}>
-                  Upload & Validate
-                </Button>
-              </div>
-            </div>
-          )}
-
-          <div className="flex justify-between">
+          <div className="flex justify-between mt-4">
             <Button variant="ghost" onClick={() => setStep("template")}>
               Back to template
             </Button>

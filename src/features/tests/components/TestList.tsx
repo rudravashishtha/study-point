@@ -38,6 +38,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { FilterField } from "@/components/filters/filter-field";
 
 interface TestListItem {
   id: string;
@@ -142,25 +143,72 @@ export function TestList({
   return (
     <div className="space-y-4">
       <div className="flex flex-col gap-4">
-        <div className="flex flex-col sm:flex-row gap-4 items-center justify-between">
-          <div className="flex flex-1 flex-wrap gap-4 items-center w-full sm:w-auto">
+        <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-end justify-between">
+          <div className="flex flex-1 flex-col gap-4 md:flex-row md:flex-wrap md:items-end w-full">
             <Input
               placeholder="Search tests..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               className="max-w-xs"
             />
-            <Select value={filterState} onValueChange={(v) => v && setFilterState(v)}>
-              <SelectTrigger className="w-[150px]">
-                <SelectValue placeholder="Status" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="ALL">All States</SelectItem>
-                <SelectItem value="DRAFT">Draft</SelectItem>
-                <SelectItem value="PUBLISHED">Published</SelectItem>
-                <SelectItem value="ARCHIVED">Archived</SelectItem>
-              </SelectContent>
-            </Select>
+            <FilterField label="Status">
+              <Select value={filterState} onValueChange={(v) => v && setFilterState(v)}>
+                <SelectTrigger className="w-[150px]">
+                  <SelectValue placeholder="Status" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="ALL">All Statuses</SelectItem>
+                  <SelectItem value="DRAFT">Draft</SelectItem>
+                  <SelectItem value="PUBLISHED">Published</SelectItem>
+                  <SelectItem value="ARCHIVED">Archived</SelectItem>
+                </SelectContent>
+              </Select>
+            </FilterField>
+            <FilterField label="Session">
+              <Select value={filterSession} onValueChange={(v) => v && setFilterSession(v)}>
+                <SelectTrigger className="w-[180px]">
+                  <SelectValue placeholder="Session" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="ALL">All Sessions</SelectItem>
+                  {sessions.map((s) => (
+                    <SelectItem key={s.id} value={s.id}>
+                      {s.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </FilterField>
+            <FilterField label="Track">
+              <Select value={filterTrack} onValueChange={(v) => v && setFilterTrack(v)}>
+                <SelectTrigger className="w-[180px]">
+                  <SelectValue placeholder="Track" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="ALL">All Tracks</SelectItem>
+                  {tracks.map((t) => (
+                    <SelectItem key={t.id} value={t.id}>
+                      {t.name || "Track"}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </FilterField>
+            <FilterField label="Batch">
+              <Select value={filterBatch} onValueChange={(v) => v && setFilterBatch(v)}>
+                <SelectTrigger className="w-[180px]">
+                  <SelectValue placeholder="Batch" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="ALL">All Batches</SelectItem>
+                  {batches.map((b) => (
+                    <SelectItem key={b.id} value={b.id}>
+                      {b.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </FilterField>
           </div>
           <Button
             onClick={() => {
@@ -170,47 +218,6 @@ export function TestList({
           >
             Create Test
           </Button>
-        </div>
-        <div className="flex flex-wrap gap-4">
-          <Select value={filterSession} onValueChange={(v) => v && setFilterSession(v)}>
-            <SelectTrigger className="w-[180px]">
-              <SelectValue placeholder="Session" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="ALL">All Sessions</SelectItem>
-              {sessions.map((s) => (
-                <SelectItem key={s.id} value={s.id}>
-                  {s.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          <Select value={filterTrack} onValueChange={(v) => v && setFilterTrack(v)}>
-            <SelectTrigger className="w-[180px]">
-              <SelectValue placeholder="Track" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="ALL">All Tracks</SelectItem>
-              {tracks.map((t) => (
-                <SelectItem key={t.id} value={t.id}>
-                  {t.name || "Track"}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          <Select value={filterBatch} onValueChange={(v) => v && setFilterBatch(v)}>
-            <SelectTrigger className="w-[180px]">
-              <SelectValue placeholder="Batch" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="ALL">All Batches</SelectItem>
-              {batches.map((b) => (
-                <SelectItem key={b.id} value={b.id}>
-                  {b.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
         </div>
       </div>
 

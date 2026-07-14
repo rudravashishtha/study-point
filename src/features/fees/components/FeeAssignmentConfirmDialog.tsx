@@ -14,8 +14,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogDescription,
-  DialogFooter,
-} from "@/components/ui/dialog";
+  } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 
 export function FeeAssignmentConfirmDialog({
@@ -56,17 +55,17 @@ export function FeeAssignmentConfirmDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-lg">
+      <DialogContent className="sm:max-w-md p-0 flex flex-col overflow-hidden max-h-[90vh]">
         {!result ? (
           <>
-            <DialogHeader>
+            <DialogHeader className="px-4 pt-4 pb-2 sm:px-6 sm:pt-6">
               <DialogTitle>Confirm Fee Assignment</DialogTitle>
               <DialogDescription>
                 This will create fee assignments for <strong>{validCount}</strong>{" "}
                 enrolment(s). This action cannot be undone automatically.
               </DialogDescription>
             </DialogHeader>
-            <DialogFooter>
+            <div className="m-0 p-4 sm:p-6 border-t bg-muted/40 flex justify-end gap-2">
               <Button
                 type="button"
                 variant="outline"
@@ -78,32 +77,34 @@ export function FeeAssignmentConfirmDialog({
               <Button type="button" onClick={handleConfirm} disabled={submitting}>
                 {submitting ? "Creating..." : "Confirm Assignment"}
               </Button>
-            </DialogFooter>
+            </div>
           </>
         ) : (
           <>
-            <DialogHeader>
+            <DialogHeader className="px-4 pt-4 pb-2 sm:px-6 sm:pt-6">
               <DialogTitle>Assignment Complete</DialogTitle>
             </DialogHeader>
-            <div className="space-y-3">
-              <div className="rounded-md bg-green-50 p-3 text-sm text-green-800">
-                <span className="font-medium">{result.created}</span> assignment(s)
-                created
+            <div className="flex-1 overflow-y-auto px-4 py-4 sm:px-6">
+              <div className="space-y-3">
+                <div className="rounded-md bg-green-50 p-3 text-sm text-green-800">
+                  <span className="font-medium">{result.created}</span> assignment(s)
+                  created
+                </div>
+                {result.skipped > 0 && (
+                  <div className="rounded-md bg-yellow-50 p-3 text-sm text-yellow-800">
+                    <span className="font-medium">{result.skipped}</span> existing
+                    assignment(s) skipped
+                  </div>
+                )}
+                {result.failed > 0 && (
+                  <div className="rounded-md bg-red-50 p-3 text-sm text-red-800">
+                    <span className="font-medium">{result.failed}</span> assignment(s)
+                    failed
+                  </div>
+                )}
               </div>
-              {result.skipped > 0 && (
-                <div className="rounded-md bg-yellow-50 p-3 text-sm text-yellow-800">
-                  <span className="font-medium">{result.skipped}</span> existing
-                  assignment(s) skipped
-                </div>
-              )}
-              {result.failed > 0 && (
-                <div className="rounded-md bg-red-50 p-3 text-sm text-red-800">
-                  <span className="font-medium">{result.failed}</span> assignment(s)
-                  failed
-                </div>
-              )}
             </div>
-            <DialogFooter>
+            <div className="m-0 p-4 sm:p-6 border-t bg-muted/40 flex justify-end gap-2">
               <Button
                 type="button"
                 onClick={() => {
@@ -113,7 +114,7 @@ export function FeeAssignmentConfirmDialog({
               >
                 Done
               </Button>
-            </DialogFooter>
+            </div>
           </>
         )}
       </DialogContent>

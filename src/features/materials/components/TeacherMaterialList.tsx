@@ -38,6 +38,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { FilterField } from "@/components/filters/filter-field";
 
 export interface TeacherMaterialItem {
   id: string;
@@ -107,25 +108,27 @@ export function TeacherMaterialList({
 
   return (
     <div className="space-y-4">
-      <div className="flex flex-col sm:flex-row gap-4 items-center justify-between">
-        <div className="flex flex-1 gap-4 items-center w-full sm:w-auto">
+      <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-end justify-between">
+        <div className="flex flex-1 flex-col gap-4 md:flex-row md:flex-wrap md:items-end w-full">
           <Input
             placeholder="Search materials..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             className="max-w-xs"
           />
-          <Select value={filterState} onValueChange={(v) => v && setFilterState(v)}>
-            <SelectTrigger className="w-[150px]">
-              <SelectValue placeholder="Status" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="ALL">All States</SelectItem>
-              <SelectItem value="DRAFT">Draft</SelectItem>
-              <SelectItem value="PUBLISHED">Published</SelectItem>
-              <SelectItem value="ARCHIVED">Archived</SelectItem>
-            </SelectContent>
-          </Select>
+          <FilterField label="Status">
+            <Select value={filterState} onValueChange={(v) => v && setFilterState(v)}>
+              <SelectTrigger className="w-[150px]">
+                <SelectValue placeholder="Status" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="ALL">All Statuses</SelectItem>
+                <SelectItem value="DRAFT">Draft</SelectItem>
+                <SelectItem value="PUBLISHED">Published</SelectItem>
+                <SelectItem value="ARCHIVED">Archived</SelectItem>
+              </SelectContent>
+            </Select>
+          </FilterField>
         </div>
         {canManage && (
           <Button

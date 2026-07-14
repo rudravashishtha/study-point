@@ -1,7 +1,8 @@
 "use client";
 
+import { useState, useTransition } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { motion } from "motion/react";
 import {
   BookOpen,
@@ -25,6 +26,23 @@ const studentLinks = [
 
 export function StudentNavigation() {
   const pathname = usePathname();
+  const router = useRouter();
+  const [isPending, startTransition] = useTransition();
+  const [pendingPath, setPendingPath] = useState<string | null>(null);
+
+  const handleNavigate = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
+    if (e.ctrlKey || e.metaKey || e.shiftKey || e.altKey) {
+      return;
+    }
+    if (pathname === href) {
+      return;
+    }
+    e.preventDefault();
+    setPendingPath(href);
+    startTransition(() => {
+      router.push(href);
+    });
+  };
 
   return (
     <nav
@@ -34,14 +52,21 @@ export function StudentNavigation() {
       <div className="mx-auto flex max-w-5xl justify-around sm:justify-start sm:gap-4 sm:px-6 lg:px-8 sm:py-4">
         {studentLinks.map(({ href, label, icon: Icon }) => {
           const isActive = pathname === href || pathname.startsWith(`${href}/`);
+          const isItemPending = isPending && pendingPath === href;
+
           return (
             <Link
               key={href}
               href={href}
+              onClick={(e) => handleNavigate(e, href)}
               aria-current={isActive ? "page" : undefined}
-              className="relative flex min-h-[4.5rem] sm:min-h-12 flex-1 sm:flex-none flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2 sm:rounded-full sm:px-4 text-xs sm:text-sm font-medium outline-none transition-colors"
+              className={`relative flex min-h-[4.5rem] sm:min-h-12 flex-1 sm:flex-none flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2 sm:rounded-full sm:px-4 text-xs sm:text-sm font-medium outline-none transition-all ${
+                isItemPending
+                  ? "opacity-60 scale-[0.98] sm:scale-95 bg-surface-interactive/50"
+                  : "hover:bg-surface-interactive/30"
+              }`}
             >
-              {isActive && (
+              {isActive && !isItemPending && (
                 <motion.div
                   layoutId="student-active-tab"
                   className="absolute inset-x-2 top-1 bottom-1 sm:inset-0 rounded-xl sm:rounded-full bg-surface-elevated shadow-sm border border-border/50"
@@ -52,7 +77,10 @@ export function StudentNavigation() {
               <span
                 className={`relative z-10 flex flex-col sm:flex-row items-center gap-1 sm:gap-2 ${isActive ? "text-primary" : "text-muted-foreground"}`}
               >
-                <Icon className="size-5 sm:size-4" aria-hidden="true" />
+                <Icon
+                  className={`size-5 sm:size-4 ${isItemPending ? "animate-pulse" : ""}`}
+                  aria-hidden="true"
+                />
                 <span>{label}</span>
               </span>
             </Link>

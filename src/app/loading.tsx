@@ -1,9 +1,5 @@
-import { LoadingState } from "@/components/feedback/loading-state";
+import { PageSkeleton } from "@/components/feedback/page-skeleton";
 
 export default function Loading() {
-  return (
-    <div className="p-4">
-      <LoadingState label="Loading workspace" />
-    </div>
-  );
+  return <PageSkeleton />;
 }

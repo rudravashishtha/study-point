@@ -13,6 +13,7 @@ import { siteUrl } from "@/lib/seo";
 import { Toaster } from "@/components/ui/toaster";
 import { SerwistProvider } from "./serwist";
 import { AccessibilityChecker } from "@/components/accessibility/axe-checker";
+import NextTopLoader from "nextjs-toploader";
 
 export const metadata: Metadata = {
   applicationName: siteConfig.name,
@@ -69,6 +70,14 @@ export default function RootLayout({
           Skip to main content
         </a>
         <AccessibilityChecker />
+        <NextTopLoader
+          color="hsl(var(--primary))"
+          showSpinner={false}
+          crawl={true}
+          height={3}
+          easing="ease"
+          speed={300}
+        />
         <SerwistProvider
           swUrl="/serwist/sw.js"
           disable={process.env.NODE_ENV === "development"}

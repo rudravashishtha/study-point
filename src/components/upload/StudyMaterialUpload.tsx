@@ -1,9 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Loader2, UploadCloud, XCircle } from "lucide-react";
 import { FileUploadUsageCategory, FileUploadScope } from "@prisma/client";
+import { FileUploadDropzone } from "./FileUploadDropzone";
 
 interface StudyMaterialUploadProps {
   usageCategory: FileUploadUsageCategory;
@@ -31,14 +30,17 @@ export function StudyMaterialUpload({
   >("idle");
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files.length > 0) {
-      const selected = e.target.files[0];
+  const handleFileChange = (selected: File | null) => {
+    if (selected) {
       if (selected.size > 50 * 1024 * 1024) {
         setErrorMsg("File exceeds 50MB limit");
         return;
       }
       setFile(selected);
+      setErrorMsg(null);
+      setStatus("idle");
+    } else {
+      setFile(null);
       setErrorMsg(null);
       setStatus("idle");
     }
@@ -112,45 +114,16 @@ export function StudyMaterialUpload({
   };
 
   return (
-    <div className="border-2 border-dashed rounded-lg p-6 flex flex-col items-center justify-center space-y-4">
-      {status === "success" ? (
-        <div role="status" className="text-green-600 flex items-center space-x-2">
-          <span>Upload complete!</span>
-        </div>
-      ) : (
-        <>
-          <div className="flex items-center justify-center w-12 h-12 rounded-full bg-primary/10 text-primary">
-            <UploadCloud className="w-6 h-6" aria-hidden="true" />
-          </div>
-          <div className="text-center">
-            <p className="text-sm text-muted-foreground">
-              Select a file to upload (Max 50MB)
-            </p>
-          </div>
-          <input
-            type="file"
-            onChange={handleFileChange}
-            disabled={uploading}
-            aria-label="Choose a file to upload"
-            className="text-sm"
-          />
-          {file && (
-            <Button onClick={handleUpload} disabled={uploading} className="w-full mt-4">
-              {uploading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              {uploading ? `Status: ${status}` : "Upload File"}
-            </Button>
-          )}
-          {errorMsg && (
-            <div
-              role="alert"
-              className="text-red-500 text-sm flex items-center space-x-1"
-            >
-              <XCircle className="w-4 h-4" />
-              <span>{errorMsg}</span>
-            </div>
-          )}
-        </>
-      )}
-    </div>
+    <FileUploadDropzone
+      title="Upload Study Material"
+      helperText="Click anywhere or drag & drop your file here.\nMaximum size: 50 MB"
+      file={file}
+      onFileChange={handleFileChange}
+      onUpload={handleUpload}
+      uploading={uploading}
+      status={status}
+      errorMsg={errorMsg}
+      disabled={uploading}
+    />
   );
 }

@@ -14,9 +14,9 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogFooter,
-} from "@/components/ui/dialog";
+  } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
+import { SubmitButton } from "@/components/ui/submit-button";
 
 export function SessionFormDialog({
   session,
@@ -62,62 +62,67 @@ export function SessionFormDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md">
-        <DialogHeader>
+      <DialogContent className="sm:max-w-md p-0 flex flex-col overflow-hidden max-h-[90vh]">
+        <DialogHeader className="px-4 pt-4 pb-2 sm:px-6 sm:pt-6">
           <DialogTitle>{session ? "Edit Session" : "Create Session"}</DialogTitle>
         </DialogHeader>
+
         {error && (
-          <div className="rounded-md bg-destructive/10 p-3 text-sm text-destructive">
+          <div className="mx-4 sm:mx-6 mt-4 rounded-md bg-destructive/10 p-3 text-sm text-destructive">
             {error}
           </div>
         )}
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="space-y-2">
-            <label htmlFor="name" className="text-sm font-medium">
-              Session Name *
-            </label>
-            <input
-              id="name"
-              name="name"
-              required
-              defaultValue={session?.name}
-              className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-              placeholder="e.g. 2026-27"
-            />
-          </div>
-          <div className="space-y-2">
-            <label htmlFor="startsOn" className="text-sm font-medium">
-              Start Date
-            </label>
-            <input
-              id="startsOn"
-              name="startsOn"
-              type="date"
-              defaultValue={startsOnValue}
-              className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-            />
-          </div>
-          <div className="space-y-2">
-            <label htmlFor="endsOn" className="text-sm font-medium">
-              End Date
-            </label>
-            <input
-              id="endsOn"
-              name="endsOn"
-              type="date"
-              defaultValue={endsOnValue}
-              className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-            />
-          </div>
-          <DialogFooter>
-            <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
-              Cancel
-            </Button>
-            <Button type="submit" disabled={isPending}>
-              {isPending ? "Saving..." : session ? "Save Changes" : "Create"}
-            </Button>
-          </DialogFooter>
-        </form>
+
+        <div className="flex-1 overflow-y-auto px-4 py-4 sm:px-6">
+          <form id="session-form" onSubmit={handleSubmit} className="space-y-4">
+            <div className="space-y-2">
+              <label htmlFor="name" className="text-sm font-medium">
+                Session Name *
+              </label>
+              <input
+                id="name"
+                name="name"
+                required
+                defaultValue={session?.name}
+                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                placeholder="e.g. 2026-27"
+              />
+            </div>
+            <div className="space-y-2">
+              <label htmlFor="startsOn" className="text-sm font-medium">
+                Start Date
+              </label>
+              <input
+                id="startsOn"
+                name="startsOn"
+                type="date"
+                defaultValue={startsOnValue}
+                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              />
+            </div>
+            <div className="space-y-2">
+              <label htmlFor="endsOn" className="text-sm font-medium">
+                End Date
+              </label>
+              <input
+                id="endsOn"
+                name="endsOn"
+                type="date"
+                defaultValue={endsOnValue}
+                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              />
+            </div>
+          </form>
+        </div>
+        
+        <div className="m-0 p-4 sm:p-6 border-t bg-muted/40 flex justify-end gap-2">
+          <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
+            Cancel
+          </Button>
+          <SubmitButton type="submit" form="session-form" pending={isPending}>
+            {isPending ? "Saving..." : session ? "Save Changes" : "Create"}
+          </SubmitButton>
+        </div>
       </DialogContent>
     </Dialog>
   );

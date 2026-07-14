@@ -18,9 +18,9 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogFooter,
-} from "@/components/ui/dialog";
+  } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
+import { SubmitButton } from "@/components/ui/submit-button";
 
 type CreateInput = z.infer<typeof createCurriculumTrackSchema>;
 
@@ -125,147 +125,155 @@ export function TrackFormDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-md">
-        <DialogHeader>
+      <DialogContent className="sm:max-w-2xl p-0 flex flex-col overflow-hidden max-h-[90vh]">
+        <DialogHeader className="px-4 pt-4 pb-2 sm:px-6 sm:pt-6">
           <DialogTitle>{track ? "Edit Track" : "Create Track"}</DialogTitle>
         </DialogHeader>
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-          <div className="space-y-2">
-            <label className="text-sm font-medium">
-              Board *{" "}
-              {track && (
-                <span className="text-xs text-muted-foreground">(Permanent)</span>
-              )}
-            </label>
-            <select
-              {...register("boardId")}
-              disabled={!!track}
-              className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background disabled:opacity-50"
-            >
-              <option value="" disabled>
-                Select Board
-              </option>
-              {boards.map((b) => (
-                <option key={b.id} value={b.id}>
-                  {b.name} ({b.code})
-                </option>
-              ))}
-            </select>
-            {errors.boardId && (
-              <p className="text-sm font-medium text-destructive">
-                {errors.boardId.message as string}
-              </p>
-            )}
-          </div>
 
-          <div className="space-y-2">
-            <label className="text-sm font-medium">
-              Class Level *{" "}
-              {track && (
-                <span className="text-xs text-muted-foreground">(Permanent)</span>
-              )}
-            </label>
-            <select
-              {...register("classLevel")}
-              disabled={!!track}
-              className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background disabled:opacity-50"
-            >
-              <option value="IX">Class IX</option>
-              <option value="X">Class X</option>
-              <option value="XI">Class XI</option>
-              <option value="XII">Class XII</option>
-            </select>
-            {errors.classLevel && (
-              <p className="text-sm font-medium text-destructive">
-                {errors.classLevel.message as string}
-              </p>
-            )}
-          </div>
-
-          <div className="space-y-2">
-            <label className="text-sm font-medium">
-              Programme{" "}
-              {track && (
-                <span className="text-xs text-muted-foreground">(Permanent)</span>
-              )}
-            </label>
-            <Controller
-              control={control}
-              name="programmeId"
-              render={({ field }) => (
-                <select
-                  value={field.value || ""}
-                  onChange={(e) => field.onChange(e.target.value || null)}
-                  disabled={!!track || selectedBoard?.code === "CBSE"}
-                  className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background disabled:opacity-50"
-                >
-                  <option value="">None</option>
-                  {filteredProgrammes.map((p) => (
-                    <option key={p.id} value={p.id}>
-                      {p.name} ({p.code})
+        <div className="flex-1 overflow-y-auto px-4 py-4 sm:px-6">
+          <form id="track-form" onSubmit={handleSubmit(onSubmit)} className="space-y-8">
+            <section className="space-y-4">
+              <h3 className="text-sm font-medium text-muted-foreground border-b pb-2">Track Details</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">
+                    Board *{" "}
+                    {track && (
+                      <span className="text-xs text-muted-foreground">(Permanent)</span>
+                    )}
+                  </label>
+                  <select
+                    {...register("boardId")}
+                    disabled={!!track}
+                    className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background disabled:opacity-50"
+                  >
+                    <option value="" disabled>
+                      Select Board
                     </option>
-                  ))}
-                </select>
-              )}
-            />
-            {errors.programmeId && (
-              <p className="text-sm font-medium text-destructive">
-                {errors.programmeId.message as string}
-              </p>
-            )}
-          </div>
+                    {boards.map((b) => (
+                      <option key={b.id} value={b.id}>
+                        {b.name} ({b.code})
+                      </option>
+                    ))}
+                  </select>
+                  {errors.boardId && (
+                    <p className="text-sm font-medium text-destructive">
+                      {errors.boardId.message as string}
+                    </p>
+                  )}
+                </div>
 
-          <div className="space-y-2">
-            <label className="text-sm font-medium">
-              Subject *{" "}
-              {track && (
-                <span className="text-xs text-muted-foreground">(Permanent)</span>
-              )}
-            </label>
-            <select
-              {...register("subjectId")}
-              disabled={!!track}
-              className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background disabled:opacity-50"
-            >
-              <option value="" disabled>
-                Select Subject
-              </option>
-              {subjects.map((s) => (
-                <option key={s.id} value={s.id}>
-                  {s.name} ({s.code})
-                </option>
-              ))}
-            </select>
-            {errors.subjectId && (
-              <p className="text-sm font-medium text-destructive">
-                {errors.subjectId.message as string}
-              </p>
-            )}
-          </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">
+                    Class Level *{" "}
+                    {track && (
+                      <span className="text-xs text-muted-foreground">(Permanent)</span>
+                    )}
+                  </label>
+                  <select
+                    {...register("classLevel")}
+                    disabled={!!track}
+                    className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background disabled:opacity-50"
+                  >
+                    <option value="IX">Class IX</option>
+                    <option value="X">Class X</option>
+                    <option value="XI">Class XI</option>
+                    <option value="XII">Class XII</option>
+                  </select>
+                  {errors.classLevel && (
+                    <p className="text-sm font-medium text-destructive">
+                      {errors.classLevel.message as string}
+                    </p>
+                  )}
+                </div>
 
-          <div className="space-y-2">
-            <label className="text-sm font-medium">Display Name *</label>
-            <input
-              {...register("displayName")}
-              className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-              placeholder="e.g. Class IX Mathematics (CBSE)"
-            />
-            {errors.displayName && (
-              <p className="text-sm font-medium text-destructive">
-                {errors.displayName.message as string}
-              </p>
-            )}
-          </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">
+                    Programme{" "}
+                    {track && (
+                      <span className="text-xs text-muted-foreground">(Permanent)</span>
+                    )}
+                  </label>
+                  <Controller
+                    control={control}
+                    name="programmeId"
+                    render={({ field }) => (
+                      <select
+                        value={field.value || ""}
+                        onChange={(e) => field.onChange(e.target.value || null)}
+                        disabled={!!track || selectedBoard?.code === "CBSE"}
+                        className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background disabled:opacity-50"
+                      >
+                        <option value="">None</option>
+                        {filteredProgrammes.map((p) => (
+                          <option key={p.id} value={p.id}>
+                            {p.name} ({p.code})
+                          </option>
+                        ))}
+                      </select>
+                    )}
+                  />
+                  {errors.programmeId && (
+                    <p className="text-sm font-medium text-destructive">
+                      {errors.programmeId.message as string}
+                    </p>
+                  )}
+                </div>
 
-          <DialogFooter>
-            <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
-              Cancel
-            </Button>
-            <Button type="submit" disabled={isPending}>
-              {isPending ? "Saving..." : track ? "Save Changes" : "Create"}
-            </Button>
-          </DialogFooter>
-        </form>
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">
+                    Subject *{" "}
+                    {track && (
+                      <span className="text-xs text-muted-foreground">(Permanent)</span>
+                    )}
+                  </label>
+                  <select
+                    {...register("subjectId")}
+                    disabled={!!track}
+                    className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background disabled:opacity-50"
+                  >
+                    <option value="" disabled>
+                      Select Subject
+                    </option>
+                    {subjects.map((s) => (
+                      <option key={s.id} value={s.id}>
+                        {s.name} ({s.code})
+                      </option>
+                    ))}
+                  </select>
+                  {errors.subjectId && (
+                    <p className="text-sm font-medium text-destructive">
+                      {errors.subjectId.message as string}
+                    </p>
+                  )}
+                </div>
+
+                <div className="space-y-2 md:col-span-2">
+                  <label className="text-sm font-medium">Display Name *</label>
+                  <input
+                    {...register("displayName")}
+                    className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                    placeholder="e.g. Class IX Mathematics (CBSE)"
+                  />
+                  {errors.displayName && (
+                    <p className="text-sm font-medium text-destructive">
+                      {errors.displayName.message as string}
+                    </p>
+                  )}
+                </div>
+              </div>
+            </section>
+          </form>
+        </div>
+        
+        <div className="m-0 p-4 sm:p-6 border-t bg-muted/40 flex justify-end gap-2">
+          <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
+            Cancel
+          </Button>
+          <SubmitButton type="submit" form="track-form" pending={isPending}>
+            {isPending ? "Saving..." : track ? "Save Changes" : "Create"}
+          </SubmitButton>
+        </div>
       </DialogContent>
     </Dialog>
   );

@@ -1,2 +1,2 @@
-import { LoadingState } from "@/components/feedback/loading-state";
-export default LoadingState;
+import { PageSkeleton } from "@/components/feedback/page-skeleton";
+export default PageSkeleton;

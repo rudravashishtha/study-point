@@ -9,6 +9,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { FilterField } from "@/components/filters/filter-field";
 
 export function StudentAccountStatusFilter() {
   const router = useRouter();
@@ -40,17 +41,19 @@ export function StudentAccountStatusFilter() {
   );
 
   return (
-    <Select value={currentStatus} onValueChange={handleChange} disabled={isPending}>
-      <SelectTrigger className="w-[180px]">
-        <SelectValue placeholder="Filter by account status" />
-      </SelectTrigger>
-      <SelectContent>
-        <SelectItem value="all">All Accounts</SelectItem>
-        <SelectItem value="none">No Account</SelectItem>
-        <SelectItem value="invited">Invited</SelectItem>
-        <SelectItem value="active">Active</SelectItem>
-        <SelectItem value="disabled">Disabled</SelectItem>
-      </SelectContent>
-    </Select>
+    <FilterField label="Account Status">
+      <Select value={currentStatus} onValueChange={handleChange} disabled={isPending}>
+        <SelectTrigger className="w-[180px]">
+          <SelectValue placeholder="Status" />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="all">All Accounts</SelectItem>
+          <SelectItem value="none">No Account</SelectItem>
+          <SelectItem value="invited">Invited</SelectItem>
+          <SelectItem value="active">Active</SelectItem>
+          <SelectItem value="disabled">Disabled</SelectItem>
+        </SelectContent>
+      </Select>
+    </FilterField>
   );
 }

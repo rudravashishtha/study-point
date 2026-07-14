@@ -1,7 +1,8 @@
 "use client";
 
+import { useState, useTransition } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { motion } from "motion/react";
 import { LayoutDashboard, BookOpen } from "lucide-react";
 
@@ -24,6 +25,27 @@ export function TeacherNavigation({
   closeMobileNav,
 }: TeacherNavigationProps) {
   const pathname = usePathname();
+  const router = useRouter();
+  const [isPending, startTransition] = useTransition();
+  const [pendingPath, setPendingPath] = useState<string | null>(null);
+
+  const handleNavigate = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
+    if (e.ctrlKey || e.metaKey || e.shiftKey || e.altKey) {
+      return;
+    }
+    if (pathname === href) {
+      closeMobileNav?.();
+      return;
+    }
+    e.preventDefault();
+    setPendingPath(href);
+    if (isMobile && closeMobileNav) {
+      closeMobileNav();
+    }
+    startTransition(() => {
+      router.push(href);
+    });
+  };
 
   return (
     <nav aria-label="Teacher navigation" className="flex flex-col gap-6 py-2">
@@ -36,8 +58,9 @@ export function TeacherNavigation({
           label="Dashboard"
           icon={LayoutDashboard}
           isActive={pathname === "/teacher"}
+          isPending={isPending && pendingPath === "/teacher"}
           isMobile={isMobile}
-          closeMobileNav={closeMobileNav}
+          onNavigate={(e) => handleNavigate(e, "/teacher")}
         />
       </div>
 
@@ -56,8 +79,9 @@ export function TeacherNavigation({
                 label={batch.name}
                 icon={BookOpen}
                 isActive={isActive}
+                isPending={isPending && pendingPath === href}
                 isMobile={isMobile}
-                closeMobileNav={closeMobileNav}
+                onNavigate={(e) => handleNavigate(e, href)}
               />
             );
           })}
@@ -72,25 +96,30 @@ function TeacherNavLink({
   label,
   icon: Icon,
   isActive,
+  isPending,
   isMobile,
-  closeMobileNav,
+  onNavigate,
 }: {
   href: string;
   label: string;
   icon: React.ComponentType<{ className?: string }>;
   isActive: boolean;
+  isPending: boolean;
   isMobile: boolean;
-  closeMobileNav?: () => void;
+  onNavigate: (e: React.MouseEvent<HTMLAnchorElement>) => void;
 }) {
   return (
     <Link
-      key={href}
       href={href}
-      onClick={closeMobileNav}
+      onClick={onNavigate}
       aria-current={isActive ? "page" : undefined}
-      className="group relative flex h-9 items-center gap-3 rounded-lg px-3 text-sm font-medium outline-none transition-colors"
+      className={`group relative flex h-9 items-center gap-3 rounded-lg px-3 text-sm font-medium outline-none transition-all ${
+        isPending
+          ? "opacity-60 scale-[0.98] bg-surface-interactive/50"
+          : "hover:bg-surface-interactive/30"
+      }`}
     >
-      {isActive && (
+      {isActive && !isPending && (
         <motion.div
           layoutId={isMobile ? "teacher-mobile-active-tab" : "teacher-desktop-active-tab"}
           className="absolute inset-0 rounded-lg bg-surface-interactive shadow-sm border border-border/50"
@@ -105,7 +134,9 @@ function TeacherNavLink({
         className={`relative z-10 flex items-center gap-3 ${isActive ? "text-foreground font-bold" : "text-muted-foreground group-hover:text-foreground"}`}
       >
         <Icon
-          className={`size-4 ${isActive ? "text-brand-glow" : "text-muted-foreground opacity-70 group-hover:opacity-100"}`}
+          className={`size-4 ${isActive ? "text-brand-glow" : "text-muted-foreground opacity-70 group-hover:opacity-100"} ${
+            isPending ? "animate-pulse" : ""
+          }`}
           aria-hidden="true"
         />
         <span>{label}</span>

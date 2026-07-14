@@ -27,6 +27,7 @@ import {
 } from "@/components/ui/select";
 import { handleActionError } from "@/lib/actions/types";
 import { updateBatchSchedulesAction } from "@/features/batches/actions/batch-actions";
+import { SubmitButton } from "@/components/ui/submit-button";
 
 const timeStringSchema = z
   .string()
@@ -342,9 +343,9 @@ export function BatchScheduleEditor({
           >
             Discard Changes
           </Button>
-          <Button type="submit" disabled={isPending || !form.formState.isDirty}>
+          <SubmitButton type="submit" pending={isPending} disabled={!form.formState.isDirty}>
             {isPending ? "Saving..." : "Save Schedules"}
-          </Button>
+          </SubmitButton>
         </div>
       </form>
     </Form>

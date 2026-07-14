@@ -13,6 +13,14 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { DataListEmpty } from "@/components/admin/data-list/DataListEmpty";
 import { FeePlanRowActions } from "./FeePlanRowActions";
+import { FilterField } from "@/components/filters/filter-field";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import dynamic from "next/dynamic";
 
 const FeePlanFormDialog = dynamic(
@@ -95,8 +103,8 @@ export function FeePlanList({
 
   return (
     <div className="space-y-4">
-      <div className="flex flex-col space-y-3 md:flex-row md:items-center md:justify-between md:space-y-0">
-        <div className="flex flex-1 flex-col space-y-2 md:flex-row md:space-x-2 md:space-y-0">
+      <div className="flex flex-col gap-4 items-start sm:items-end sm:flex-row justify-between md:space-y-0">
+        <div className="flex flex-1 flex-col gap-4 md:flex-row md:flex-wrap md:items-end w-full">
           <input
             type="text"
             placeholder="Search fee plans..."
@@ -105,29 +113,39 @@ export function FeePlanList({
             className="flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm transition-colors placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring md:w-64"
           />
 
-          <select
-            value={archiveFilter}
-            onChange={(e) =>
-              setArchiveFilter(e.target.value as "active" | "archived" | "all")
-            }
-            className="flex h-9 rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
-          >
-            <option value="active">Active</option>
-            <option value="archived">Archived</option>
-            <option value="all">All</option>
-          </select>
+          <FilterField label="Archive Status">
+            <Select
+              value={archiveFilter}
+              onValueChange={(v) => setArchiveFilter(v as "active" | "archived" | "all")}
+            >
+              <SelectTrigger className="h-9 w-[180px]">
+                <SelectValue placeholder="Status" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="active">Active Only</SelectItem>
+                <SelectItem value="archived">Archived Only</SelectItem>
+                <SelectItem value="all">All Records</SelectItem>
+              </SelectContent>
+            </Select>
+          </FilterField>
 
-          <select
-            value={frequencyFilter}
-            onChange={(e) => setFrequencyFilter(e.target.value as FeePlanFrequency | "")}
-            className="flex h-9 rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
-          >
-            <option value="">All Frequencies</option>
-            <option value="MONTHLY">Monthly</option>
-            <option value="QUARTERLY">Quarterly</option>
-            <option value="YEARLY">Yearly</option>
-            <option value="CUSTOM">Custom</option>
-          </select>
+          <FilterField label="Frequency">
+            <Select
+              value={frequencyFilter}
+              onValueChange={(v) => setFrequencyFilter(v as FeePlanFrequency | "")}
+            >
+              <SelectTrigger className="h-9 w-[180px]">
+                <SelectValue placeholder="Frequency" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="">All Frequencies</SelectItem>
+                <SelectItem value="MONTHLY">Monthly</SelectItem>
+                <SelectItem value="QUARTERLY">Quarterly</SelectItem>
+                <SelectItem value="YEARLY">Yearly</SelectItem>
+                <SelectItem value="CUSTOM">Custom</SelectItem>
+              </SelectContent>
+            </Select>
+          </FilterField>
         </div>
 
         <button

@@ -18,6 +18,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import { createAdminTestAction, updateAdminTestAction } from "@/app/admin/tests/actions";
 import { TestUpload } from "@/components/upload/TestUpload";
+import { SubmitButton } from "@/components/ui/submit-button";
 
 interface TestFormBatch {
   id: string;
@@ -155,190 +156,202 @@ export function TestFormDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
+      <DialogContent className="sm:max-w-2xl p-0 flex flex-col overflow-hidden max-h-[90vh]">
+        <DialogHeader className="px-4 pt-4 pb-2 sm:px-6 sm:pt-6">
           <DialogTitle>{test ? "Edit Test" : "Create Test"}</DialogTitle>
         </DialogHeader>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="batch">Batch</Label>
-            <Select
-              value={batchId}
-              onValueChange={(v) => v && setBatchId(v)}
-              disabled={!!test}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Select batch" />
-              </SelectTrigger>
-              <SelectContent>
-                {batches.map((b) => (
-                  <SelectItem key={b.id} value={b.id}>
-                    {b.name}
-                    {b.archivedAt ? " (Archived)" : ""}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="title">Title</Label>
-            <Input
-              id="title"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              required
-              minLength={3}
-              maxLength={100}
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="description">Description (Optional)</Label>
-            <Textarea
-              id="description"
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              maxLength={2000}
-              rows={3}
-            />
-          </div>
-
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="testType">Test Type</Label>
-              <Select value={testType} onValueChange={(v) => v && setTestType(v)}>
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="CHAPTER_TEST">Chapter Test</SelectItem>
-                  <SelectItem value="UNIT_TEST">Unit Test</SelectItem>
-                  <SelectItem value="FULL_SYLLABUS_TEST">Full Syllabus Test</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="testDate">Test Date & Time</Label>
-              <Input
-                id="testDate"
-                type="datetime-local"
-                value={testDate}
-                onChange={(e) => setTestDate(e.target.value)}
-                required
-              />
-            </div>
-          </div>
-
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="maximumMarks">Maximum Marks</Label>
-              <Input
-                id="maximumMarks"
-                type="number"
-                min={1}
-                value={maximumMarks}
-                onChange={(e) => setMaximumMarks(e.target.value)}
-                required
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="durationMinutes">Duration (min, Optional)</Label>
-              <Input
-                id="durationMinutes"
-                type="number"
-                min={1}
-                value={durationMinutes}
-                onChange={(e) => setDurationMinutes(e.target.value)}
-              />
-            </div>
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="syllabusDescription">Syllabus Description (Optional)</Label>
-            <Textarea
-              id="syllabusDescription"
-              value={syllabusDescription}
-              onChange={(e) => setSyllabusDescription(e.target.value)}
-              maxLength={2000}
-              rows={3}
-              placeholder="Describe what topics are covered..."
-            />
-          </div>
-
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label>Chapter (Optional)</Label>
-              <Select
-                value={chapterId}
-                onValueChange={(val) => {
-                  setChapterId(val || "none");
-                  setTopicId("none");
-                }}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Select chapter" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="none">-- No Chapter --</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="space-y-2">
-              <Label>Topic (Optional)</Label>
-              <Select
-                value={topicId}
-                onValueChange={(val) => setTopicId(val || "none")}
-                disabled
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Select topic" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="none">-- No Topic --</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-
-          <div className="space-y-2">
-            <Label>Question Paper File (Optional)</Label>
-            {test?.fileAssetId && !questionPaperFileId && (
-              <div className="text-sm text-muted-foreground mb-2">
-                Currently attached. Upload a new file below to replace it.
+        
+        <div className="flex-1 overflow-y-auto px-4 py-4 sm:px-6">
+          <form id="test-form" onSubmit={handleSubmit} className="space-y-8">
+            
+            {/* General Information */}
+            <section className="space-y-4">
+              <h3 className="text-sm font-medium text-muted-foreground border-b pb-2">General Information</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="title">Title</Label>
+                  <Input
+                    id="title"
+                    value={title}
+                    onChange={(e) => setTitle(e.target.value)}
+                    required
+                    minLength={3}
+                    maxLength={100}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="batch">Batch</Label>
+                  <Select
+                    value={batchId}
+                    onValueChange={(v) => v && setBatchId(v)}
+                    disabled={!!test}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select batch" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {batches.length === 0 ? (
+                        <SelectItem value="none" disabled>No batches available</SelectItem>
+                      ) : (
+                        batches.map((b) => (
+                          <SelectItem key={b.id} value={b.id}>
+                            {b.name}
+                            {b.archivedAt ? " (Archived)" : ""}
+                          </SelectItem>
+                        ))
+                      )}
+                    </SelectContent>
+                  </Select>
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="testType">Test Type</Label>
+                  <Select value={testType} onValueChange={(v) => v && setTestType(v)}>
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="CHAPTER_TEST">Chapter Test</SelectItem>
+                      <SelectItem value="UNIT_TEST">Unit Test</SelectItem>
+                      <SelectItem value="FULL_SYLLABUS_TEST">Full Syllabus Test</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="testDate">Date & Time</Label>
+                  <Input
+                    id="testDate"
+                    type="datetime-local"
+                    value={testDate}
+                    onChange={(e) => setTestDate(e.target.value)}
+                    required
+                  />
+                </div>
               </div>
-            )}
-            {batchId && (
-              <TestUpload
-                targetBatchId={batchId}
-                onUploadSuccess={(fid) => {
-                  setQuestionPaperFileId(fid);
-                  toast.success("File uploaded successfully");
-                }}
-                onUploadError={(err) => toast.error(err)}
-              />
-            )}
-            {!batchId && (
-              <p className="text-sm text-muted-foreground">
-                Select a batch first to enable file upload.
-              </p>
-            )}
-          </div>
+            </section>
 
-          <div className="pt-4 flex justify-end gap-2">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => onOpenChange(false)}
-              disabled={loading}
-            >
-              Cancel
-            </Button>
-            <Button type="submit" disabled={loading}>
-              {loading ? "Saving..." : "Save Test"}
-            </Button>
-          </div>
-        </form>
+            {/* Evaluation Details */}
+            <section className="space-y-4">
+              <h3 className="text-sm font-medium text-muted-foreground border-b pb-2">Evaluation Details</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="maximumMarks">Maximum Marks</Label>
+                  <Input
+                    id="maximumMarks"
+                    type="number"
+                    min={1}
+                    value={maximumMarks}
+                    onChange={(e) => setMaximumMarks(e.target.value)}
+                    required
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="durationMinutes">Duration (min, Optional)</Label>
+                  <Input
+                    id="durationMinutes"
+                    type="number"
+                    min={1}
+                    value={durationMinutes}
+                    onChange={(e) => setDurationMinutes(e.target.value)}
+                  />
+                </div>
+              </div>
+            </section>
+
+            {/* Syllabus & Curriculum */}
+            <section className="space-y-4">
+              <h3 className="text-sm font-medium text-muted-foreground border-b pb-2">Syllabus & Curriculum</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2 col-span-1 md:col-span-2">
+                  <Label htmlFor="syllabusDescription">Syllabus Description (Optional)</Label>
+                  <Textarea
+                    id="syllabusDescription"
+                    value={syllabusDescription}
+                    onChange={(e) => setSyllabusDescription(e.target.value)}
+                    maxLength={2000}
+                    rows={3}
+                    placeholder="Describe what topics are covered..."
+                  />
+                </div>
+                
+                <div className="space-y-2">
+                  <Label>Chapter (Optional)</Label>
+                  <Select
+                    value={chapterId}
+                    onValueChange={(val) => {
+                      setChapterId(val || "none");
+                      setTopicId("none");
+                    }}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select chapter" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="none">-- No Chapter --</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <Label>Topic (Optional)</Label>
+                  <Select
+                    value={topicId}
+                    onValueChange={(val) => setTopicId(val || "none")}
+                    disabled
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select topic" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="none">-- No Topic --</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+            </section>
+
+            {/* Attachments */}
+            <section className="space-y-4">
+              <h3 className="text-sm font-medium text-muted-foreground border-b pb-2">Attachments</h3>
+              <div className="space-y-2">
+                <Label>Question Paper Upload (Optional)</Label>
+                {test?.fileAssetId && !questionPaperFileId && (
+                  <div className="text-sm text-muted-foreground mb-2">
+                    Currently attached. Upload a new file below to replace it.
+                  </div>
+                )}
+                {batchId ? (
+                  <TestUpload
+                    targetBatchId={batchId}
+                    onUploadSuccess={(fid) => {
+                      setQuestionPaperFileId(fid);
+                      toast.success("File uploaded successfully");
+                    }}
+                    onUploadError={(err) => toast.error(err)}
+                  />
+                ) : (
+                  <div className="text-sm text-muted-foreground bg-muted p-4 rounded-md border text-center">
+                    Select a batch first to enable file upload.
+                  </div>
+                )}
+              </div>
+            </section>
+
+          </form>
+        </div>
+        
+        <div className="m-0 p-4 sm:p-6 border-t bg-muted/40 flex justify-end gap-2">
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => onOpenChange(false)}
+            disabled={loading}
+          >
+            Cancel
+          </Button>
+          <SubmitButton type="submit" form="test-form" pending={loading}>
+            {loading ? "Saving..." : "Save Test"}
+          </SubmitButton>
+        </div>
       </DialogContent>
     </Dialog>
   );
