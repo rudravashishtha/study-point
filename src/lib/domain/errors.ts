@@ -6,6 +6,7 @@ export type DomainErrorCode =
   | "CONCURRENT_UPDATE"
   | "UNAUTHORIZED"
   | "INVALID_RELATION"
+  | "VALIDATION"
   | "INTERNAL_ERROR"
   | "IMPORT_VALIDATION"
   | "IMPORT_FAILED";

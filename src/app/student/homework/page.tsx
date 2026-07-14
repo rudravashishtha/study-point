@@ -28,7 +28,7 @@ export default async function StudentHomeworkPage() {
   // Check if the student has any active enrolments
   const student = await db.student.findUnique({
     where: { id: appUser.studentId },
-    include: { enrolments: { where: { status: "ACTIVE", archivedAt: null } } },
+    include: { enrolments: { where: { status: "active", archivedAt: null } } },
   });
 
   if (!student || student.enrolments.length === 0) {

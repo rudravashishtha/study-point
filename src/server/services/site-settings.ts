@@ -28,6 +28,9 @@ export interface SiteSettingsData {
   heroCtaText: string | null;
   heroCtaTarget: string | null;
   feeDisplayEnabled: boolean;
+  admissionsOpen: boolean;
+  resourcesEnabled: boolean;
+  resourcesSearchEnabled: boolean;
   createdAt: Date;
   updatedAt: Date;
   createdBy: string | null;
@@ -60,6 +63,9 @@ const DEFAULT_SETTINGS: Omit<
   heroCtaText: "Enquire Now",
   heroCtaTarget: "/admissions",
   feeDisplayEnabled: true,
+  admissionsOpen: true,
+  resourcesEnabled: true,
+  resourcesSearchEnabled: true,
 };
 
 async function getOrCreateSingleton() {

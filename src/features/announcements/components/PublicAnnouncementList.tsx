@@ -3,6 +3,7 @@
 import { AnnouncementPriority } from "@prisma/client";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
+import { RichText } from "@/components/editor/RichText";
 
 const priorityMeta: Record<AnnouncementPriority, { label: string; className: string }> = {
   NORMAL: { label: "Normal", className: "bg-gray-100 text-gray-800" },
@@ -56,9 +57,7 @@ export function PublicAnnouncementList({
               </Badge>
             </div>
 
-            <p className="mt-3 text-sm text-muted-foreground whitespace-pre-wrap leading-6">
-              {a.content}
-            </p>
+            <RichText html={a.content} className="mt-3 text-sm leading-6" />
 
             <div className="mt-4 flex flex-wrap gap-x-4 gap-y-1 text-xs text-muted-foreground">
               {a.publishedAt && (

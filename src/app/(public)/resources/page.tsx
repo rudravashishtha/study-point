@@ -1,11 +1,7 @@
 import { Metadata } from "next";
-import { FileText } from "lucide-react";
-import { EmptyState } from "@/components/feedback/empty-state";
 import { listPublicResources } from "@/server/services/study-materials";
-import {
-  PublicResourceCard,
-  getResourceTypeMeta,
-} from "@/features/public/components/PublicResourceCard";
+import { getSiteSettings } from "@/server/services/site-settings";
+import { ResourcesSearchClient } from "@/features/public/components/ResourcesSearchClient";
 
 export const revalidate = 3600;
 
@@ -17,16 +13,16 @@ export const metadata: Metadata = {
   openGraph: { url: "/resources" },
 };
 
-const GROUP_ORDER = ["DOCUMENT", "PRESENTATION", "IMAGE", "LINK", "TEXT"];
-
 export default async function ResourcesPage() {
-  const result = await listPublicResources(1, 60);
-  const resources = result.success ? result.data : [];
+  const [result, settingsResult] = await Promise.all([
+    listPublicResources(1, 60),
+    getSiteSettings(),
+  ]);
 
-  const grouped = GROUP_ORDER.map((type) => ({
-    type,
-    items: resources.filter((r) => r.resourceType === type),
-  })).filter((group) => group.items.length > 0);
+  const resources = result.success ? result.data : [];
+  const searchEnabled = settingsResult.success
+    ? settingsResult.data.resourcesSearchEnabled
+    : true;
 
   return (
     <div className="space-y-0">
@@ -48,45 +44,10 @@ export default async function ResourcesPage() {
             </p>
           </header>
 
-          {grouped.length === 0 ? (
-            <div className="mx-auto max-w-md">
-              <EmptyState
-                icon={FileText}
-                title="No resources published yet"
-                description="Free study resources will be published here soon. Please check back later."
-              />
-            </div>
-          ) : (
-            grouped.map((group) => {
-              const meta = getResourceTypeMeta(group.type);
-              const Icon = meta.icon;
-              return (
-                <section
-                  key={group.type}
-                  className="mb-12"
-                  aria-labelledby={`group-${group.type}`}
-                >
-                  <div className="mb-5 flex items-center gap-2">
-                    <Icon className="size-5 text-primary" aria-hidden="true" />
-                    <h2
-                      id={`group-${group.type}`}
-                      className="text-xl font-bold font-heading text-foreground md:text-2xl"
-                    >
-                      {meta.label}
-                    </h2>
-                    <span className="text-sm text-muted-foreground">
-                      ({group.items.length})
-                    </span>
-                  </div>
-                  <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-                    {group.items.map((resource) => (
-                      <PublicResourceCard key={resource.id} resource={resource} />
-                    ))}
-                  </div>
-                </section>
-              );
-            })
-          )}
+          <ResourcesSearchClient
+            resources={resources}
+            searchEnabled={searchEnabled}
+          />
         </div>
       </section>
     </div>

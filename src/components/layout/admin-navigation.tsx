@@ -11,6 +11,7 @@ import {
   CreditCard,
   Database,
   FileText,
+  Globe,
   GraduationCap,
   LayoutDashboard,
   Megaphone,
@@ -59,6 +60,10 @@ export const adminNavigationGroups = [
       { href: "/admin/imports", label: "Data Imports", icon: Database },
       { href: "/admin/announcements", label: "Notices", icon: Megaphone },
     ],
+  },
+  {
+    name: "Content",
+    links: [{ href: "/admin/website", label: "Website", icon: Globe }],
   },
   {
     name: "System",

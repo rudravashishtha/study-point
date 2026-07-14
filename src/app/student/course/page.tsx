@@ -1,11 +1,10 @@
 import { redirect } from "next/navigation";
-import { BookOpen } from "lucide-react";
 import { requireRole } from "@/lib/auth/permissions";
 import { Role } from "@prisma/client";
-import { listStudentMaterials } from "@/server/services/study-materials";
-import { StudentMaterialList } from "@/features/materials/components/StudentMaterialList";
+import { getStudentCourseData } from "@/server/services/student-course";
+import { StudentCourseView } from "@/features/dashboard/components/StudentCourseView";
 import { EmptyState } from "@/components/feedback/empty-state";
-import { db } from "@/lib/db";
+import { BookOpen } from "lucide-react";
 
 export default async function StudentCoursePage() {
   const appUser = await requireRole(Role.STUDENT);
@@ -14,59 +13,24 @@ export default async function StudentCoursePage() {
     redirect("/unauthorized");
   }
 
-  // Fetch student materials server-side
-  const materialsResult = await listStudentMaterials(appUser.id);
-  if (!materialsResult.success) {
-    if (materialsResult.error.code === "UNAUTHORIZED") {
-      redirect("/unauthorized");
-    }
+  const result = await getStudentCourseData(appUser.studentId);
+
+  if (!result.success) {
     return (
       <EmptyState
         icon={BookOpen}
-        title="Error loading materials"
-        description={materialsResult.error.message}
+        title="Error loading course"
+        description={result.error.message}
       />
     );
   }
 
-  const materials = materialsResult.data;
-
-  // We need to pass chapters to the UI so it can display chapter names if needed,
-  // or the backend can include it. listStudentMaterials doesn't include chapters.
-  // We'll fetch all active chapters.
-  const activeChapters = await db.chapter.findMany({
-    where: { archivedAt: null },
-    select: { id: true, name: true },
-  });
-
-  // Similarly topics
-  const activeTopics = await db.topic.findMany({
-    where: { archivedAt: null },
-    select: { id: true, name: true },
-  });
-
-  if (materials.length === 0) {
-    // Check if the student has any active enrolments to determine empty state message
-    const student = await db.student.findUnique({
-      where: { id: appUser.studentId },
-      include: { enrolments: { where: { status: "ACTIVE", archivedAt: null } } },
-    });
-
-    if (!student || student.enrolments.length === 0) {
-      return (
-        <EmptyState
-          icon={BookOpen}
-          title="No Active Courses"
-          description="You are not currently enrolled in any active courses."
-        />
-      );
-    }
-
+  if (result.data.length === 0) {
     return (
       <EmptyState
         icon={BookOpen}
-        title="No Materials Yet"
-        description="There are currently no study materials published for your courses."
+        title="No Active Courses"
+        description="You are not currently enrolled in any active courses."
       />
     );
   }
@@ -74,19 +38,12 @@ export default async function StudentCoursePage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold tracking-tight">Study Materials</h1>
+        <h1 className="text-3xl font-bold tracking-tight">My Course &amp; Batch</h1>
         <p className="text-muted-foreground">
-          Resources, notes, and links for your active courses.
+          Your class, batch, schedule, and teacher information.
         </p>
       </div>
-
-      <div className="border rounded-md p-6 bg-card text-card-foreground shadow-sm">
-        <StudentMaterialList
-          materials={materials}
-          chapters={activeChapters}
-          topics={activeTopics}
-        />
-      </div>
+      <StudentCourseView enrolments={result.data} />
     </div>
   );
 }

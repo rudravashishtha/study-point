@@ -39,6 +39,9 @@ export const SiteSettingsUpdateSchema = z.object({
   heroCtaText: z.string().trim().min(1).max(50).nullable().optional(),
   heroCtaTarget: z.string().trim().min(1).nullable().optional(),
   feeDisplayEnabled: z.boolean().optional(),
+  admissionsOpen: z.boolean().optional(),
+  resourcesEnabled: z.boolean().optional(),
+  resourcesSearchEnabled: z.boolean().optional(),
 });
 
 export type SiteSettingsUpdateInput = z.infer<typeof SiteSettingsUpdateSchema>;

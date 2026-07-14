@@ -2,6 +2,7 @@ import { Prisma, AnnouncementAudience, AnnouncementPriority } from "@prisma/clie
 import { db } from "../../lib/db";
 import { ActorContext } from "../../lib/domain/actor";
 import { createAuditLog } from "../../lib/domain/audit";
+import { sanitizeRichText } from "../../lib/sanitize";
 import { DomainError } from "../../lib/domain/errors";
 import { ServiceResult, success, failure } from "./types";
 
@@ -160,7 +161,7 @@ export async function createAnnouncement(
         curriculumTrackId,
         batchId,
         title: input.title,
-        content: input.content,
+        content: sanitizeRichText(input.content),
         priority: input.priority || "NORMAL",
         publishedAt: publishNow ? new Date() : null,
         expiresAt,
@@ -203,7 +204,7 @@ export async function updateAnnouncement(
 
   const data: Prisma.AnnouncementUpdateInput = {};
   if (input.title !== undefined) data.title = input.title;
-  if (input.content !== undefined) data.content = input.content;
+  if (input.content !== undefined) data.content = sanitizeRichText(input.content);
   if (input.priority !== undefined) data.priority = input.priority;
   if (input.expiresAt !== undefined) data.expiresAt = parseISODate(input.expiresAt);
   data.updatedBy = actor.userId;
@@ -472,7 +473,9 @@ export async function listStudentAnnouncements(
     },
   });
 
-  return success({ items });
+  return success({
+    items: items.map((item) => ({ ...item, content: sanitizeRichText(item.content) })),
+  });
 }
 
 // ─── Public Listing ──────────────────────────────────────────────────
@@ -501,5 +504,119 @@ export async function listPublicAnnouncements(): Promise<
     },
   });
 
-  return success({ items });
+  return success({
+    items: items.map((item) => ({ ...item, content: sanitizeRichText(item.content) })),
+  });
+}
+
+// ─── Student Read State ──────────────────────────────────────────────
+
+/**
+ * Returns the ids of announcements currently visible to a student, based on the
+ * same audience scoping used by `listStudentAnnouncements`. Centralised so both
+ * the unread-count query and the mark-read mutation verify visibility from the
+ * same source of truth (never trusting client-supplied ids blindly).
+ */
+export async function getStudentVisibleAnnouncementIds(
+  studentId: string,
+): Promise<string[]> {
+  const student = await db.student.findUnique({
+    where: { id: studentId },
+    select: {
+      enrolments: {
+        where: { status: "active", archivedAt: null },
+        select: { curriculumTrackId: true, batchId: true },
+      },
+    },
+  });
+
+  if (!student || student.enrolments.length === 0) return [];
+
+  const trackIds = student.enrolments.map((e) => e.curriculumTrackId);
+  const batchIds = student.enrolments
+    .map((e) => e.batchId)
+    .filter((id): id is string => id !== null);
+
+  const now = new Date();
+
+  const items = await db.announcement.findMany({
+    where: {
+      publishedAt: { not: null },
+      archivedAt: null,
+      AND: [
+        { OR: [{ expiresAt: null }, { expiresAt: { gt: now } }] },
+        {
+          OR: [
+            { audience: "PUBLIC" as AnnouncementAudience },
+            { audience: "ALL_STUDENTS" as AnnouncementAudience },
+            ...(trackIds.length > 0
+              ? [
+                  {
+                    audience: "CURRICULUM_TRACK" as AnnouncementAudience,
+                    curriculumTrackId: { in: trackIds },
+                  },
+                ]
+              : []),
+            ...(batchIds.length > 0
+              ? [
+                  {
+                    audience: "BATCH" as AnnouncementAudience,
+                    batchId: { in: batchIds },
+                  },
+                ]
+              : []),
+          ],
+        },
+      ],
+    },
+    select: { id: true },
+  });
+
+  return items.map((a) => a.id);
+}
+
+export async function getStudentAnnouncementUnreadCount(
+  studentId: string,
+): Promise<number> {
+  const visibleIds = await getStudentVisibleAnnouncementIds(studentId);
+  if (visibleIds.length === 0) return 0;
+
+  const readCount = await db.studentAnnouncementRead.count({
+    where: { studentId, announcementId: { in: visibleIds } },
+  });
+
+  return Math.max(0, visibleIds.length - readCount);
+}
+
+/**
+ * Marks the given announcements as read for the student. Only announcements that
+ * are actually visible to the student are marked; any id the student is not
+ * authorised to see is ignored. Idempotent (upsert). No audit logging: this is
+ * benign read-tracking, not an administrative mutation.
+ */
+export async function markStudentAnnouncementsRead(
+  studentId: string,
+  announcementIds: string[],
+): Promise<ServiceResult<number>> {
+  if (!studentId) {
+    return failure("UNAUTHORIZED", "Student profile required");
+  }
+
+  const visibleIds = await getStudentVisibleAnnouncementIds(studentId);
+  const toMark = announcementIds.filter((id) => visibleIds.includes(id));
+  if (toMark.length === 0) {
+    return success(0);
+  }
+
+  await db.$transaction(
+    toMark.map((announcementId) =>
+      db.studentAnnouncementRead.upsert({
+        where: { studentId_announcementId: { studentId, announcementId } },
+        create: { studentId, announcementId },
+        update: {},
+      }),
+    ),
+  );
+
+  return success(toMark.length);
 }

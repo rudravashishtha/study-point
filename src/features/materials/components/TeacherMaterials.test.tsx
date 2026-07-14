@@ -132,7 +132,7 @@ describe("Teacher Materials UI", () => {
     );
 
     expect(screen.getAllByText("Batch Algebra Notes")[0]).toBeInTheDocument();
-    expect(screen.getByText("ARCHIVED")).toBeInTheDocument();
+    expect(screen.getByText("Archived")).toBeInTheDocument();
 
     // Cannot edit or archive an already archived material
     expect(screen.queryByText("Edit")).not.toBeInTheDocument();

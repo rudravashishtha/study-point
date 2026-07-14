@@ -1,11 +1,17 @@
 import type { MetadataRoute } from "next";
-import { siteConfig } from "@/config/site";
+import { getSiteSettings } from "@/server/services/site-settings";
 
-export default function manifest(): MetadataRoute.Manifest {
+export default async function manifest(): Promise<MetadataRoute.Manifest> {
+  const settingsResult = await getSiteSettings();
+  const name = settingsResult.success ? settingsResult.data.instituteName : "Study Point";
+  const description = settingsResult.success && settingsResult.data.defaultDescription
+    ? settingsResult.data.defaultDescription
+    : "A premium mathematics institute coaching students in Classes IX, X, XI, and XII.";
+
   return {
-    name: siteConfig.name,
-    short_name: siteConfig.shortName,
-    description: siteConfig.description,
+    name,
+    short_name: name,
+    description,
     start_url: "/",
     display: "standalone",
     orientation: "portrait",

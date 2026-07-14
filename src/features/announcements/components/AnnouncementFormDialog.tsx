@@ -8,12 +8,8 @@ import {
   updateAnnouncementAction,
 } from "@/app/admin/announcements/actions";
 import { useRouter } from "next/navigation";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  } from "@/components/ui/dialog";
+import { RichTextEditor } from "@/components/editor/RichTextEditor";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { SubmitButton } from "@/components/ui/submit-button";
 
@@ -52,6 +48,7 @@ export function AnnouncementFormDialog({
   const [audience, setAudience] = useState<AnnouncementAudience>(
     announcement?.audience || "PUBLIC",
   );
+  const [content, setContent] = useState(announcement?.content || "");
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -69,7 +66,7 @@ export function AnnouncementFormDialog({
             : null,
       batchId: audience === "BATCH" ? (formData.get("batchId") as string) : null,
       title: formData.get("title") as string,
-      content: formData.get("content") as string,
+      content,
       priority: (formData.get("priority") as AnnouncementPriority) || "NORMAL",
       publish: formData.get("publish") === "on",
       expiresAt: (formData.get("expiresAt") as string) || null,
@@ -115,10 +112,11 @@ export function AnnouncementFormDialog({
 
         <div className="flex-1 overflow-y-auto px-4 py-4 sm:px-6">
           <form id="announcement-form" onSubmit={handleSubmit} className="space-y-8">
-            
             {/* Notice Details */}
             <section className="space-y-4">
-              <h3 className="text-sm font-medium text-muted-foreground border-b pb-2">Notice Details</h3>
+              <h3 className="text-sm font-medium text-muted-foreground border-b pb-2">
+                Notice Details
+              </h3>
               <div className="grid grid-cols-1 gap-4">
                 <div className="space-y-2">
                   <label htmlFor="title" className="text-sm font-medium">
@@ -137,14 +135,11 @@ export function AnnouncementFormDialog({
                   <label htmlFor="content" className="text-sm font-medium">
                     Content *
                   </label>
-                  <textarea
-                    id="content"
-                    name="content"
-                    required
-                    rows={4}
-                    defaultValue={announcement?.content}
-                    className="flex w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                  <RichTextEditor
+                    value={content}
+                    onChange={setContent}
                     placeholder="Write the notice content here..."
+                    minHeight={180}
                   />
                 </div>
               </div>
@@ -152,7 +147,9 @@ export function AnnouncementFormDialog({
 
             {/* Audience & Priority */}
             <section className="space-y-4">
-              <h3 className="text-sm font-medium text-muted-foreground border-b pb-2">Audience & Priority</h3>
+              <h3 className="text-sm font-medium text-muted-foreground border-b pb-2">
+                Audience & Priority
+              </h3>
               <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                 <div className="space-y-2">
                   <label htmlFor="audience" className="text-sm font-medium">
@@ -244,7 +241,9 @@ export function AnnouncementFormDialog({
 
             {/* Settings */}
             <section className="space-y-4">
-              <h3 className="text-sm font-medium text-muted-foreground border-b pb-2">Settings</h3>
+              <h3 className="text-sm font-medium text-muted-foreground border-b pb-2">
+                Settings
+              </h3>
               <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                 <div className="space-y-2">
                   <label htmlFor="academicSessionId" className="text-sm font-medium">
@@ -296,10 +295,9 @@ export function AnnouncementFormDialog({
                 </div>
               )}
             </section>
-
           </form>
         </div>
-        
+
         <div className="m-0 p-4 sm:p-6 border-t bg-muted/40 flex justify-end gap-2">
           <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
             Cancel

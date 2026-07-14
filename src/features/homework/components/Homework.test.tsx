@@ -132,7 +132,7 @@ describe("Admin Homework UI", () => {
         tracks={tracks}
       />,
     );
-    expect(screen.getByText("ARCHIVED")).toBeInTheDocument();
+    expect(screen.getByText("Archived")).toBeInTheDocument();
     expect(screen.queryByRole("button", { name: /actions/i })).not.toBeInTheDocument();
   });
 

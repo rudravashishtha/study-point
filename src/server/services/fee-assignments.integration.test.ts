@@ -592,4 +592,73 @@ describe.skipIf(!isTestConfigured)("Fee Assignment Service Integration", () => {
     const adminListDues = await listStudentFeeDues(adminActor);
     expect(adminListDues.success).toBe(false);
   });
+
+  // ── 22. Cross-student fee isolation ──────────────────────────
+  it("22. student fee dues are scoped to the student's own enrolments", async () => {
+    const fa1 = await db.studentFeeAssignment.create({
+      data: {
+        enrolmentId: enrolmentA.id,
+        feePlanId: feePlan.id,
+        assignedTotalAmount: new Prisma.Decimal(30000),
+        startsOn: new Date(),
+        status: "ACTIVE",
+      },
+    });
+    await db.studentFeeDue.create({
+      data: {
+        feeAssignmentId: fa1.id,
+        label: "Term 1",
+        dueDate: new Date(),
+        amountDue: new Prisma.Decimal(10000),
+        amountWaived: new Prisma.Decimal(0),
+        status: "PENDING",
+      },
+    });
+    const fa2 = await db.studentFeeAssignment.create({
+      data: {
+        enrolmentId: enrolmentB.id,
+        feePlanId: feePlan.id,
+        assignedTotalAmount: new Prisma.Decimal(30000),
+        startsOn: new Date(),
+        status: "ACTIVE",
+      },
+    });
+
+    const res = await listStudentFeeDues(studentActor1);
+    expect(res.success).toBe(true);
+    if (!res.success) return;
+    const ids = res.data.assignments.map((a) => a.id);
+    expect(ids).toContain(fa1.id);
+    expect(ids).not.toContain(fa2.id);
+  });
+
+  // ── 23. Empty fee assignment state ───────────────────────────
+  it("23. student with active enrolment but no fee assignment sees empty dues", async () => {
+    const s4 = await db.student.create({
+      data: { studentCode: "FEESTU04", fullName: "Fee Student Four" },
+    });
+    const su4 = await db.appUser.create({
+      data: { role: Role.STUDENT, status: "ACTIVE", studentId: s4.id },
+    });
+    const track = await db.curriculumTrack.findFirstOrThrow();
+    await db.enrolment.create({
+      data: {
+        studentId: s4.id,
+        academicSessionId: session.id,
+        curriculumTrackId: track.id,
+        batchId: batch.id,
+        joiningDate: new Date(),
+        status: "active",
+      },
+    });
+    const actor4: ActorContext = {
+      userId: su4.id,
+      role: "STUDENT",
+      metadata: { role: "STUDENT", status: "ACTIVE" },
+    };
+    const res = await listStudentFeeDues(actor4);
+    expect(res.success).toBe(true);
+    if (!res.success) return;
+    expect(res.data.assignments).toHaveLength(0);
+  });
 });

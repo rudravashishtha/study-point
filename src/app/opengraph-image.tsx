@@ -1,11 +1,18 @@
 import { ImageResponse } from "next/og";
+import { getSiteSettings } from "@/server/services/site-settings";
 import { siteConfig } from "@/config/site";
 
 export const alt = siteConfig.description;
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
-export default function OpenGraphImage() {
+export default async function OpenGraphImage() {
+  const settingsResult = await getSiteSettings();
+  const name = settingsResult.success ? settingsResult.data.instituteName : siteConfig.name;
+  const description = settingsResult.success && settingsResult.data.defaultDescription
+    ? settingsResult.data.defaultDescription
+    : siteConfig.description;
+
   return new ImageResponse(
     (
       <div
@@ -22,10 +29,10 @@ export default function OpenGraphImage() {
         }}
       >
         <div style={{ fontSize: 80, fontWeight: 700, marginBottom: 8 }}>
-          {siteConfig.name}
+          {name}
         </div>
         <div style={{ fontSize: 28, color: "#94a3b8", textAlign: "center", maxWidth: 600 }}>
-          {siteConfig.description}
+          {description}
         </div>
         <div
           style={{

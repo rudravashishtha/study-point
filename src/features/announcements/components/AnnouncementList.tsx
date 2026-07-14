@@ -129,9 +129,7 @@ export function AnnouncementList({
           <FilterField label="Status">
             <Select
               value={archiveFilter}
-              onValueChange={(v) =>
-                setArchiveFilter(v as "active" | "archived" | "all")
-              }
+              onValueChange={(v) => setArchiveFilter(v as "active" | "archived" | "all")}
             >
               <SelectTrigger className="h-9 w-[150px]">
                 <SelectValue placeholder="Status" />
@@ -147,9 +145,7 @@ export function AnnouncementList({
           <FilterField label="Audience">
             <Select
               value={audienceFilter}
-              onValueChange={(v) =>
-                setAudienceFilter(v as AnnouncementAudience | "")
-              }
+              onValueChange={(v) => setAudienceFilter(v as AnnouncementAudience | "")}
             >
               <SelectTrigger className="h-9 w-[180px]">
                 <SelectValue placeholder="Audience" />
@@ -314,7 +310,10 @@ export function AnnouncementList({
                       </span>
                     </TableCell>
                     <TableCell className="text-right">
-                      <AnnouncementRowActions announcement={a} onEdit={() => handleEdit(a)} />
+                      <AnnouncementRowActions
+                        announcement={a}
+                        onEdit={() => handleEdit(a)}
+                      />
                     </TableCell>
                   </TableRow>
                 ))}
@@ -325,6 +324,7 @@ export function AnnouncementList({
       )}
 
       <AnnouncementFormDialog
+        key={editingAnnouncement?.id ?? "new"}
         announcement={editingAnnouncement}
         sessions={sessions}
         tracks={tracks}

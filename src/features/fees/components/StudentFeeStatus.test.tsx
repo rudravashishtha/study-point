@@ -1,8 +1,12 @@
 // @vitest-environment jsdom
 import "@testing-library/jest-dom/vitest";
-import { describe, it, expect, afterEach } from "vitest";
+import { describe, it, expect, vi, afterEach } from "vitest";
 import { render, screen, cleanup } from "@testing-library/react";
 import { StudentFeeStatus } from "./StudentFeeStatus";
+
+vi.mock("next/navigation", () => ({
+  useRouter: () => ({ push: vi.fn(), refresh: vi.fn() }),
+}));
 
 afterEach(() => {
   cleanup();
@@ -38,9 +42,10 @@ describe("StudentFeeStatus", () => {
 
   it("2. shows pending total in summary", () => {
     render(<StudentFeeStatus assignments={[makeAssignment()]} />);
-    expect(screen.getByText(/Pending Fees/)).toBeInTheDocument();
+    expect(screen.getByText("Settled")).toBeInTheDocument();
+    expect(screen.getByText("Plan Total")).toBeInTheDocument();
     const totals = screen.getAllByText("₹5000.00");
-    expect(totals.length).toBe(2);
+    expect(totals.length).toBeGreaterThanOrEqual(2);
     expect(totals[0].className).toContain("font-heading");
   });
 
@@ -63,7 +68,7 @@ describe("StudentFeeStatus", () => {
 
   it("6. shows status badge per due", () => {
     render(<StudentFeeStatus assignments={[makeAssignment()]} />);
-    expect(screen.getByText("Pending")).toBeInTheDocument();
+    expect(screen.getAllByText("Pending").length).toBeGreaterThanOrEqual(1);
   });
 
   it("7. excludes CANCELLED dues from totals", () => {
@@ -168,5 +173,28 @@ describe("StudentFeeStatus", () => {
     const totals = screen.getAllByText("₹2000.00");
     expect(totals[0].className).toContain("font-heading");
     expect(screen.getByText("Waived")).toBeInTheDocument();
+  });
+
+  it("11. shows a receipt link only for paid dues", () => {
+    const assignment = makeAssignment({
+      dues: [
+        {
+          id: "due-paid",
+          label: "Paid Instalment",
+          dueDate: "2026-08-01T00:00:00.000Z",
+          amountDue: "5000.00",
+          amountWaived: "0.00",
+          status: "PAID",
+        },
+      ],
+    });
+    render(<StudentFeeStatus assignments={[assignment]} />);
+    const link = screen.getByRole("link", { name: "Receipt" });
+    expect(link).toHaveAttribute("href", "/student/fees/receipt/due-paid");
+  });
+
+  it("12. does not show a receipt link for unpaid dues", () => {
+    render(<StudentFeeStatus assignments={[makeAssignment()]} />);
+    expect(screen.queryByRole("link", { name: "Receipt" })).toBeNull();
   });
 });

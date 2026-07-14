@@ -30,6 +30,8 @@ import {
   restoreAnnouncement,
   listStudentAnnouncements,
   listPublicAnnouncements,
+  getStudentAnnouncementUnreadCount,
+  markStudentAnnouncementsRead,
 } from "./announcements";
 import { ActorContext } from "@/lib/domain/actor";
 
@@ -55,6 +57,7 @@ describe.skipIf(!isTestConfigured)("Announcement Service Integration", () => {
     await db.appUser.deleteMany();
     await db.teacher.deleteMany();
     await db.student.deleteMany();
+    await db.studentAnnouncementRead.deleteMany();
   });
 
   afterAll(async () => {
@@ -662,5 +665,120 @@ describe.skipIf(!isTestConfigured)("Announcement Service Integration", () => {
     expect(res.success).toBe(true);
     if (!res.success) return;
     expect(res.data.items).toHaveLength(0);
+  });
+
+  // ── Student Read State ───────────────────────────────────────────
+
+  it("28. unread count is visibility-scoped and mark-read ignores ids the student cannot see", async () => {
+    const s1 = await db.student.findUnique({ where: { studentCode: "ANNS01" } });
+    const s2 = await db.student.findUnique({ where: { studentCode: "ANNS02" } });
+    const s3 = await db.student.findUnique({ where: { studentCode: "ANNS03" } });
+    expect(s1 && s2 && s3).toBeTruthy();
+    if (!s1 || !s2 || !s3) return;
+
+    const now = new Date();
+    const past = new Date(now.getTime() - 86400000);
+
+    // Visible to Student A (trackA / batchA): PUBLIC, CURRICULUM_TRACK(trackA), BATCH(batchA)
+    const pub = await db.announcement.create({
+      data: {
+        audience: "PUBLIC",
+        title: "Public A",
+        content: "x",
+        publishedAt: now,
+      },
+    });
+    const trackAOnly = await db.announcement.create({
+      data: {
+        audience: "CURRICULUM_TRACK",
+        curriculumTrackId: trackA.id,
+        title: "Track A Only",
+        content: "x",
+        publishedAt: now,
+      },
+    });
+    const batchAOnly = await db.announcement.create({
+      data: {
+        audience: "BATCH",
+        batchId: batchA.id,
+        title: "Batch A Only",
+        content: "x",
+        publishedAt: now,
+      },
+    });
+    // Visible only to Student B (trackB)
+    const trackBOnly = await db.announcement.create({
+      data: {
+        audience: "CURRICULUM_TRACK",
+        curriculumTrackId: trackB.id,
+        title: "Track B Only",
+        content: "x",
+        publishedAt: now,
+      },
+    });
+    // Not visible to anyone: expired, draft, archived-batch
+    await db.announcement.create({
+      data: {
+        audience: "PUBLIC",
+        title: "Expired",
+        content: "x",
+        publishedAt: now,
+        expiresAt: past,
+      },
+    });
+    await db.announcement.create({
+      data: { audience: "PUBLIC", title: "Draft", content: "x" },
+    });
+    await db.announcement.create({
+      data: {
+        audience: "BATCH",
+        batchId: archivedBatch.id,
+        title: "Archived Batch",
+        content: "x",
+        publishedAt: now,
+      },
+    });
+
+    // Student A sees exactly 3 visible announcements
+    const beforeA = await getStudentAnnouncementUnreadCount(s1.id);
+    expect(beforeA).toBe(3);
+
+    // Student B sees only the PUBLIC + Track B announcements = 2
+    const beforeB = await getStudentAnnouncementUnreadCount(s2.id);
+    expect(beforeB).toBe(2);
+
+    // Student C (no active enrolment) sees nothing
+    const beforeC = await getStudentAnnouncementUnreadCount(s3.id);
+    expect(beforeC).toBe(0);
+
+    // Marking read must ignore ids the student cannot see (trackBOnly)
+    const mark = await markStudentAnnouncementsRead(s1.id, [
+      pub.id,
+      trackAOnly.id,
+      trackBOnly.id, // not visible to A → must be ignored
+    ]);
+    expect(mark.success).toBe(true);
+    if (!mark.success) return;
+    expect(mark.data).toBe(2); // only pub + trackAOnly actually marked
+
+    // After marking, A's unread drops to 1 (batchAOnly remains)
+    const afterA = await getStudentAnnouncementUnreadCount(s1.id);
+    expect(afterA).toBe(1);
+
+    // B's unread is untouched by A's mark-read
+    const afterB = await getStudentAnnouncementUnreadCount(s2.id);
+    expect(afterB).toBe(2);
+
+    // A cannot have a read receipt for the announcement it cannot see
+    const rogueReads = await db.studentAnnouncementRead.count({
+      where: { studentId: s1.id, announcementId: trackBOnly.id },
+    });
+    expect(rogueReads).toBe(0);
+
+    // Marking the remaining visible one clears A's unread
+    const mark2 = await markStudentAnnouncementsRead(s1.id, [batchAOnly.id]);
+    expect(mark2.success).toBe(true);
+    if (!mark2.success) return;
+    expect(await getStudentAnnouncementUnreadCount(s1.id)).toBe(0);
   });
 });

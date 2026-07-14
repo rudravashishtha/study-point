@@ -111,7 +111,7 @@ describe("Admin Test UI", () => {
     fireEvent.change(await screen.findByLabelText("Maximum Marks"), {
       target: { value: "30" },
     });
-    fireEvent.change(await screen.findByLabelText("Test Date & Time"), {
+    fireEvent.change(await screen.findByLabelText("Date & Time"), {
       target: { value: "2026-08-01T10:00" },
     });
     return dialog;
@@ -145,7 +145,7 @@ describe("Admin Test UI", () => {
         tracks={tracks}
       />,
     );
-    expect(screen.getByText("ARCHIVED")).toBeInTheDocument();
+    expect(screen.getByText("Archived")).toBeInTheDocument();
     expect(screen.queryByRole("button", { name: /actions/i })).not.toBeInTheDocument();
   });
 

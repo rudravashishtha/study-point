@@ -1,7 +1,6 @@
 "use client";
 
 import { TeacherNavigation } from "./teacher-navigation";
-import { siteConfig } from "@/config/site";
 import { Menu, X, LogOut } from "lucide-react";
 import { useState, useRef, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "motion/react";
@@ -19,9 +18,11 @@ interface BatchLink {
 export function TeacherShell({
   children,
   batches,
+  instituteName = "Study Point",
 }: {
   children: React.ReactNode;
   batches: BatchLink[];
+  instituteName?: string;
 }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const pathname = usePathname();
@@ -80,7 +81,7 @@ export function TeacherShell({
         <div className="h-16 flex items-center px-6 border-b border-border/40 shrink-0">
           <Link href="/teacher" className="flex flex-col">
             <span className="text-[10px] font-bold uppercase tracking-widest text-primary mb-0.5">
-              {siteConfig.name}
+              {instituteName}
             </span>
             <span className="text-sm font-bold font-heading">Teacher Workspace</span>
           </Link>
@@ -146,7 +147,7 @@ export function TeacherShell({
               <div className="h-14 flex items-center justify-between px-4 border-b border-border/40 shrink-0">
                 <div className="flex flex-col">
                   <span className="text-[10px] font-bold uppercase tracking-widest text-primary mb-0.5">
-                    {siteConfig.name}
+                    {instituteName}
                   </span>
                   <span className="text-sm font-bold font-heading">Teacher Workspace</span>
                 </div>

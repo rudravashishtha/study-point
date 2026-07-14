@@ -72,6 +72,22 @@ function makeData(overrides: Record<string, unknown> = {}) {
         },
       ],
     },
+    courses: [
+      {
+        classLevel: "X",
+        subjectName: "Mathematics",
+        batchName: "Batch A",
+        academicSession: "2026-27",
+      },
+    ],
+    recentMaterials: [
+      {
+        id: "m-1",
+        title: "Algebra Notes",
+        resourceType: "DOCUMENT",
+        publishedAt: "2026-07-01T10:00:00.000Z",
+      },
+    ],
     ...overrides,
   } as {
     timetable: {
@@ -83,6 +99,7 @@ function makeData(overrides: Record<string, unknown> = {}) {
           startTime: string;
           endTime: string;
           dayLabel: string;
+          liveClassUrl: string | null;
           batch?: { name: string; curriculumTrack?: { subject?: { name: string } } };
         }[];
       }[];
@@ -98,15 +115,29 @@ function makeData(overrides: Record<string, unknown> = {}) {
         dues: { id: string; status: string; amountDue: string; amountWaived: string }[];
       }[];
     };
+    courses: {
+      classLevel: string;
+      subjectName: string;
+      batchName: string | null;
+      academicSession: string;
+    }[];
+    recentMaterials: {
+      id: string;
+      title: string;
+      resourceType: string;
+      publishedAt: string | Date | null;
+    }[];
   };
   return data;
 }
 
 describe("StudentDashboard", () => {
-  it("1. renders all five widget cards", () => {
+  it("1. renders all widget cards", () => {
     render(<StudentDashboard data={makeData()} />);
-    expect(screen.getByText("Next Class")).toBeInTheDocument();
+    expect(screen.getByText(/Next Class/)).toBeInTheDocument();
+    expect(screen.getByText("My Course")).toBeInTheDocument();
     expect(screen.getByText("Fee Status")).toBeInTheDocument();
+    expect(screen.getByText("Recent Materials")).toBeInTheDocument();
     expect(screen.getByText("Homework")).toBeInTheDocument();
     expect(screen.getByText("Tests")).toBeInTheDocument();
     expect(screen.getByText("Notices")).toBeInTheDocument();

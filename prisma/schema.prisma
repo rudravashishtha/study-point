@@ -61,6 +61,7 @@ model Student {
 
   appUser    AppUser?
   enrolments Enrolment[]
+  announcementReads StudentAnnouncementRead[]
 
   archivedAt DateTime?
   archivedBy String?
@@ -346,11 +347,27 @@ model Announcement {
   curriculumTrack CurriculumTrack? @relation(fields: [curriculumTrackId], references: [id])
   batch           Batch?           @relation(fields: [batchId], references: [id])
 
+  readReceipts StudentAnnouncementRead[]
+
   @@index([audience])
   @@index([publishedAt])
   @@index([expiresAt])
   @@index([curriculumTrackId])
   @@index([batchId])
+}
+
+model StudentAnnouncementRead {
+  id             String      @id @default(uuid())
+  studentId      String
+  announcementId String
+  readAt         DateTime    @default(now())
+
+  student      Student      @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  announcement Announcement @relation(fields: [announcementId], references: [id], onDelete: Cascade)
+
+  @@unique([studentId, announcementId])
+  @@index([studentId])
+  @@index([announcementId])
 }
 
 model BatchSchedule {
@@ -508,6 +525,7 @@ enum FileUploadUsageCategory {
   STUDY_MATERIAL
   HOMEWORK
   TEST
+  PUBLIC_ASSET
 }
 
 enum FileUploadScope {
@@ -665,9 +683,11 @@ model FileAsset {
   targetTrack   CurriculumTrack? @relation("FileAssetTrack", fields: [targetTrackId], references: [id])
   uploadedBy    AppUser          @relation("FileAssetUploader", fields: [uploadedById], references: [id])
 
-  studyMaterials StudyMaterial[]
-  homeworks      Homework[]      @relation("FileAssetHomework")
-  tests          Test[]          @relation("FileAssetTest")
+  studyMaterials   StudyMaterial[]
+  homeworks        Homework[]       @relation("FileAssetHomework")
+  tests            Test[]           @relation("FileAssetTest")
+  testimonials     Testimonial[]    @relation("TestimonialPhoto")
+  galleryItems     GalleryItem[]
 }
 
 model StudyMaterial {
@@ -687,6 +707,7 @@ model StudyMaterial {
 
   visibility     StudyMaterialVisibility
   lifecycleState StudyMaterialLifecycleState
+  featured       Boolean @default(false)
 
   publishedAt DateTime?
   createdAt   DateTime  @default(now())
@@ -706,12 +727,97 @@ model StudyMaterial {
 
   @@index([academicSessionId, curriculumTrackId, visibility, lifecycleState])
   @@index([batchId, lifecycleState])
+  @@index([visibility, lifecycleState, featured])
 }
 
 model SystemSequence {
   id        String   @id
   lastValue Int
   updatedAt DateTime @updatedAt
+}
+
+model HomepageSection {
+  id           String   @id @default(uuid())
+  sectionKey   String   @unique
+  isVisible    Boolean  @default(true)
+  displayOrder Int      @default(0)
+  title        String?
+  locked       Boolean  @default(false)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  updatedBy    String?
+}
+
+model WhyChooseUsItem {
+  id           String   @id @default(uuid())
+  title        String
+  description  String
+  iconName     String?
+  displayOrder Int      @default(0)
+  isPublished  Boolean  @default(false)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model MethodologyStep {
+  id           String   @id @default(uuid())
+  title        String
+  description  String
+  stepNumber   Int
+  displayOrder Int      @default(0)
+  isPublished  Boolean  @default(false)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model Testimonial {
+  id            String         @id @default(uuid())
+  studentName   String
+  designation  String?
+  studentClass  ClassLevel?
+  batch         String?
+  year          Int?
+  studentPhotoFileId String?
+  message       String
+  featured      Boolean        @default(false)
+  displayOrder  Int            @default(0)
+  isPublished   Boolean        @default(false)
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+
+  studentPhoto FileAsset? @relation("TestimonialPhoto", fields: [studentPhotoFileId], references: [id])
+}
+
+model GalleryItem {
+  id           String   @id @default(uuid())
+  caption      String?
+  category     String?
+  fileAssetId  String
+  displayOrder Int      @default(0)
+  isPublished  Boolean  @default(false)
+  createdAt    DateTime @default(now())
+
+  fileAsset FileAsset @relation(fields: [fileAssetId], references: [id])
+}
+
+model FAQ {
+  id           String   @id @default(uuid())
+  question     String
+  answer       String
+  category     String?
+  displayOrder Int      @default(0)
+  isPublished  Boolean  @default(false)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model PerformanceMetric {
+  id           String   @id @default(uuid())
+  label        String
+  value        String
+  displayOrder Int      @default(0)
+  isPublished  Boolean  @default(false)
+  createdAt    DateTime @default(now())
 }
 
 model ImportJob {
@@ -885,6 +991,9 @@ model SiteSettings {
   heroCtaText     String?
   heroCtaTarget   String?
   feeDisplayEnabled Boolean @default(true)
+  admissionsOpen  Boolean @default(true)
+  resourcesEnabled Boolean @default(true)
+  resourcesSearchEnabled Boolean @default(true)
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
   createdBy       String?

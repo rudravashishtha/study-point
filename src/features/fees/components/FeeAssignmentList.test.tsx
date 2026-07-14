@@ -3,6 +3,7 @@ import "@testing-library/jest-dom/vitest";
 import { describe, it, expect, vi, afterEach } from "vitest";
 import { render, screen, fireEvent, cleanup } from "@testing-library/react";
 import { FeeAssignmentList } from "./FeeAssignmentList";
+import { chooseSelectOption } from "@/test/select-helpers";
 import { FeeAssignmentStatus, Prisma } from "@prisma/client";
 
 type AssignmentRow = Prisma.StudentFeeAssignmentGetPayload<{
@@ -363,7 +364,7 @@ describe("FeeAssignmentList UI", () => {
     expect(screen.getAllByText("Archive").length).toBeGreaterThan(0);
   });
 
-  it("7. archive filter switches between active/archived/all", () => {
+  it("7. archive filter switches between active/archived/all", async () => {
     const data = [
       createMockAssignment("a1"),
       createMockAssignment("a2", {
@@ -387,7 +388,7 @@ describe("FeeAssignmentList UI", () => {
 
     const archiveSelect = screen.getAllByRole("combobox");
     const archiveEl = archiveSelect[archiveSelect.length - 1];
-    fireEvent.change(archiveEl, { target: { value: "active" } });
+    await chooseSelectOption(archiveEl, "Active Only");
     expect(screen.getAllByText("Alice").length).toBeGreaterThan(0);
     expect(screen.queryAllByText("Bob").length).toBe(0);
   });
@@ -407,7 +408,9 @@ describe("FeeAssignmentList UI", () => {
     expect(btn).toBeInTheDocument();
     fireEvent.click(btn);
     expect(await screen.findByText("Assign Fee Plan to Students")).toBeInTheDocument();
-    expect(await screen.findByText(/select a fee plan/i)).toBeInTheDocument();
+    expect(
+      await screen.findByText("Select a fee plan and enrolments to generate a preview."),
+    ).toBeInTheDocument();
   });
 
   it("9. 'Assign Fee Plan' button is present", () => {

@@ -1,7 +1,6 @@
 import { ZodError } from "zod";
 import { DomainError } from "../domain/errors";
 import { unstable_rethrow } from "next/navigation";
-import type { ActionResult } from "./types";
 
 export function handleActionError(error: unknown): {
   success: false;

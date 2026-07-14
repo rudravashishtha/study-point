@@ -2,7 +2,10 @@ import { redirect } from "next/navigation";
 import { Megaphone } from "lucide-react";
 import { requireRole } from "@/lib/auth/permissions";
 import { Role } from "@prisma/client";
-import { listStudentAnnouncements } from "@/server/services/announcements";
+import {
+  listStudentAnnouncements,
+  markStudentAnnouncementsRead,
+} from "@/server/services/announcements";
 import { StudentAnnouncementList } from "@/features/announcements/components/StudentAnnouncementList";
 import { EmptyState } from "@/components/feedback/empty-state";
 import { db } from "@/lib/db";
@@ -17,7 +20,7 @@ export default async function StudentAnnouncementsPage() {
 
   const student = await db.student.findUnique({
     where: { id: appUser.studentId },
-    include: { enrolments: { where: { status: "ACTIVE", archivedAt: null } } },
+    include: { enrolments: { where: { status: "active", archivedAt: null } } },
   });
 
   if (!student || student.enrolments.length === 0) {
@@ -55,6 +58,16 @@ export default async function StudentAnnouncementsPage() {
   }
 
   const announcements = result.data.items;
+
+  // Opening this page marks the currently visible announcements read for this
+  // student. Visibility is re-verified inside the service, so client-supplied
+  // ids can never mark unrelated announcements read.
+  if (announcements.length > 0) {
+    await markStudentAnnouncementsRead(
+      appUser.studentId,
+      announcements.map((a) => a.id),
+    );
+  }
 
   if (announcements.length === 0) {
     return (

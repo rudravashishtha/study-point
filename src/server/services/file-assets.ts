@@ -38,6 +38,69 @@ export type UploadIntentResult = {
   uploadUrl: string;
 };
 
+const PUBLIC_ASSETS_BUCKET = "public-assets";
+
+export const publicAssetUploadSchema = z.object({
+  originalFilename: z.string().min(1),
+  mimeType: z.string().min(1),
+  sizeBytes: z.number().int().positive().max(50 * 1024 * 1024),
+});
+
+export type PublicAssetUploadInput = z.infer<typeof publicAssetUploadSchema>;
+
+export async function createPublicAssetUploadIntent(
+  actorUserId: string,
+  input: PublicAssetUploadInput,
+): Promise<ServiceResult<UploadIntentResult>> {
+  const parsed = publicAssetUploadSchema.safeParse(input);
+  if (!parsed.success) {
+    return failure("INVALID_INPUT", "Invalid upload input");
+  }
+  const data = parsed.data;
+
+  const storageKey = `rich-text/${randomUUID()}-${data.originalFilename.replace(/[^a-zA-Z0-9.-]/g, "_")}`;
+
+  const asset = await prisma.$transaction(async (tx) => {
+    const newAsset = await tx.fileAsset.create({
+      data: {
+        bucket: PUBLIC_ASSETS_BUCKET,
+        storageKey,
+        originalFilename: data.originalFilename,
+        mimeType: data.mimeType,
+        sizeBytes: data.sizeBytes,
+        storageAccessClass: "PUBLIC",
+        lifecycleState: "PENDING",
+        usageCategory: "PUBLIC_ASSET",
+        uploadScope: "CURRICULUM_TRACK",
+        uploadedById: actorUserId,
+      },
+    });
+
+    await tx.auditLog.create({
+      data: {
+        action: "FILE_UPLOAD_INTENT",
+        entityType: "FileAsset",
+        entityId: newAsset.id,
+        actorUserId,
+        summary: "Public asset upload intent created",
+        metadata: { storageKey, sizeBytes: data.sizeBytes, originalFilename: data.originalFilename },
+      },
+    });
+
+    return newAsset;
+  });
+
+  const { data: signedData, error } = await supabaseAdmin.storage
+    .from(PUBLIC_ASSETS_BUCKET)
+    .createSignedUploadUrl(storageKey);
+
+  if (error || !signedData) {
+    return failure("UPLOAD_URL_FAILED", "Failed to generate upload URL");
+  }
+
+  return success({ fileAssetId: asset.id, uploadUrl: signedData.signedUrl });
+}
+
 export async function createUploadIntent(
   actorUserId: string,
   input: UploadIntentInput,

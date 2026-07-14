@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { cn } from "@/lib/utils";
 
 const dueStatusMeta: Record<string, { label: string; className: string }> = {
@@ -9,7 +10,9 @@ const dueStatusMeta: Record<string, { label: string; className: string }> = {
   OVERDUE: { label: "Overdue", className: "bg-red-100 text-red-800" },
 };
 
-function formatCurrency(value: number | string): string {
+const RECEIPTABLE_STATUSES = new Set(["PAID", "PARTIALLY_PAID"]);
+
+export function formatCurrency(value: number | string): string {
   const n = typeof value === "string" ? parseFloat(value) : value;
   return `₹${n.toFixed(2)}`;
 }
@@ -21,6 +24,19 @@ function formatDate(date: Date | string): string {
     month: "short",
     day: "numeric",
   });
+}
+
+function netAmountForAssignment(a: FeeAssignment, kind: "all" | "settled"): number {
+  return a.dues
+    .filter((d) =>
+      kind === "settled"
+        ? d.status === "PAID" || d.status === "WAIVED"
+        : d.status !== "CANCELLED",
+    )
+    .reduce<number>(
+      (sum, d) => sum + (parseFloat(d.amountDue) - parseFloat(d.amountWaived)),
+      0,
+    );
 }
 
 interface FeeDue {
@@ -45,46 +61,54 @@ export interface FeeAssignment {
 export function StudentFeeStatus({ assignments }: { assignments: FeeAssignment[] }) {
   if (assignments.length === 0) return null;
 
-  const pendingTotal = assignments
-    .flatMap((a) => a.dues)
-    .filter(
-      (d) =>
-        d.status === "PENDING" || d.status === "OVERDUE" || d.status === "PARTIALLY_PAID",
-    )
-    .reduce<number>(
-      (sum, d) => sum + (parseFloat(d.amountDue) - parseFloat(d.amountWaived)),
-      0,
-    );
+  const allDues = assignments.flatMap((a) => a.dues);
+
+  const netAmount = (statuses?: string[]) =>
+    allDues
+      .filter((d) => !statuses || statuses.includes(d.status))
+      .reduce<number>(
+        (sum, d) => sum + (parseFloat(d.amountDue) - parseFloat(d.amountWaived)),
+        0,
+      );
+
+  const pendingTotal = netAmount(["PENDING", "OVERDUE", "PARTIALLY_PAID"]);
+  const settledTotal = netAmount(["PAID", "WAIVED"]);
+  const plannedTotal = netAmount();
 
   return (
     <div className="space-y-6">
-      {/* Summary */}
-      <div className="rounded-2xl border border-border/60 bg-surface-elevated p-5 sm:p-6 flex flex-col gap-1">
-        <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-          Pending Fees
-        </p>
-        <p className="text-3xl font-bold font-heading">{formatCurrency(pendingTotal)}</p>
-        <p className="text-sm text-muted-foreground">
-          Across {assignments.length} active fee{" "}
-          {assignments.length === 1 ? "plan" : "plans"}
-        </p>
+      {/* Summary cards */}
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+        <div className="rounded-2xl border border-border/60 bg-surface-elevated p-4 sm:p-5 flex flex-col gap-1">
+          <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+            Pending
+          </p>
+          <p className="text-2xl font-bold font-heading sm:text-3xl">
+            {formatCurrency(pendingTotal)}
+          </p>
+        </div>
+        <div className="rounded-2xl border border-border/60 bg-surface-elevated p-4 sm:p-5 flex flex-col gap-1">
+          <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+            Settled
+          </p>
+          <p className="text-2xl font-bold font-heading sm:text-3xl">
+            {formatCurrency(settledTotal)}
+          </p>
+        </div>
+        <div className="col-span-2 rounded-2xl border border-border/60 bg-surface-elevated p-4 sm:p-5 flex flex-col gap-1 sm:col-span-1">
+          <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+            Plan Total
+          </p>
+          <p className="text-2xl font-bold font-heading sm:text-3xl">
+            {formatCurrency(plannedTotal)}
+          </p>
+        </div>
       </div>
 
       {/* Assignment cards */}
       {assignments.map((a) => {
-        const plannedTotal = a.dues
-          .filter((d) => d.status !== "CANCELLED")
-          .reduce<number>(
-            (sum, d) => sum + (parseFloat(d.amountDue) - parseFloat(d.amountWaived)),
-            0,
-          );
-
-        const settledTotal = a.dues
-          .filter((d) => d.status === "PAID" || d.status === "WAIVED")
-          .reduce<number>(
-            (sum, d) => sum + (parseFloat(d.amountDue) - parseFloat(d.amountWaived)),
-            0,
-          );
+        const planned = netAmountForAssignment(a, "all");
+        const settled = netAmountForAssignment(a, "settled");
 
         return (
           <div
@@ -101,14 +125,14 @@ export function StudentFeeStatus({ assignments }: { assignments: FeeAssignment[]
                   ` · ${a.enrolment.curriculumTrack.subject.name}`}
               </p>
               <p className="text-xs text-muted-foreground">
-                Plan total: {formatCurrency(plannedTotal)} · Settled:{" "}
-                {formatCurrency(settledTotal)}
+                Plan total: {formatCurrency(planned)} · Settled: {formatCurrency(settled)}
               </p>
             </div>
 
             <div className="space-y-2">
               {a.dues.map((due) => {
                 const meta = dueStatusMeta[due.status] || dueStatusMeta.PENDING;
+                const canViewReceipt = RECEIPTABLE_STATUSES.has(due.status);
                 return (
                   <div
                     key={due.id}
@@ -134,6 +158,14 @@ export function StudentFeeStatus({ assignments }: { assignments: FeeAssignment[]
                       >
                         {meta.label}
                       </span>
+                      {canViewReceipt && (
+                        <Link
+                          href={`/student/fees/receipt/${due.id}`}
+                          className="text-xs font-medium text-primary hover:underline"
+                        >
+                          Receipt
+                        </Link>
+                      )}
                     </div>
                   </div>
                 );
