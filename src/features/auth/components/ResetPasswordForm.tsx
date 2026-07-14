@@ -4,6 +4,7 @@ import { useActionState, useState } from "react";
 import { updatePassword } from "@/features/auth/actions";
 import { LoginButton } from "./LoginButton";
 import { PasswordStrength } from "./PasswordStrength";
+import { Eye, EyeOff } from "lucide-react";
 
 type FormState = { error: string | null };
 const initialState: FormState = { error: null };
@@ -25,23 +26,26 @@ export function ResetPasswordForm() {
         <label htmlFor="password" className="text-sm font-medium">
           New password
         </label>
-        <input
-          id="password"
-          name="password"
-          type={show ? "text" : "password"}
-          autoComplete="new-password"
-          required
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          className={inputClass}
-        />
-        <button
-          type="button"
-          onClick={() => setShow((v) => !v)}
-          className="text-xs text-muted-foreground underline hover:text-foreground"
-        >
-          {show ? "Hide" : "Show"}
-        </button>
+        <div className="relative">
+          <input
+            id="password"
+            name="password"
+            type={show ? "text" : "password"}
+            autoComplete="new-password"
+            required
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            className={`${inputClass} pr-10`}
+          />
+          <button
+            type="button"
+            onClick={() => setShow(!show)}
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-sm"
+            aria-label={show ? "Hide password" : "Show password"}
+          >
+            {show ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+          </button>
+        </div>
         <PasswordStrength password={password} />
       </div>
       {state.error && (
