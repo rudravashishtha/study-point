@@ -183,62 +183,72 @@ export function MaterialList({
                   </TableCell>
                   <TableCell>{format(new Date(m.createdAt), "MMM d, yyyy")}</TableCell>
                   <TableCell className="text-right">
-                    <DropdownMenu>
-                      <DropdownMenuTrigger>
-                        <Button variant="ghost" size="sm">
-                          Options
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        {m.fileAssetId && (
-                          <DropdownMenuItem
-                            onClick={() =>
-                              window.open(
-                                `/api/materials/${m.id}/download`,
-                                "_blank",
-                                "noopener,noreferrer",
-                              )
-                            }
-                          >
-                            <Download className="mr-2 h-4 w-4" /> Download
-                          </DropdownMenuItem>
-                        )}
-                        {m.lifecycleState !== "ARCHIVED" && (
-                          <DropdownMenuItem
-                            onClick={() => {
-                              setEditingMaterial(m);
-                              setIsFormOpen(true);
-                            }}
-                          >
-                            <Edit className="mr-2 h-4 w-4" /> Edit
-                          </DropdownMenuItem>
-                        )}
-                        {m.lifecycleState === "DRAFT" && (
-                          <DropdownMenuItem
-                            onClick={() =>
-                              handleAction(
-                                () => publishAdminMaterialAction(m.id),
-                                "Material published",
-                              )
-                            }
-                          >
-                            <CheckCircle className="mr-2 h-4 w-4" /> Publish
-                          </DropdownMenuItem>
-                        )}
-                        {m.lifecycleState !== "ARCHIVED" && (
-                          <DropdownMenuItem
-                            onClick={() =>
-                              handleAction(
-                                () => archiveAdminMaterialAction(m.id),
-                                "Material archived",
-                              )
-                            }
-                          >
-                            <Archive className="mr-2 h-4 w-4" /> Archive
-                          </DropdownMenuItem>
-                        )}
-                      </DropdownMenuContent>
-                    </DropdownMenu>
+                    {(() => {
+                      const canDownload = !!m.fileAssetId;
+                      const canEdit = m.lifecycleState !== "ARCHIVED";
+                      const canPublish = m.lifecycleState === "DRAFT";
+                      const canArchive = m.lifecycleState !== "ARCHIVED";
+                      const hasActions = canDownload || canEdit || canPublish || canArchive;
+                      if (!hasActions) return null;
+                      return (
+                        <DropdownMenu>
+                          <DropdownMenuTrigger>
+                            <Button variant="ghost" size="sm">
+                              Options
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
+                            {canDownload && (
+                              <DropdownMenuItem
+                                onClick={() =>
+                                  window.open(
+                                    `/api/materials/${m.id}/download`,
+                                    "_blank",
+                                    "noopener,noreferrer",
+                                  )
+                                }
+                              >
+                                <Download className="mr-2 h-4 w-4" /> Download
+                              </DropdownMenuItem>
+                            )}
+                            {canEdit && (
+                              <DropdownMenuItem
+                                onClick={() => {
+                                  setEditingMaterial(m);
+                                  setIsFormOpen(true);
+                                }}
+                              >
+                                <Edit className="mr-2 h-4 w-4" /> Edit
+                              </DropdownMenuItem>
+                            )}
+                            {canPublish && (
+                              <DropdownMenuItem
+                                onClick={() =>
+                                  handleAction(
+                                    () => publishAdminMaterialAction(m.id),
+                                    "Material published",
+                                  )
+                                }
+                              >
+                                <CheckCircle className="mr-2 h-4 w-4" /> Publish
+                              </DropdownMenuItem>
+                            )}
+                            {canArchive && (
+                              <DropdownMenuItem
+                                onClick={() =>
+                                  handleAction(
+                                    () => archiveAdminMaterialAction(m.id),
+                                    "Material archived",
+                                  )
+                                }
+                              >
+                                <Archive className="mr-2 h-4 w-4" /> Archive
+                              </DropdownMenuItem>
+                            )}
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      );
+                    })()}
                   </TableCell>
                 </TableRow>
               ))

@@ -31,7 +31,7 @@ export const metadata: Metadata = {
     title: siteConfig.name,
   },
   formatDetection: {
-    telephone: false,
+    telephone: true,
   },
   openGraph: {
     type: "website",
@@ -44,6 +44,9 @@ export const metadata: Metadata = {
   robots: {
     index: true,
     follow: true,
+  },
+  icons: {
+    icon: "/favicon.svg",
   },
 };
 

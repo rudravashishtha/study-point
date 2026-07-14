@@ -6,9 +6,11 @@ import { motion } from "motion/react";
 import {
   BookOpen,
   Calendar,
+  CalendarRange,
   CreditCard,
   Database,
   FileText,
+  GraduationCap,
   LayoutDashboard,
   Megaphone,
   Settings,
@@ -24,6 +26,7 @@ export const adminNavigationGroups = [
     name: "Academics",
     links: [
       { href: "/admin/curriculum", label: "Curriculum", icon: BookOpen },
+      { href: "/admin/academic-sessions", label: "Academic Sessions", icon: CalendarRange },
       { href: "/admin/batches", label: "Batches", icon: Calendar },
       { href: "/admin/materials", label: "Study Materials", icon: FileText },
       { href: "/admin/homework", label: "Homework", icon: FileText },
@@ -32,7 +35,11 @@ export const adminNavigationGroups = [
   },
   {
     name: "People",
-    links: [{ href: "/admin/students", label: "Students", icon: Users }],
+    links: [
+      { href: "/admin/students", label: "Students", icon: Users },
+      { href: "/admin/students/activate", label: "Activate Accounts", icon: Users },
+      { href: "/admin/teachers", label: "Teachers", icon: GraduationCap },
+    ],
   },
   {
     name: "Assessment",

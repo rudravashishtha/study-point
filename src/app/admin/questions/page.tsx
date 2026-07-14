@@ -8,8 +8,8 @@ export default async function AdminQuestionsPage() {
   return (
     <EmptyState
       icon={ClipboardList}
-      title="Question bank shell"
-      description="Question creation, filtering, LaTeX rendering, and import support are Phase 5 and Phase 6 work."
+      title="Question Bank"
+      description="Coming in a future update — question creation, filtering, LaTeX rendering, and bulk import are being developed."
     />
   );
 }

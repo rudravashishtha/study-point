@@ -31,6 +31,7 @@ const defaultQuickLinks = [
   { href: "/announcements", label: "Notices" },
   { href: "/contact", label: "Contact" },
   { href: "/admissions", label: "Admissions" },
+  { href: "/login", label: "Login" },
 ];
 
 export function PublicFooter({ settings }: PublicFooterProps) {
@@ -58,11 +59,10 @@ export function PublicFooter({ settings }: PublicFooterProps) {
               <span>{instituteName}</span>
             </div>
             {tagline && (
-              <p className="text-sm text-muted-foreground max-w-xs">{tagline}</p>
+              <p className="text-sm text-muted-foreground max-w-xs">
+                {tagline ?? "Excellence in Mathematics Education for Classes IX–XII"}
+              </p>
             )}
-            <p className="text-sm text-muted-foreground max-w-xs">
-              Excellence in Mathematics Education for Classes IX–XII
-            </p>
 
             {socialLinks && Object.keys(socialLinks).length > 0 && (
               <div className="flex gap-3 pt-2">
@@ -86,7 +86,7 @@ export function PublicFooter({ settings }: PublicFooterProps) {
           </div>
 
           <div className="space-y-4">
-            <h3 className="font-semibold text-foreground">Contact</h3>
+            <div className="font-semibold text-foreground">Contact</div>
             <address className="not-italic text-sm text-muted-foreground space-y-2">
               {phone && (
                 <a
@@ -214,7 +214,7 @@ export function PublicFooter({ settings }: PublicFooterProps) {
           </div>
 
           <div className="space-y-4">
-            <h3 className="font-semibold text-foreground">Quick Links</h3>
+            <div className="font-semibold text-foreground">Quick Links</div>
             <nav aria-label="Quick links">
               <ul className="space-y-2">
                 {defaultQuickLinks.map((link) => (

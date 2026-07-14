@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 
-export type AuthTheme = "default" | "student" | "teacher" | "admin";
+export type AuthTheme = "default" | "student" | "teacher" | "admin" | "forgot";
 
 const THEMES: Record<
   AuthTheme,
@@ -9,6 +9,12 @@ const THEMES: Record<
   default: {
     title: "Welcome back",
     subtitle: "Sign in to your Study Point account",
+    card: "border-border bg-card",
+    accent: "text-indigo-600",
+  },
+  forgot: {
+    title: "Reset your password",
+    subtitle: "Enter your email to receive a reset link",
     card: "border-border bg-card",
     accent: "text-indigo-600",
   },

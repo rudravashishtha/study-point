@@ -9,6 +9,7 @@ const publicLinks = [
   { href: "/courses", label: "Courses" },
   { href: "/resources", label: "Resources" },
   { href: "/announcements", label: "Announcements" },
+  { href: "/login", label: "Login" },
 ];
 
 export function PublicNavigation() {

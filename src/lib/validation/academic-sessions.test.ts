@@ -1,5 +1,6 @@
 import { describe, it, expect } from "vitest";
-import { parseDateOnlyUTC, SessionCreateSchema } from "./academic-sessions";
+import { parseDateOnlyUTC } from "./common";
+import { SessionCreateSchema } from "./academic-sessions";
 
 describe("Academic Session Validation", () => {
   describe("parseDateOnlyUTC", () => {

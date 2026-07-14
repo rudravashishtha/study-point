@@ -40,6 +40,7 @@ export function LoginForm() {
           type="password"
           autoComplete="current-password"
           required
+          placeholder="Enter your password"
           className={inputClass}
         />
       </div>

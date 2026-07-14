@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Phone, MessageSquare } from "lucide-react";
+import { Phone, MessageSquare, LogIn } from "lucide-react";
 import { WhatsAppButton } from "@/features/public/components/WhatsAppButton";
 interface PublicHeaderProps {
   settings: {
@@ -76,6 +76,13 @@ export function PublicHeader({ settings }: PublicHeaderProps) {
 
         <div className="flex items-center gap-3">
           {phoneLink}
+          <Link
+            href="/login"
+            className="hidden sm:inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
+          >
+            <LogIn className="size-4" aria-hidden="true" />
+            <span>Login</span>
+          </Link>
           <WhatsAppButton
             phoneNumber={settings?.whatsappNumber}
             className="flex items-center gap-1.5 rounded-full bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground shadow-sm transition-colors hover:bg-primary/90"
@@ -135,7 +142,7 @@ export function PublicHeader({ settings }: PublicHeaderProps) {
         >
           <nav className="px-4 py-4" role="navigation" aria-label="Mobile navigation">
             <ul className="flex flex-col gap-2">
-              {navLinks.map((link) => (
+              {[...navLinks, { href: "/login", label: "Login" }].map((link) => (
                 <li key={link.href}>
                   <Link
                     href={link.href}

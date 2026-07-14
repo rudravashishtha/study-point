@@ -1,3 +1,6 @@
+// Contact values below are placeholders.
+// Replace them with the institute's real details before production deployment.
+// These may later be migrated to database-driven site settings.
 export const siteConfig = {
   name: "Study Point",
   shortName: "Study Point",

@@ -90,7 +90,7 @@ export default async function AdmissionsPage() {
               Admissions Open
             </p>
             <h1 className="text-4xl font-bold font-heading tracking-tight text-foreground md:text-5xl lg:text-6xl">
-              Join Study Point for Classes IX–XII
+              Join Study Point for Classes IX-XII
             </h1>
             <p className="mx-auto mt-5 max-w-2xl text-lg text-muted-foreground">
               Personalised mathematics coaching built on clear concepts, regular practice,

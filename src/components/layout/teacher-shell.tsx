@@ -1,6 +1,6 @@
 "use client";
 
-import { AdminNavigation } from "./admin-navigation";
+import { TeacherNavigation } from "./teacher-navigation";
 import { siteConfig } from "@/config/site";
 import { Menu, X, LogOut } from "lucide-react";
 import { useState, useRef, useEffect, useCallback } from "react";
@@ -9,7 +9,20 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { signOut } from "@/features/auth/actions";
 
-export function AdminShell({ children }: { children: React.ReactNode }) {
+interface BatchLink {
+  id: string;
+  name: string;
+  subjectName: string;
+  classLevel: string;
+}
+
+export function TeacherShell({
+  children,
+  batches,
+}: {
+  children: React.ReactNode;
+  batches: BatchLink[];
+}) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const pathname = usePathname();
   const drawerRef = useRef<HTMLDivElement>(null);
@@ -43,7 +56,6 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
         }
       }
     };
-    // Focus close button on open
     const closeBtn = drawerRef.current?.querySelector<HTMLButtonElement>(
       'button[aria-label="Close menu"]',
     );
@@ -55,7 +67,6 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
     };
   }, [mobileMenuOpen, closeDrawer]);
 
-  // Very simple breadcrumb derivation for top bar
   const segments = pathname.split("/").filter(Boolean);
   const currentPage =
     segments.length > 1
@@ -67,16 +78,16 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
       {/* Desktop Sidebar */}
       <aside className="hidden md:flex flex-col w-64 border-r border-border/40 bg-surface-elevated shrink-0 h-dvh sticky top-0">
         <div className="h-16 flex items-center px-6 border-b border-border/40 shrink-0">
-          <Link href="/admin" className="flex flex-col">
+          <Link href="/teacher" className="flex flex-col">
             <span className="text-[10px] font-bold uppercase tracking-widest text-brand-glow/80 mb-0.5">
               {siteConfig.name}
             </span>
-            <span className="text-sm font-bold font-heading">Workspace</span>
+            <span className="text-sm font-bold font-heading">Teacher Workspace</span>
           </Link>
         </div>
 
         <div className="flex-1 overflow-y-auto px-4 py-4 scrollbar-hide">
-          <AdminNavigation />
+          <TeacherNavigation batches={batches} />
         </div>
 
         <div className="p-4 border-t border-border/40 shrink-0">
@@ -137,7 +148,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
                   <span className="text-[10px] font-bold uppercase tracking-widest text-brand-glow/80 mb-0.5">
                     {siteConfig.name}
                   </span>
-                  <span className="text-sm font-bold font-heading">Workspace</span>
+                  <span className="text-sm font-bold font-heading">Teacher Workspace</span>
                 </div>
                 <button
                   onClick={closeDrawer}
@@ -149,7 +160,8 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
               </div>
 
               <div className="flex-1 overflow-y-auto px-4 py-4">
-                <AdminNavigation
+                <TeacherNavigation
+                  batches={batches}
                   isMobile
                   closeMobileNav={() => setMobileMenuOpen(false)}
                 />
@@ -164,9 +176,6 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
         {/* Desktop Contextual Top Bar */}
         <header className="hidden md:flex h-16 items-center justify-between px-8 border-b border-border/40 bg-surface/50 backdrop-blur-md sticky top-0 z-30 shrink-0">
           <h1 className="text-lg font-bold font-heading">{currentPage}</h1>
-          <div className="size-8 rounded-full bg-surface-interactive border border-border/60 flex items-center justify-center font-bold text-xs">
-            AD
-          </div>
         </header>
 
         {/* Workspace Content */}

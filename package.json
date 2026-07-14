@@ -7,8 +7,9 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "test": "vitest run",
+    "test": "vitest run --exclude 'tests/cuj/**' --exclude 'tests/smoke/**'",
     "typecheck": "tsc --noEmit",
+    "playwright": "playwright test",
     "format": "prettier --check .",
     "format:check": "prettier --check ."
   },
@@ -44,6 +45,7 @@
   },
   "devDependencies": {
     "@axe-core/react": "^4.12.1",
+    "@playwright/test": "^1.61.1",
     "@serwist/turbopack": "^9.5.11",
     "@tailwindcss/postcss": "^4",
     "@testing-library/jest-dom": "^6.9.1",

@@ -47,9 +47,7 @@ export default async function AcademicSessionsPage({
           <PageHeaderHeading>Academic Sessions</PageHeaderHeading>
           <PageHeaderDescription>Manage academic years and terms.</PageHeaderDescription>
         </div>
-        <PageHeaderActions>
-          {/* Action button would go here */}
-        </PageHeaderActions>
+        <PageHeaderActions />
       </PageHeader>
 
       <DataListToolbar>

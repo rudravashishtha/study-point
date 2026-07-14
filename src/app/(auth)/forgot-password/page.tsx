@@ -8,7 +8,7 @@ export const metadata: Metadata = {
 
 export default function ForgotPasswordPage() {
   return (
-    <AuthScreen theme="default">
+    <AuthScreen theme="forgot">
       <ForgotPasswordForm />
     </AuthScreen>
   );

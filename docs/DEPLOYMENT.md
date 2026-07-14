@@ -250,6 +250,65 @@ For quick manual reverts on production:
 
 ---
 
+## Staging Environment
+
+Deploy to a staging environment before every production release.
+
+### Staging Checklist
+
+- [ ] Deploy build to staging server
+- [ ] Run `npx prisma migrate deploy` against staging database
+- [ ] Seed staging data (`npx prisma db seed` if applicable)
+- [ ] Verify `/api/health` returns `{"status":"ok","db":"connected"}`
+- [ ] Verify all CUJs on staging (login, admin, student, teacher, public)
+- [ ] Verify storage uploads (upload a file, confirm it appears in Supabase Storage)
+- [ ] Verify email flows (password reset email arrives)
+- [ ] Verify PWA installation prompt appears on mobile Chrome
+- [ ] Verify mobile responsiveness at 375px and 414px viewport widths
+- [ ] Verify Sentry events arrive in dashboard
+- [ ] Verify database backups are being created
+
+## Browser Compatibility
+
+The application targets these browsers. Test on staging before production:
+
+| Browser       | Desktop | Mobile |
+| ------------- | ------- | ------ |
+| Chrome        | ✅      | ✅     |
+| Safari        | ✅      | ✅     |
+| Firefox       | ✅      | —      |
+| Edge          | ✅      | —      |
+| Samsung Internet | —    | ✅     |
+
+Mobile Safari is particularly important since the application is a PWA that users may install via "Add to Home Screen."
+
+## Performance Budget
+
+Run a Lighthouse audit on staging before production:
+
+| Check                        | Target      |
+| ---------------------------- | ----------- |
+| Performance score            | > 90        |
+| Cumulative Layout Shift      | < 0.1       |
+| Largest Contentful Paint     | < 2.5s      |
+| First Input Delay            | < 100ms     |
+| No hydration warnings        | Required    |
+| Bundle sizes (initial JS)    | < 150 KB    |
+| Images optimized             | Required    |
+
+Automated Lighthouse CI is not required for v1.0. A manual run on staging is sufficient.
+
+## Pre-Deployment Checklist
+
+```sh
+# Run the full validation suite locally before every deployment
+npm run lint
+npm run typecheck
+npm run test
+npm run build
+npm run playwright
+```
+
 ## Post-Deployment Smoke Tests
 
 After every deployment, manually verify:
@@ -261,9 +320,11 @@ After every deployment, manually verify:
 5. **Student portal** — a test student can view their dashboard, timetable, materials.
 6. **File upload** — upload a small file and verify it appears in storage.
 7. **Public pages** — `/`, `/courses`, `/resources`, `/contact` render correctly.
-8. **PWA** — the service worker is registered (`/serwist/sw.js` loads), the manifest is accessible (`/manifest.webmanifest`).
-9. **Sentry** — trigger a test error from `/sentry-example-page` (if configured) and verify it appears in the Sentry dashboard.
-10. **Mobile** — test critical flows at mobile viewport width.
+8. **SEO metadata** — `/robots.txt`, `/sitemap.xml`, `/opengraph-image` are accessible.
+9. **Favicon** — `/favicon.svg` loads in the browser tab.
+10. **PWA** — the service worker is registered (`/serwist/sw.js` loads), the manifest is accessible (`/manifest.webmanifest`), and the offline page (`/offline`) is reachable.
+11. **Sentry** — trigger a test error from `/sentry-example-page` (if configured) and verify it appears in the Sentry dashboard.
+12. **Mobile** — test critical flows at mobile viewport width.
 
 ---
 
@@ -300,6 +361,17 @@ Sentry tracing is enabled with a `tracesSampleRate` of `0.1` (10% of requests) i
 - **Dependencies**: Run `npm audit` regularly. Update non-breaking dependencies with `npm update`.
 - **Logs**: Monitor application logs for unusual error patterns.
 - **Sentry**: Review error trends weekly. Set up alert rules for new error types.
+
+### Quarterly Maintenance
+
+Perform these tasks every quarter:
+
+- **Database restore verification**: Download the latest automated backup from Supabase, restore it to a local PostgreSQL instance, and run `npx prisma migrate deploy` to verify migration compatibility. A backup is not proven useful until you have successfully restored it.
+- **Storage restore verification**: Download a storage bucket backup and verify file integrity.
+- **Dependency audit**: Run `npm audit` and review all `WARNING` and `CRITICAL` advisories.
+- **Expired content review**: Archive outdated study materials, test papers, and announcements.
+- **User accounts review**: Archive inactive student and teacher accounts.
+- **Log rotation**: Verify application logs are not consuming excessive disk space.
 
 ### SSL / TLS
 

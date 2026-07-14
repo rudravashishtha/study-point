@@ -8,8 +8,8 @@ export default async function AdminSettingsPage() {
   return (
     <EmptyState
       icon={Settings}
-      title="Settings shell"
-      description="Environment-backed configuration and institute settings will be added as the foundation matures."
+      title="Settings"
+      description="Coming in a future update — administrative settings and configuration will be available here."
     />
   );
 }
