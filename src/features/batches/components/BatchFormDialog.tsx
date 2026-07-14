@@ -40,7 +40,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { handleActionError } from "@/lib/actions/types";
+
 import { createBatchAction, updateBatchDetailsAction } from "@/app/admin/batches/actions";
 import { SubmitButton } from "@/components/ui/submit-button";
 
@@ -118,7 +118,7 @@ export function BatchFormDialog({
           : await createBatchAction(data);
 
         if (!result.success) {
-          handleActionError(result.error);
+          toast.error(result.error);
           return;
         }
 
@@ -204,7 +204,7 @@ export function BatchFormDialog({
                           disabled={isEditing}
                         >
                           <FormControl>
-                            <SelectTrigger>
+                            <SelectTrigger className="h-auto min-h-10 [&>span]:line-clamp-none [&>span]:whitespace-normal">
                               <SelectValue placeholder="Select session..." />
                             </SelectTrigger>
                           </FormControl>
@@ -233,7 +233,7 @@ export function BatchFormDialog({
                           disabled={isEditing}
                         >
                           <FormControl>
-                            <SelectTrigger>
+                            <SelectTrigger className="h-auto min-h-10 [&>span]:line-clamp-none [&>span]:whitespace-normal">
                               <SelectValue placeholder="Select track..." />
                             </SelectTrigger>
                           </FormControl>

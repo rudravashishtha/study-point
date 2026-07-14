@@ -29,7 +29,7 @@ type TrackWithRelations = CurriculumTrack & {
 export default async function AdminBatchesPage({
   searchParams,
 }: {
-  searchParams: { [key: string]: string | string[] | undefined };
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }) {
   const allowedSortFields = ["name", "capacity", "createdAt", "updatedAt"] as const;
 

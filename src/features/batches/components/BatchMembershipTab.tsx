@@ -18,7 +18,7 @@ import {
 } from "@/components/ui/table";
 import { AddStudentToBatchDialog } from "@/features/enrolments/components/AddStudentToBatchDialog";
 import { removeEnrolmentFromBatchAction } from "@/features/batches/actions/batch-actions";
-import { handleActionError } from "@/lib/actions/types";
+
 
 type EnrolmentWithStudent = Enrolment & { student: Student };
 
@@ -47,7 +47,7 @@ export function BatchMembershipTab({
       try {
         const result = await removeEnrolmentFromBatchAction(batch.id, enrolmentId);
         if (!result.success) {
-          handleActionError(result.error);
+          toast.error(result.error.message);
           return;
         }
         toast.success("Student removed from batch successfully");

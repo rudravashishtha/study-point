@@ -107,7 +107,7 @@ export function AdminNavigation({
     <nav aria-label="Admin navigation" className="flex flex-col gap-6 py-2">
       {adminNavigationGroups.map((group) => (
         <div key={group.name} className="flex flex-col gap-1">
-          <p className="px-3 text-[10px] font-bold uppercase tracking-widest text-muted-foreground/70 mb-1">
+          <p className="px-3 text-[10px] font-bold uppercase tracking-widest text-muted-foreground mb-1">
             {group.name}
           </p>
           {group.links.map(({ href, label, icon: Icon }) => {

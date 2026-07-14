@@ -1,6 +1,7 @@
 import { revalidatePath } from "next/cache";
 import { ActorContext } from "@/lib/domain/actor";
-import { ActionResult, handleActionError } from "@/lib/actions/types";
+import type { ActionResult } from "@/lib/actions/types";
+import { handleActionError } from "@/lib/actions/errors";
 import { requireAppUser } from "@/lib/auth/permissions";
 import { DomainError } from "@/lib/domain/errors";
 

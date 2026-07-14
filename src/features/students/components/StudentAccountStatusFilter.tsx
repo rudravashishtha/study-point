@@ -46,7 +46,7 @@ export function StudentAccountStatusFilter() {
         <SelectTrigger className="w-[180px]">
           <SelectValue placeholder="Status" />
         </SelectTrigger>
-        <SelectContent>
+        <SelectContent className="w-auto min-w-[var(--anchor-width)] max-w-[90vw] overflow-x-hidden">
           <SelectItem value="all">All Accounts</SelectItem>
           <SelectItem value="none">No Account</SelectItem>
           <SelectItem value="invited">Invited</SelectItem>

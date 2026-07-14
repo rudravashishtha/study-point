@@ -24,7 +24,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { handleActionError } from "@/lib/actions/types";
+
 import { archiveBatchAction, restoreBatchAction } from "@/app/admin/batches/actions";
 import { useState } from "react";
 import dynamic from "next/dynamic";
@@ -66,7 +66,7 @@ export function BatchList({
       try {
         const result = await archiveBatchAction(id);
         if (!result.success) {
-          handleActionError(result.error);
+          toast.error(result.error);
           return;
         }
         toast.success("Batch archived successfully");
@@ -82,7 +82,7 @@ export function BatchList({
       try {
         const result = await restoreBatchAction(id);
         if (!result.success) {
-          handleActionError(result.error);
+          toast.error(result.error);
           return;
         }
         toast.success("Batch restored successfully");

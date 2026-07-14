@@ -20,7 +20,7 @@ import { DataListToolbar, DataListFilters } from "@/components/layout/data-list-
 export default async function StudentsPage({
   searchParams,
 }: {
-  searchParams: { [key: string]: string | string[] | undefined };
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }) {
   const allowedSortFields = [
     "fullName",

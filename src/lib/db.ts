@@ -4,8 +4,8 @@ import { PrismaPg } from "@prisma/adapter-pg";
 
 const prismaClientSingleton = () => {
   const pool = new Pool({
-    connectionString: process.env.DIRECT_URL,
-    max: 5,
+    connectionString: process.env.DATABASE_URL,
+    max: 2,
     ssl:
       process.env.NODE_ENV === "test" || process.env.NODE_ENV === "development"
         ? undefined

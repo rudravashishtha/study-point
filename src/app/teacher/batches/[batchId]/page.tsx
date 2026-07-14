@@ -16,11 +16,11 @@ import {
 export default async function TeacherBatchDetailPage({
   params,
 }: {
-  params: { batchId: string };
+  params: Promise<{ batchId: string }>;
 }) {
   await requireAuth();
 
-  const { batchId } = params;
+  const { batchId } = await params;
 
   const context = await getTeacherContext(batchId);
   if (!context.isAuthorized) {

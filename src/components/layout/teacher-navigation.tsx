@@ -50,7 +50,7 @@ export function TeacherNavigation({
   return (
     <nav aria-label="Teacher navigation" className="flex flex-col gap-6 py-2">
       <div className="flex flex-col gap-1">
-        <p className="px-3 text-[10px] font-bold uppercase tracking-widest text-muted-foreground/70 mb-1">
+        <p className="px-3 text-[10px] font-bold uppercase tracking-widest text-muted-foreground mb-1">
           Overview
         </p>
         <TeacherNavLink
@@ -66,7 +66,7 @@ export function TeacherNavigation({
 
       {batches.length > 0 && (
         <div className="flex flex-col gap-1">
-          <p className="px-3 text-[10px] font-bold uppercase tracking-widest text-muted-foreground/70 mb-1">
+          <p className="px-3 text-[10px] font-bold uppercase tracking-widest text-muted-foreground mb-1">
             My Batches
           </p>
           {batches.map((batch) => {

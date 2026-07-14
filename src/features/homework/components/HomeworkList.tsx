@@ -159,7 +159,7 @@ export function HomeworkList({
                 <SelectTrigger className="w-[150px]">
                   <SelectValue placeholder="Status" />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="w-auto min-w-[var(--anchor-width)] max-w-[90vw] overflow-x-hidden">
                   <SelectItem value="ALL">All Statuses</SelectItem>
                   <SelectItem value="DRAFT">Draft</SelectItem>
                   <SelectItem value="PUBLISHED">Published</SelectItem>
@@ -172,7 +172,7 @@ export function HomeworkList({
                 <SelectTrigger className="w-[180px]">
                   <SelectValue placeholder="Session" />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="w-auto min-w-[var(--anchor-width)] max-w-[90vw] overflow-x-hidden">
                   <SelectItem value="ALL">All Sessions</SelectItem>
                   {sessions.map((s) => (
                     <SelectItem key={s.id} value={s.id}>
@@ -187,7 +187,7 @@ export function HomeworkList({
                 <SelectTrigger className="w-[180px]">
                   <SelectValue placeholder="Track" />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="w-auto min-w-[var(--anchor-width)] max-w-[90vw] overflow-x-hidden">
                   <SelectItem value="ALL">All Tracks</SelectItem>
                   {tracks.map((t) => (
                     <SelectItem key={t.id} value={t.id}>
@@ -202,7 +202,7 @@ export function HomeworkList({
                 <SelectTrigger className="w-[180px]">
                   <SelectValue placeholder="Batch" />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="w-auto min-w-[var(--anchor-width)] max-w-[90vw] overflow-x-hidden">
                   <SelectItem value="ALL">All Batches</SelectItem>
                   {batches.map((b) => (
                     <SelectItem key={b.id} value={b.id}>
@@ -284,7 +284,7 @@ export function HomeworkList({
                               : "secondary"
                         }
                       >
-                        {h.lifecycleState}
+                        {h.lifecycleState.charAt(0) + h.lifecycleState.slice(1).toLowerCase()}
                       </Badge>
                     </TableCell>
                     <TableCell className="text-right">

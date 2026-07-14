@@ -125,7 +125,7 @@ export function TeacherHomeworkList({
               <SelectTrigger className="w-[150px]">
                 <SelectValue placeholder="Status" />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="w-auto min-w-[var(--anchor-width)] max-w-[90vw] overflow-x-hidden">
                 <SelectItem value="ALL">All Statuses</SelectItem>
                 <SelectItem value="DRAFT">Draft</SelectItem>
                 <SelectItem value="PUBLISHED">Published</SelectItem>
@@ -205,7 +205,7 @@ export function TeacherHomeworkList({
                               : "secondary"
                         }
                       >
-                        {h.lifecycleState}
+                        {h.lifecycleState.charAt(0) + h.lifecycleState.slice(1).toLowerCase()}
                       </Badge>
                     </TableCell>
                     <TableCell className="text-right">

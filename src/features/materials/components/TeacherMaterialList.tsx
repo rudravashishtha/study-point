@@ -60,6 +60,14 @@ export interface TeacherChapterItem {
   topics?: { id: string; name: string }[];
 }
 
+const resourceTypeLabel: Record<string, string> = {
+  DOCUMENT: "Document",
+  PRESENTATION: "Presentation",
+  IMAGE: "Image",
+  LINK: "External Link",
+  TEXT: "Text",
+};
+
 interface ActionResult {
   success: boolean;
   error?: any;
@@ -121,7 +129,7 @@ export function TeacherMaterialList({
               <SelectTrigger className="w-[150px]">
                 <SelectValue placeholder="Status" />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="w-auto min-w-[var(--anchor-width)] max-w-[90vw] overflow-x-hidden">
                 <SelectItem value="ALL">All Statuses</SelectItem>
                 <SelectItem value="DRAFT">Draft</SelectItem>
                 <SelectItem value="PUBLISHED">Published</SelectItem>
@@ -181,7 +189,7 @@ export function TeacherMaterialList({
                     </TableCell>
                     <TableCell>
                       <Badge variant="outline" className="text-[10px]">
-                        {m.resourceType}
+                        {resourceTypeLabel[m.resourceType] || m.resourceType}
                       </Badge>
                       {isTrackScope && (
                         <Badge variant="secondary" className="ml-2 text-[10px]">
@@ -199,7 +207,7 @@ export function TeacherMaterialList({
                               : "secondary"
                         }
                       >
-                        {m.lifecycleState}
+                        {m.lifecycleState.charAt(0) + m.lifecycleState.slice(1).toLowerCase()}
                       </Badge>
                     </TableCell>
                     <TableCell className="text-sm text-muted-foreground">

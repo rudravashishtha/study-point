@@ -19,11 +19,11 @@ export default async function AdminCurriculumBuilderPage({
   params,
   searchParams,
 }: {
-  params: { trackId: string };
-  searchParams: { [key: string]: string | string[] | undefined };
+  params: Promise<{ trackId: string }>;
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }) {
   await requireAdmin();
-  const { trackId } = params;
+  const { trackId } = await params;
   const resolvedParams = await searchParams;
   const archiveState = (resolvedParams.archiveState as string) || "active";
 

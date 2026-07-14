@@ -62,6 +62,19 @@ interface MaterialListSession {
   name: string;
 }
 
+const visibilityLabel: Record<StudyMaterialVisibility, string> = {
+  CURRICULUM_TRACK: "Curriculum Track",
+  BATCH: "Specific Batch",
+};
+
+const resourceTypeLabel: Record<StudyMaterialResourceType, string> = {
+  DOCUMENT: "Document",
+  PRESENTATION: "Presentation",
+  IMAGE: "Image",
+  LINK: "External Link",
+  TEXT: "Text",
+};
+
 interface MaterialActionResult {
   success: boolean;
   error?: any;
@@ -122,7 +135,7 @@ export function MaterialList({
               <SelectTrigger className="w-[150px]">
                 <SelectValue placeholder="Status" />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="w-auto min-w-[var(--anchor-width)] max-w-[90vw] overflow-x-hidden">
                 <SelectItem value="ALL">All Statuses</SelectItem>
                 <SelectItem value="DRAFT">Draft</SelectItem>
                 <SelectItem value="PUBLISHED">Published</SelectItem>
@@ -169,8 +182,8 @@ export function MaterialList({
                   >
                     {m.title}
                   </TableCell>
-                  <TableCell>{m.resourceType}</TableCell>
-                  <TableCell>{m.visibility}</TableCell>
+                  <TableCell>{resourceTypeLabel[m.resourceType]}</TableCell>
+                  <TableCell>{visibilityLabel[m.visibility]}</TableCell>
                   <TableCell>
                     <Badge
                       variant={
@@ -181,7 +194,7 @@ export function MaterialList({
                             : "destructive"
                       }
                     >
-                      {m.lifecycleState}
+                      {m.lifecycleState.charAt(0) + m.lifecycleState.slice(1).toLowerCase()}
                     </Badge>
                   </TableCell>
                   <TableCell>{format(new Date(m.createdAt), "MMM d, yyyy")}</TableCell>

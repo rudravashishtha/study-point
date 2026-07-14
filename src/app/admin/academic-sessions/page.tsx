@@ -18,7 +18,7 @@ import { DataListToolbar, DataListFilters } from "@/components/layout/data-list-
 export default async function AcademicSessionsPage({
   searchParams,
 }: {
-  searchParams: { [key: string]: string | string[] | undefined };
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }) {
   const allowedSortFields = ["createdAt", "name", "startsOn", "endsOn"] as const;
 

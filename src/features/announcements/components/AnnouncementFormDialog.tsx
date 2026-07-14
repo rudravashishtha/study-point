@@ -96,7 +96,7 @@ export function AnnouncementFormDialog({
   const audienceOptions: { value: AnnouncementAudience; label: string }[] = [
     { value: "PUBLIC", label: "Public" },
     { value: "ALL_STUDENTS", label: "All Students" },
-    { value: "CURRICULUM_TRACK", label: "Specific Track" },
+    { value: "CURRICULUM_TRACK", label: "Curriculum Track" },
     { value: "BATCH", label: "Specific Batch" },
   ];
 

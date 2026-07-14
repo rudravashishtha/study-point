@@ -87,7 +87,7 @@ export async function BatchTeachersTab({
                           <Badge
                             key={p}
                             variant="outline"
-                            className="text-[10px] opacity-70"
+                            className="text-[10px]"
                           >
                             {p}
                           </Badge>

@@ -25,7 +25,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { handleActionError } from "@/lib/actions/types";
+
 import { updateBatchSchedulesAction } from "@/features/batches/actions/batch-actions";
 import { SubmitButton } from "@/components/ui/submit-button";
 
@@ -89,9 +89,14 @@ export function BatchScheduleEditor({
   const onSubmit = (data: FormValues) => {
     startTransition(async () => {
       try {
-        const result = await updateBatchSchedulesAction(batch.id, data.schedules);
+        const cleaned = data.schedules.map((s) => ({
+          ...s,
+          liveClassUrl: s.liveClassUrl || null,
+          roomOrLocation: s.roomOrLocation || null,
+        }));
+        const result = await updateBatchSchedulesAction(batch.id, cleaned);
         if (!result.success) {
-          handleActionError(result.error);
+          toast.error(result.error.message);
           return;
         }
         toast.success("Batch schedules updated successfully");

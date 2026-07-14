@@ -18,11 +18,11 @@ type EnrolmentWithStudent = Enrolment & { student: Student };
 export default async function BatchDetailPage({
   params,
 }: {
-  params: { batchId: string };
+  params: Promise<{ batchId: string }>;
 }) {
   await requireAdmin();
 
-  const { batchId } = params;
+  const { batchId } = await params;
 
   const [batch, enrolments, teacherAssignments] = await Promise.all([
     getBatchById(batchId),

@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { handleActionError } from "../actions/types";
+import { handleActionError } from "../actions/errors";
 import { DomainError } from "./errors";
 import { z } from "zod";
 

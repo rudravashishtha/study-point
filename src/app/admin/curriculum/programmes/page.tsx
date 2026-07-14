@@ -14,7 +14,7 @@ import Link from "next/link";
 export default async function AdminCurriculumProgrammesPage({
   searchParams,
 }: {
-  searchParams: { [key: string]: string | string[] | undefined };
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }) {
   const allowedSortFields = ["createdAt", "updatedAt", "name", "code"] as const;
 

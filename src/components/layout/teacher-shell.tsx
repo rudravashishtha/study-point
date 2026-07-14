@@ -79,7 +79,7 @@ export function TeacherShell({
       <aside className="hidden md:flex flex-col w-64 border-r border-border/40 bg-surface-elevated shrink-0 h-dvh sticky top-0">
         <div className="h-16 flex items-center px-6 border-b border-border/40 shrink-0">
           <Link href="/teacher" className="flex flex-col">
-            <span className="text-[10px] font-bold uppercase tracking-widest text-brand-glow/80 mb-0.5">
+            <span className="text-[10px] font-bold uppercase tracking-widest text-primary mb-0.5">
               {siteConfig.name}
             </span>
             <span className="text-sm font-bold font-heading">Teacher Workspace</span>
@@ -145,7 +145,7 @@ export function TeacherShell({
             >
               <div className="h-14 flex items-center justify-between px-4 border-b border-border/40 shrink-0">
                 <div className="flex flex-col">
-                  <span className="text-[10px] font-bold uppercase tracking-widest text-brand-glow/80 mb-0.5">
+                  <span className="text-[10px] font-bold uppercase tracking-widest text-primary mb-0.5">
                     {siteConfig.name}
                   </span>
                   <span className="text-sm font-bold font-heading">Teacher Workspace</span>

@@ -38,8 +38,8 @@ type AnnouncementRow = Prisma.AnnouncementGetPayload<{
 const audienceLabel: Record<AnnouncementAudience, string> = {
   PUBLIC: "Public",
   ALL_STUDENTS: "All Students",
-  CURRICULUM_TRACK: "Track",
-  BATCH: "Batch",
+  CURRICULUM_TRACK: "Curriculum Track",
+  BATCH: "Specific Batch",
 };
 
 const priorityLabel: Record<AnnouncementPriority, string> = {
@@ -136,7 +136,7 @@ export function AnnouncementList({
               <SelectTrigger className="h-9 w-[150px]">
                 <SelectValue placeholder="Status" />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="w-auto min-w-[var(--anchor-width)] max-w-[90vw] overflow-x-hidden">
                 <SelectItem value="active">Active Only</SelectItem>
                 <SelectItem value="archived">Archived Only</SelectItem>
                 <SelectItem value="all">All Statuses</SelectItem>
@@ -154,12 +154,12 @@ export function AnnouncementList({
               <SelectTrigger className="h-9 w-[180px]">
                 <SelectValue placeholder="Audience" />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="w-auto min-w-[var(--anchor-width)] max-w-[90vw] overflow-x-hidden">
                 <SelectItem value="">All Audiences</SelectItem>
                 <SelectItem value="PUBLIC">Public</SelectItem>
                 <SelectItem value="ALL_STUDENTS">All Students</SelectItem>
-                <SelectItem value="CURRICULUM_TRACK">Track</SelectItem>
-                <SelectItem value="BATCH">Batch</SelectItem>
+                <SelectItem value="CURRICULUM_TRACK">Curriculum Track</SelectItem>
+                <SelectItem value="BATCH">Specific Batch</SelectItem>
               </SelectContent>
             </Select>
           </FilterField>
@@ -172,7 +172,7 @@ export function AnnouncementList({
               <SelectTrigger className="h-9 w-[180px]">
                 <SelectValue placeholder="Session" />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="w-auto min-w-[var(--anchor-width)] max-w-[90vw] overflow-x-hidden">
                 <SelectItem value="">All Sessions</SelectItem>
                 {sessions.map((s) => (
                   <SelectItem key={s.id} value={s.id}>

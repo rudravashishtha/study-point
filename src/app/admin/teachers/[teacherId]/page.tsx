@@ -16,11 +16,11 @@ import type { AppUserStatus } from "@/features/teachers/domain/provisioning";
 export default async function TeacherDetailPage({
   params,
 }: {
-  params: { teacherId: string };
+  params: Promise<{ teacherId: string }>;
 }) {
   await requireAdmin();
 
-  const { teacherId } = params;
+  const { teacherId } = await params;
 
   const [teacher, allAssignments] = await Promise.all([
     getTeacher(teacherId),
@@ -148,7 +148,7 @@ export default async function TeacherDetailPage({
                               <Badge
                                 key={p}
                                 variant="outline"
-                                className="text-[10px] opacity-70"
+                                className="text-[10px]"
                               >
                                 {p}
                               </Badge>
