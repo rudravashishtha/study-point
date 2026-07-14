@@ -51,3 +51,7 @@ Thumbs.db
 
 # Serwist
 public/sw*
+
+# Release workflow artifacts
+bug_backlog.md
+dashboard.md
