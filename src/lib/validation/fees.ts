@@ -50,7 +50,6 @@ export const FeePlanCreateSchema = z
     },
   );
 
-export type FeePlanCreateInput = z.infer<typeof FeePlanCreateSchema>;
 
 export const FeePlanUpdateSchema = z
   .object({
@@ -76,7 +75,6 @@ export const FeePlanUpdateSchema = z
     },
   );
 
-export type FeePlanUpdateInput = z.infer<typeof FeePlanUpdateSchema>;
 
 export const FeePlanListParamsSchema = z.object({
   query: z.string().optional().default(""),
@@ -84,4 +82,3 @@ export const FeePlanListParamsSchema = z.object({
   frequency: z.enum(["MONTHLY", "QUARTERLY", "YEARLY", "CUSTOM"]).optional(),
 });
 
-export type FeePlanListParams = z.infer<typeof FeePlanListParamsSchema>;

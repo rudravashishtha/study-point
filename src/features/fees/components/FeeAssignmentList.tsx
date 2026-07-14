@@ -3,8 +3,14 @@
 import React, { useState, useMemo } from "react";
 import { Prisma, FeeAssignmentStatus } from "@prisma/client";
 import { format } from "date-fns";
-import { DataListTableShell } from "@/components/admin/data-list/DataListTableShell";
-import { DataListMobileShell } from "@/components/admin/data-list/DataListMobileShell";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { DataListEmpty } from "@/components/admin/data-list/DataListEmpty";
 import { FeeAssignmentRowActions } from "./FeeAssignmentRowActions";
 import dynamic from "next/dynamic";
@@ -205,64 +211,55 @@ export function FeeAssignmentList({
       ) : (
         <>
           {/* Desktop Table */}
-          <DataListTableShell
-            headers={
-              <>
-                <th className="h-10 px-4 text-left font-medium text-muted-foreground whitespace-nowrap">
-                  Student
-                </th>
-                <th className="h-10 px-4 text-left font-medium text-muted-foreground whitespace-nowrap">
-                  Fee Plan
-                </th>
-                <th className="h-10 px-4 text-right font-medium text-muted-foreground whitespace-nowrap">
-                  Amount
-                </th>
-                <th className="h-10 px-4 text-center font-medium text-muted-foreground whitespace-nowrap">
-                  Status
-                </th>
-                <th className="h-10 px-4 text-center font-medium text-muted-foreground whitespace-nowrap">
-                  Dues
-                </th>
-                <th className="h-10 px-4 text-right font-medium text-muted-foreground whitespace-nowrap">
-                  Actions
-                </th>
-              </>
-            }
-          >
-            {filtered.map((a) => (
-              <tr key={a.id} className="border-b transition-colors hover:bg-muted/50">
-                <td className="p-4">
-                  <div className="font-medium">
-                    {a.enrolment?.student?.fullName ?? "Unknown"}
-                  </div>
-                  {a.enrolment?.student?.studentCode && (
-                    <div className="text-xs text-muted-foreground">
-                      {a.enrolment.student.studentCode}
-                    </div>
-                  )}
-                </td>
-                <td className="p-4 text-sm">
-                  <div>{a.feePlan?.name ?? "-"}</div>
-                  <div className="text-xs text-muted-foreground">
-                    Start: {formatDate(a.startsOn)}
-                  </div>
-                </td>
-                <td className="p-4 text-sm text-right">
-                  {formatAmount(a.assignedTotalAmount.toString())}
-                </td>
-                <td className="p-4 text-center">{statusBadge(a.status)}</td>
-                <td className="p-4 text-center text-sm text-muted-foreground">
-                  {a._count.dues}
-                </td>
-                <td className="p-4 text-right">
-                  <FeeAssignmentRowActions assignment={a} />
-                </td>
-              </tr>
-            ))}
-          </DataListTableShell>
+          <div className="hidden w-full overflow-auto rounded-md border md:block bg-card">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead className="whitespace-nowrap">Student</TableHead>
+                  <TableHead className="whitespace-nowrap">Fee Plan</TableHead>
+                  <TableHead className="text-right whitespace-nowrap">Amount</TableHead>
+                  <TableHead className="text-center whitespace-nowrap">Status</TableHead>
+                  <TableHead className="text-center whitespace-nowrap">Dues</TableHead>
+                  <TableHead className="text-right whitespace-nowrap">Actions</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {filtered.map((a) => (
+                  <TableRow key={a.id}>
+                    <TableCell>
+                      <div className="font-medium">
+                        {a.enrolment?.student?.fullName ?? "Unknown"}
+                      </div>
+                      {a.enrolment?.student?.studentCode && (
+                        <div className="text-xs text-muted-foreground">
+                          {a.enrolment.student.studentCode}
+                        </div>
+                      )}
+                    </TableCell>
+                    <TableCell>
+                      <div>{a.feePlan?.name ?? "-"}</div>
+                      <div className="text-xs text-muted-foreground">
+                        Start: {formatDate(a.startsOn)}
+                      </div>
+                    </TableCell>
+                    <TableCell className="text-right">
+                      {formatAmount(a.assignedTotalAmount.toString())}
+                    </TableCell>
+                    <TableCell className="text-center">{statusBadge(a.status)}</TableCell>
+                    <TableCell className="text-center text-muted-foreground">
+                      {a._count.dues}
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <FeeAssignmentRowActions assignment={a} />
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
 
           {/* Mobile Cards */}
-          <DataListMobileShell>
+          <div className="flex flex-col space-y-4 md:hidden">
             {filtered.map((a) => (
               <div
                 key={a.id}
@@ -309,7 +306,7 @@ export function FeeAssignmentList({
                 </div>
               </div>
             ))}
-          </DataListMobileShell>
+          </div>
         </>
       )}
 

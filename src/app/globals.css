@@ -10,6 +10,8 @@
   --font-sans: "Manrope", ui-sans-serif, system-ui, sans-serif;
   --font-heading: "Outfit", ui-sans-serif, system-ui, sans-serif;
   --font-mono: "JetBrains Mono", ui-monospace, monospace;
+  --text-xxs: 0.625rem;
+  --text-xxs--line-height: 0.75rem;
   --color-surface: var(--surface);
   --color-surface-elevated: var(--surface-elevated);
   --color-surface-interactive: var(--surface-interactive);

@@ -73,7 +73,7 @@ interface HomeworkListTrack {
 
 interface HomeworkActionResult {
   success: boolean;
-  error?: { message: string };
+  error?: any;
 }
 
 function toHomeworkFormData(item: HomeworkListItem): HomeworkFormData {
@@ -127,7 +127,7 @@ export function HomeworkList({
     try {
       const res = await action();
       if (!res.success) {
-        toast.error("Error", { description: res.error?.message });
+        toast.error("Error", { description: typeof res.error === 'string' ? res.error : res.error?.message || "Unknown error" });
         return;
       }
       toast.success("Success", { description: successMsg });

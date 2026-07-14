@@ -1,6 +1,5 @@
 "use server";
 
-import { requireAppUser } from "@/lib/auth/permissions";
 import { requireTeacherPermission } from "@/server/auth/teacher";
 import {
   createStudyMaterial,
@@ -10,7 +9,6 @@ import {
   CreateStudyMaterialInput,
   UpdateStudyMaterialInput,
 } from "@/server/services/study-materials";
-import { failure } from "@/server/services/types";
 import { db } from "@/lib/db";
 import {
   createHomework,
@@ -20,130 +18,156 @@ import {
   CreateHomeworkInput,
   UpdateHomeworkInput,
 } from "@/server/services/homework";
-import { revalidatePath } from "next/cache";
+import { withActor, withAuthorization, withRevalidation } from "@/lib/actions/wrappers";
+import { DomainError } from "@/lib/domain/errors";
 
-export async function createTeacherHomeworkAction(
-  batchId: string,
-  input: Omit<CreateHomeworkInput, "batchId">,
-) {
-  const user = await requireAppUser();
-  await requireTeacherPermission(batchId, "HOMEWORK_MANAGE");
+export const createTeacherHomeworkAction = withActor(
+  withAuthorization(
+    "TEACHER",
+    withRevalidation(
+      (_actor, batchId) => [`/teacher/batches/${batchId}`],
+      async (actor, batchId: string, input: Omit<CreateHomeworkInput, "batchId">) => {
+        await requireTeacherPermission(batchId, "HOMEWORK_MANAGE");
 
-  const payload: CreateHomeworkInput = {
-    ...input,
-    batchId,
-  };
+        const payload: CreateHomeworkInput = {
+          ...input,
+          batchId,
+        };
 
-  const res = await createHomework(user.id, payload);
-  if (res.success) {
-    revalidatePath(`/teacher/batches/${batchId}`);
-  }
-  return res;
-}
+        await createHomework(actor.userId, payload);
+        return { success: true, data: undefined };
+      }
+    )
+  )
+);
 
-export async function updateTeacherHomeworkAction(
-  batchId: string,
-  id: string,
-  input: UpdateHomeworkInput,
-) {
-  const user = await requireAppUser();
-  await requireTeacherPermission(batchId, "HOMEWORK_MANAGE");
+export const updateTeacherHomeworkAction = withActor(
+  withAuthorization(
+    "TEACHER",
+    withRevalidation(
+      (_actor, batchId) => [`/teacher/batches/${batchId}`],
+      async (actor, batchId: string, id: string, input: UpdateHomeworkInput) => {
+        await requireTeacherPermission(batchId, "HOMEWORK_MANAGE");
+        await updateHomework(actor.userId, id, input);
+        return { success: true, data: undefined };
+      }
+    )
+  )
+);
 
-  const res = await updateHomework(user.id, id, input);
-  if (res.success) {
-    revalidatePath(`/teacher/batches/${batchId}`);
-  }
-  return res;
-}
+export const publishTeacherHomeworkAction = withActor(
+  withAuthorization(
+    "TEACHER",
+    withRevalidation(
+      (_actor, batchId) => [`/teacher/batches/${batchId}`],
+      async (actor, batchId: string, id: string) => {
+        await requireTeacherPermission(batchId, "HOMEWORK_MANAGE");
+        await publishHomework(actor.userId, id);
+        return { success: true, data: undefined };
+      }
+    )
+  )
+);
 
-export async function publishTeacherHomeworkAction(batchId: string, id: string) {
-  const user = await requireAppUser();
-  await requireTeacherPermission(batchId, "HOMEWORK_MANAGE");
-  const res = await publishHomework(user.id, id);
-  if (res.success) {
-    revalidatePath(`/teacher/batches/${batchId}`);
-  }
-  return res;
-}
+export const archiveTeacherHomeworkAction = withActor(
+  withAuthorization(
+    "TEACHER",
+    withRevalidation(
+      (_actor, batchId) => [`/teacher/batches/${batchId}`],
+      async (actor, batchId: string, id: string) => {
+        await requireTeacherPermission(batchId, "HOMEWORK_MANAGE");
+        await archiveHomework(actor.userId, id);
+        return { success: true, data: undefined };
+      }
+    )
+  )
+);
 
-export async function archiveTeacherHomeworkAction(batchId: string, id: string) {
-  const user = await requireAppUser();
-  await requireTeacherPermission(batchId, "HOMEWORK_MANAGE");
-  const res = await archiveHomework(user.id, id);
-  if (res.success) {
-    revalidatePath(`/teacher/batches/${batchId}`);
-  }
-  return res;
-}
+export const createTeacherMaterialAction = withActor(
+  withAuthorization(
+    "TEACHER",
+    withRevalidation(
+      (_actor, batchId) => [`/teacher/batches/${batchId}`],
+      async (
+        actor,
+        batchId: string,
+        input: Omit<
+          CreateStudyMaterialInput,
+          "visibility" | "batchId" | "academicSessionId" | "curriculumTrackId"
+        >
+      ) => {
+        await requireTeacherPermission(batchId, "MATERIALS_MANAGE");
 
-export async function createTeacherMaterialAction(
-  batchId: string,
-  input: Omit<
-    CreateStudyMaterialInput,
-    "visibility" | "batchId" | "academicSessionId" | "curriculumTrackId"
-  >,
-) {
-  const user = await requireAppUser();
-  await requireTeacherPermission(batchId, "MATERIALS_MANAGE");
+        const batch = await db.batch.findUnique({
+          where: { id: batchId },
+          select: { academicSessionId: true, curriculumTrackId: true },
+        });
+        if (!batch) {
+          throw new DomainError("NOT_FOUND", "Batch not found");
+        }
 
-  const batch = await db.batch.findUnique({
-    where: { id: batchId },
-    select: { academicSessionId: true, curriculumTrackId: true },
-  });
-  if (!batch) {
-    return failure("NOT_FOUND", "Batch not found");
-  }
+        const payload: CreateStudyMaterialInput = {
+          ...input,
+          visibility: "BATCH",
+          batchId,
+          academicSessionId: batch.academicSessionId,
+          curriculumTrackId: batch.curriculumTrackId,
+        };
 
-  const payload: CreateStudyMaterialInput = {
-    ...input,
-    visibility: "BATCH",
-    batchId,
-    academicSessionId: batch.academicSessionId,
-    curriculumTrackId: batch.curriculumTrackId,
-  };
+        await createStudyMaterial(actor.userId, payload);
+        return { success: true, data: undefined };
+      }
+    )
+  )
+);
 
-  const res = await createStudyMaterial(user.id, payload);
-  if (res.success) {
-    revalidatePath(`/teacher/batches/${batchId}`);
-  }
-  return res;
-}
+export const updateTeacherMaterialAction = withActor(
+  withAuthorization(
+    "TEACHER",
+    withRevalidation(
+      (_actor, batchId) => [`/teacher/batches/${batchId}`],
+      async (
+        actor,
+        batchId: string,
+        id: string,
+        input: Omit<
+          UpdateStudyMaterialInput,
+          "visibility" | "batchId" | "academicSessionId" | "curriculumTrackId"
+        >
+      ) => {
+        await requireTeacherPermission(batchId, "MATERIALS_MANAGE");
 
-export async function updateTeacherMaterialAction(
-  batchId: string,
-  id: string,
-  input: Omit<
-    UpdateStudyMaterialInput,
-    "visibility" | "batchId" | "academicSessionId" | "curriculumTrackId"
-  >,
-) {
-  const user = await requireAppUser();
-  await requireTeacherPermission(batchId, "MATERIALS_MANAGE");
+        await updateStudyMaterial(actor.userId, id, input);
+        return { success: true, data: undefined };
+      }
+    )
+  )
+);
 
-  // We do not allow changing visibility or batchId
-  const res = await updateStudyMaterial(user.id, id, input);
-  if (res.success) {
-    revalidatePath(`/teacher/batches/${batchId}`);
-  }
-  return res;
-}
+export const publishTeacherMaterialAction = withActor(
+  withAuthorization(
+    "TEACHER",
+    withRevalidation(
+      (_actor, batchId) => [`/teacher/batches/${batchId}`],
+      async (actor, batchId: string, id: string) => {
+        await requireTeacherPermission(batchId, "MATERIALS_MANAGE");
+        await publishStudyMaterial(actor.userId, id);
+        return { success: true, data: undefined };
+      }
+    )
+  )
+);
 
-export async function publishTeacherMaterialAction(batchId: string, id: string) {
-  const user = await requireAppUser();
-  await requireTeacherPermission(batchId, "MATERIALS_MANAGE");
-  const res = await publishStudyMaterial(user.id, id);
-  if (res.success) {
-    revalidatePath(`/teacher/batches/${batchId}`);
-  }
-  return res;
-}
-
-export async function archiveTeacherMaterialAction(batchId: string, id: string) {
-  const user = await requireAppUser();
-  await requireTeacherPermission(batchId, "MATERIALS_MANAGE");
-  const res = await archiveStudyMaterial(user.id, id);
-  if (res.success) {
-    revalidatePath(`/teacher/batches/${batchId}`);
-  }
-  return res;
-}
+export const archiveTeacherMaterialAction = withActor(
+  withAuthorization(
+    "TEACHER",
+    withRevalidation(
+      (_actor, batchId) => [`/teacher/batches/${batchId}`],
+      async (actor, batchId: string, id: string) => {
+        await requireTeacherPermission(batchId, "MATERIALS_MANAGE");
+        await archiveStudyMaterial(actor.userId, id);
+        return { success: true, data: undefined };
+      }
+    )
+  )
+);

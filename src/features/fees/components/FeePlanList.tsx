@@ -2,8 +2,15 @@
 
 import React, { useState, useMemo } from "react";
 import { Prisma, FeePlanFrequency } from "@prisma/client";
-import { DataListTableShell } from "@/components/admin/data-list/DataListTableShell";
-import { DataListMobileShell } from "@/components/admin/data-list/DataListMobileShell";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Badge } from "@/components/ui/badge";
 import { DataListEmpty } from "@/components/admin/data-list/DataListEmpty";
 import { FeePlanRowActions } from "./FeePlanRowActions";
 import dynamic from "next/dynamic";
@@ -140,74 +147,63 @@ export function FeePlanList({
         />
       ) : (
         <>
-          <DataListTableShell
-            headers={
-              <>
-                <th className="h-10 px-4 text-left font-medium text-muted-foreground">
-                  Name
-                </th>
-                <th className="h-10 px-4 text-left font-medium text-muted-foreground">
-                  Amount
-                </th>
-                <th className="h-10 px-4 text-left font-medium text-muted-foreground">
-                  Frequency
-                </th>
-                <th className="h-10 px-4 text-left font-medium text-muted-foreground">
-                  Track
-                </th>
-                <th className="h-10 px-4 text-left font-medium text-muted-foreground">
-                  Batch
-                </th>
-                <th className="h-10 px-4 text-center font-medium text-muted-foreground">
-                  Public
-                </th>
-                <th className="h-10 px-4 text-right font-medium text-muted-foreground">
-                  Actions
-                </th>
-              </>
-            }
-          >
-            {filteredPlans.map((plan) => (
-              <tr key={plan.id} className="border-b transition-colors hover:bg-muted/50">
-                <td className="p-4 font-medium">
-                  <div className="flex items-center space-x-2">
-                    <span>{plan.name}</span>
-                    {plan.archivedAt && (
-                      <span className="rounded-full bg-muted px-2 py-0.5 text-xs text-muted-foreground">
-                        Archived
-                      </span>
-                    )}
-                  </div>
-                </td>
-                <td className="p-4 text-sm">
-                  {formatAmount(plan.totalAmount.toString())}
-                </td>
-                <td className="p-4 text-sm">
-                  <span className="rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-medium text-blue-800">
-                    {frequencyLabel(plan.frequency)}
-                  </span>
-                </td>
-                <td className="p-4 text-sm text-muted-foreground">
-                  {plan.curriculumTrack?.displayName || "-"}
-                </td>
-                <td className="p-4 text-sm text-muted-foreground">
-                  {plan.batch?.name || "All batches"}
-                </td>
-                <td className="p-4 text-center text-sm">
-                  {plan.showPublicly ? (
-                    <span className="text-green-600 font-medium">Yes</span>
-                  ) : (
-                    <span className="text-muted-foreground">No</span>
-                  )}
-                </td>
-                <td className="p-4 text-right">
-                  <FeePlanRowActions plan={plan} onEdit={() => handleEdit(plan)} />
-                </td>
-              </tr>
-            ))}
-          </DataListTableShell>
+          {/* Desktop View */}
+          <div className="hidden w-full overflow-auto rounded-md border md:block bg-card">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Name</TableHead>
+                  <TableHead>Amount</TableHead>
+                  <TableHead>Frequency</TableHead>
+                  <TableHead>Track</TableHead>
+                  <TableHead>Batch</TableHead>
+                  <TableHead className="text-center">Public</TableHead>
+                  <TableHead className="text-right">Actions</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {filteredPlans.map((plan) => (
+                  <TableRow key={plan.id}>
+                    <TableCell className="font-medium">
+                      <div className="flex items-center space-x-2">
+                        <span>{plan.name}</span>
+                        {plan.archivedAt && (
+                          <Badge variant="secondary">Archived</Badge>
+                        )}
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      {formatAmount(plan.totalAmount.toString())}
+                    </TableCell>
+                    <TableCell>
+                      <Badge variant="outline" className="bg-blue-100 text-blue-800 hover:bg-blue-100">
+                        {frequencyLabel(plan.frequency)}
+                      </Badge>
+                    </TableCell>
+                    <TableCell className="text-muted-foreground">
+                      {plan.curriculumTrack?.displayName || "-"}
+                    </TableCell>
+                    <TableCell className="text-muted-foreground">
+                      {plan.batch?.name || "All batches"}
+                    </TableCell>
+                    <TableCell className="text-center">
+                      {plan.showPublicly ? (
+                        <span className="text-green-600 font-medium">Yes</span>
+                      ) : (
+                        <span className="text-muted-foreground">No</span>
+                      )}
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <FeePlanRowActions plan={plan} onEdit={() => handleEdit(plan)} />
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
 
-          <DataListMobileShell>
+          {/* Mobile View */}
+          <div className="flex flex-col space-y-4 md:hidden">
             {filteredPlans.map((plan) => (
               <div
                 key={plan.id}
@@ -215,9 +211,9 @@ export function FeePlanList({
               >
                 <div className="flex items-center justify-between mb-2">
                   <span className="font-semibold">{plan.name}</span>
-                  <span className="rounded-full bg-blue-100 px-2 py-0.5 text-xs font-medium text-blue-800">
+                  <Badge variant="outline" className="bg-blue-100 text-blue-800 hover:bg-blue-100">
                     {frequencyLabel(plan.frequency)}
-                  </span>
+                  </Badge>
                 </div>
 
                 <div className="text-sm space-y-1 mb-3">
@@ -252,7 +248,7 @@ export function FeePlanList({
                 </div>
               </div>
             ))}
-          </DataListMobileShell>
+          </div>
         </>
       )}
 

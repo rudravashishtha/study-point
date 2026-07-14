@@ -2,6 +2,12 @@ import { requireAdmin } from "@/lib/auth/permissions";
 import { db } from "@/lib/db";
 import { TestList } from "@/features/tests/components/TestList";
 
+import {
+  PageHeader,
+  PageHeaderHeading,
+  PageHeaderDescription,
+} from "@/components/layout/page-header";
+
 export default async function AdminTestsPage() {
   await requireAdmin();
 
@@ -27,9 +33,12 @@ export default async function AdminTestsPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold tracking-tight">Tests</h1>
-      </div>
+      <PageHeader>
+        <div>
+          <PageHeaderHeading>Tests</PageHeaderHeading>
+          <PageHeaderDescription>Manage student tests and evaluations.</PageHeaderDescription>
+        </div>
+      </PageHeader>
 
       <TestList tests={tests} sessions={sessions} batches={batches} tracks={tracks} />
     </div>

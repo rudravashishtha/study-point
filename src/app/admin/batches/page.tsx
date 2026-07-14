@@ -5,12 +5,20 @@ import { listBatches, type ListBatchesInput } from "@/server/services/batches";
 import { listAcademicSessions } from "@/server/services/academic-sessions";
 import { listTracks } from "@/server/services/curriculum/tracks";
 import { BatchList } from "@/features/batches/components/BatchList";
-import { DataListSearch } from "@/components/admin/data-list/DataListSearch";
 import { DataListArchiveFilter } from "@/components/admin/data-list/DataListArchiveFilter";
 import { DataListPagination } from "@/components/admin/data-list/DataListPagination";
 import { DataListEmpty } from "@/components/admin/data-list/DataListEmpty";
 import { CreateBatchButton } from "./CreateBatchButton";
 import { CurriculumTrack, Board, Subject, Programme } from "@prisma/client";
+
+import {
+  PageHeader,
+  PageHeaderHeading,
+  PageHeaderDescription,
+  PageHeaderActions,
+} from "@/components/layout/page-header";
+import { DataListToolbar, DataListFilters } from "@/components/layout/data-list-toolbar";
+import { DataListSearch } from "@/components/admin/data-list/DataListSearch";
 
 type TrackWithRelations = CurriculumTrack & {
   board: Board;
@@ -68,18 +76,22 @@ export default async function AdminBatchesPage({
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold tracking-tight">Batches</h1>
-        <CreateBatchButton sessions={sessions} tracks={tracks as TrackWithRelations[]} />
-      </div>
-
-      <div className="flex flex-col space-y-4 md:flex-row md:items-center md:justify-between md:space-y-0">
-        <DataListSearch placeholder="Search batches..." />
-        <div className="flex items-center space-x-2">
-          {/* We can add Session and Track filters here later */}
-          <DataListArchiveFilter />
+      <PageHeader>
+        <div>
+          <PageHeaderHeading>Batches</PageHeaderHeading>
+          <PageHeaderDescription>Manage class batches and schedules.</PageHeaderDescription>
         </div>
-      </div>
+        <PageHeaderActions>
+          <CreateBatchButton sessions={sessions} tracks={tracks as TrackWithRelations[]} />
+        </PageHeaderActions>
+      </PageHeader>
+
+      <DataListToolbar>
+        <DataListSearch placeholder="Search batches..." />
+        <DataListFilters>
+          <DataListArchiveFilter />
+        </DataListFilters>
+      </DataListToolbar>
 
       {listResult.items.length === 0 ? (
         <DataListEmpty

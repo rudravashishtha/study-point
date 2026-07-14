@@ -2,6 +2,13 @@
 
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useTransition } from "react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 export function DataListArchiveFilter() {
   const router = useRouter();
@@ -12,7 +19,8 @@ export function DataListArchiveFilter() {
   const currentVal = searchParams.get("archive") || "active";
 
   const handleChange = useCallback(
-    (val: string) => {
+    (val: string | null) => {
+      if (!val) return;
       const params = new URLSearchParams(searchParams.toString());
       if (val === "active") {
         params.delete("archive");
@@ -30,17 +38,16 @@ export function DataListArchiveFilter() {
 
   return (
     <div className="flex items-center space-x-2">
-      <select
-        value={currentVal}
-        onChange={(e) => handleChange(e.target.value)}
-        disabled={isPending}
-        aria-label="Filter by archive status"
-        className="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-      >
-        <option value="active">Active Only</option>
-        <option value="archived">Archived Only</option>
-        <option value="all">All Records</option>
-      </select>
+      <Select value={currentVal} onValueChange={handleChange} disabled={isPending}>
+        <SelectTrigger className="w-[180px]">
+          <SelectValue placeholder="Filter by archive status" />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="active">Active Only</SelectItem>
+          <SelectItem value="archived">Archived Only</SelectItem>
+          <SelectItem value="all">All Records</SelectItem>
+        </SelectContent>
+      </Select>
     </div>
   );
 }

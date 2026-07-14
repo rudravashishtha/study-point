@@ -72,7 +72,7 @@ interface ListTrack {
 
 interface ActionResult {
   success: boolean;
-  error?: { message: string };
+  error?: any;
 }
 
 export function TestList({
@@ -115,7 +115,7 @@ export function TestList({
     try {
       const res = await action();
       if (!res.success) {
-        toast.error("Error", { description: res.error?.message ?? "Unknown error" });
+        toast.error("Error", { description: typeof res.error === 'string' ? res.error : res.error?.message || "Unknown error" });
         return;
       }
       toast.success("Success", { description: successMsg });

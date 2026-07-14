@@ -7,6 +7,13 @@ import { DataListSearch } from "@/components/admin/data-list/DataListSearch";
 import { DataListArchiveFilter } from "@/components/admin/data-list/DataListArchiveFilter";
 import { DataListPagination } from "@/components/admin/data-list/DataListPagination";
 import { DataListEmpty } from "@/components/admin/data-list/DataListEmpty";
+import {
+  PageHeader,
+  PageHeaderHeading,
+  PageHeaderDescription,
+  PageHeaderActions,
+} from "@/components/layout/page-header";
+import { DataListToolbar, DataListFilters } from "@/components/layout/data-list-toolbar";
 
 export default async function AcademicSessionsPage({
   searchParams,
@@ -35,10 +42,22 @@ export default async function AcademicSessionsPage({
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col space-y-4 md:flex-row md:items-center md:justify-between md:space-y-0">
+      <PageHeader>
+        <div>
+          <PageHeaderHeading>Academic Sessions</PageHeaderHeading>
+          <PageHeaderDescription>Manage academic years and terms.</PageHeaderDescription>
+        </div>
+        <PageHeaderActions>
+          {/* Action button would go here */}
+        </PageHeaderActions>
+      </PageHeader>
+
+      <DataListToolbar>
         <DataListSearch placeholder="Search sessions..." />
-        <DataListArchiveFilter />
-      </div>
+        <DataListFilters>
+          <DataListArchiveFilter />
+        </DataListFilters>
+      </DataListToolbar>
 
       {sessions.length === 0 ? (
         <DataListEmpty

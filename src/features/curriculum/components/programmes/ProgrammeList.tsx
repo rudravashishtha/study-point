@@ -2,8 +2,15 @@
 
 import React, { useState } from "react";
 import { Programme, Board } from "@prisma/client";
-import { DataListTableShell } from "@/components/admin/data-list/DataListTableShell";
-import { DataListMobileShell } from "@/components/admin/data-list/DataListMobileShell";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Badge } from "@/components/ui/badge";
 import { ProgrammeRowActions } from "./ProgrammeRowActions";
 import { ProgrammeFormDialog } from "./ProgrammeFormDialog";
 
@@ -31,8 +38,7 @@ export function ProgrammeList({
 
   return (
     <div className="space-y-4">
-      <div className="flex justify-between items-center">
-        <h2 className="text-xl font-bold">Programmes</h2>
+      <div className="flex justify-end items-center">
         <button
           onClick={handleCreate}
           className="rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90"
@@ -41,61 +47,50 @@ export function ProgrammeList({
         </button>
       </div>
 
-      <DataListTableShell
-        headers={
-          <>
-            <th className="h-10 px-4 text-left font-medium text-muted-foreground">
-              Code
-            </th>
-            <th className="h-10 px-4 text-left font-medium text-muted-foreground">
-              Name
-            </th>
-            <th className="h-10 px-4 text-left font-medium text-muted-foreground">
-              Board
-            </th>
-            <th className="h-10 px-4 text-left font-medium text-muted-foreground">
-              Status
-            </th>
-            <th className="h-10 px-4 text-right font-medium text-muted-foreground">
-              Actions
-            </th>
-          </>
-        }
-      >
-        {programmes.map((programme) => (
-          <tr key={programme.id} className="border-b transition-colors hover:bg-muted/50">
-            <td className="p-4 font-medium">{programme.code}</td>
-            <td className="p-4">{programme.name}</td>
-            <td className="p-4">
-              {programme.board.name} ({programme.board.code})
-              {programme.board.archivedAt && (
-                <span className="ml-2 text-xs text-muted-foreground bg-muted px-2 py-0.5 rounded-md">
-                  Archived Board
-                </span>
-              )}
-            </td>
-            <td className="p-4">
-              {programme.archivedAt ? (
-                <span className="rounded-full bg-muted px-2.5 py-0.5 text-xs font-medium text-muted-foreground">
-                  Archived
-                </span>
-              ) : (
-                <span className="rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-800">
-                  Active
-                </span>
-              )}
-            </td>
-            <td className="p-4 text-right">
-              <ProgrammeRowActions
-                programme={programme}
-                onEdit={() => handleEdit(programme)}
-              />
-            </td>
-          </tr>
-        ))}
-      </DataListTableShell>
+      {/* Desktop View */}
+      <div className="hidden w-full overflow-auto rounded-md border md:block bg-card">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Code</TableHead>
+              <TableHead>Name</TableHead>
+              <TableHead>Board</TableHead>
+              <TableHead>Status</TableHead>
+              <TableHead className="text-right">Actions</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {programmes.map((programme) => (
+              <TableRow key={programme.id}>
+                <TableCell className="font-medium">{programme.code}</TableCell>
+                <TableCell>{programme.name}</TableCell>
+                <TableCell>
+                  {programme.board.name} ({programme.board.code})
+                  {programme.board.archivedAt && (
+                    <Badge variant="outline" className="ml-2">Archived Board</Badge>
+                  )}
+                </TableCell>
+                <TableCell>
+                  {programme.archivedAt ? (
+                    <Badge variant="secondary">Archived</Badge>
+                  ) : (
+                    <Badge variant="default" className="bg-green-600 hover:bg-green-700">Active</Badge>
+                  )}
+                </TableCell>
+                <TableCell className="text-right">
+                  <ProgrammeRowActions
+                    programme={programme}
+                    onEdit={() => handleEdit(programme)}
+                  />
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </div>
 
-      <DataListMobileShell>
+      {/* Mobile View */}
+      <div className="flex flex-col space-y-4 md:hidden">
         {programmes.map((programme) => (
           <div
             key={programme.id}
@@ -104,13 +99,9 @@ export function ProgrammeList({
             <div className="flex items-center justify-between mb-2">
               <span className="font-semibold">{programme.name}</span>
               {programme.archivedAt ? (
-                <span className="rounded-full bg-muted px-2.5 py-0.5 text-xs font-medium text-muted-foreground">
-                  Archived
-                </span>
+                <Badge variant="secondary">Archived</Badge>
               ) : (
-                <span className="rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-800">
-                  Active
-                </span>
+                <Badge variant="default" className="bg-green-600 hover:bg-green-700">Active</Badge>
               )}
             </div>
             <div className="text-sm text-muted-foreground mb-4 space-y-1">
@@ -130,7 +121,7 @@ export function ProgrammeList({
             </div>
           </div>
         ))}
-      </DataListMobileShell>
+      </div>
 
       <ProgrammeFormDialog
         programme={editingProgramme}

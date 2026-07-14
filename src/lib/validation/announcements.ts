@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { AnnouncementAudience, AnnouncementPriority } from "@prisma/client";
+import { zIsoDateString } from "./common";
 
 export const AnnouncementCreateSchema = z
   .object({
@@ -11,33 +12,12 @@ export const AnnouncementCreateSchema = z
     content: z.string().trim().min(1, "Content is required."),
     priority: z.nativeEnum(AnnouncementPriority).optional().default("NORMAL"),
     publish: z.boolean().optional().default(false),
-    expiresAt: z.string().optional().nullable(),
-  })
-  .refine(
-    (data) => {
-      if (data.expiresAt) {
-        const d = new Date(data.expiresAt);
-        return !isNaN(d.getTime());
-      }
-      return true;
-    },
-    { message: "Invalid expiry date.", path: ["expiresAt"] },
-  );
+    expiresAt: zIsoDateString,
+  });
 
 export const AnnouncementUpdateSchema = z.object({
   title: z.string().trim().min(1, "Title cannot be empty.").optional(),
   content: z.string().trim().min(1, "Content cannot be empty.").optional(),
   priority: z.nativeEnum(AnnouncementPriority).optional(),
-  expiresAt: z
-    .string()
-    .nullable()
-    .optional()
-    .refine(
-      (val) => {
-        if (!val) return true;
-        const d = new Date(val);
-        return !isNaN(d.getTime());
-      },
-      { message: "Invalid expiry date." },
-    ),
+  expiresAt: zIsoDateString,
 });

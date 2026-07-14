@@ -2,8 +2,15 @@
 
 import React, { useState } from "react";
 import { Board } from "@prisma/client";
-import { DataListTableShell } from "@/components/admin/data-list/DataListTableShell";
-import { DataListMobileShell } from "@/components/admin/data-list/DataListMobileShell";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Badge } from "@/components/ui/badge";
 import { BoardRowActions } from "./BoardRowActions";
 import { BoardFormDialog } from "./BoardFormDialog";
 
@@ -23,8 +30,7 @@ export function BoardList({ boards }: { boards: Board[] }) {
 
   return (
     <div className="space-y-4">
-      <div className="flex justify-between items-center">
-        <h2 className="text-xl font-bold">Boards</h2>
+      <div className="flex justify-end items-center">
         <button
           onClick={handleCreate}
           className="rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90"
@@ -33,47 +39,40 @@ export function BoardList({ boards }: { boards: Board[] }) {
         </button>
       </div>
 
-      <DataListTableShell
-        headers={
-          <>
-            <th className="h-10 px-4 text-left font-medium text-muted-foreground">
-              Code
-            </th>
-            <th className="h-10 px-4 text-left font-medium text-muted-foreground">
-              Name
-            </th>
-            <th className="h-10 px-4 text-left font-medium text-muted-foreground">
-              Status
-            </th>
-            <th className="h-10 px-4 text-right font-medium text-muted-foreground">
-              Actions
-            </th>
-          </>
-        }
-      >
-        {boards.map((board) => (
-          <tr key={board.id} className="border-b transition-colors hover:bg-muted/50">
-            <td className="p-4 font-medium">{board.code}</td>
-            <td className="p-4">{board.name}</td>
-            <td className="p-4">
-              {board.archivedAt ? (
-                <span className="rounded-full bg-muted px-2.5 py-0.5 text-xs font-medium text-muted-foreground">
-                  Archived
-                </span>
-              ) : (
-                <span className="rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-800">
-                  Active
-                </span>
-              )}
-            </td>
-            <td className="p-4 text-right">
-              <BoardRowActions board={board} onEdit={() => handleEdit(board)} />
-            </td>
-          </tr>
-        ))}
-      </DataListTableShell>
+      {/* Desktop View */}
+      <div className="hidden w-full overflow-auto rounded-md border md:block bg-card">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Code</TableHead>
+              <TableHead>Name</TableHead>
+              <TableHead>Status</TableHead>
+              <TableHead className="text-right">Actions</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {boards.map((board) => (
+              <TableRow key={board.id}>
+                <TableCell className="font-medium">{board.code}</TableCell>
+                <TableCell>{board.name}</TableCell>
+                <TableCell>
+                  {board.archivedAt ? (
+                    <Badge variant="secondary">Archived</Badge>
+                  ) : (
+                    <Badge variant="default" className="bg-green-600 hover:bg-green-700">Active</Badge>
+                  )}
+                </TableCell>
+                <TableCell className="text-right">
+                  <BoardRowActions board={board} onEdit={() => handleEdit(board)} />
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </div>
 
-      <DataListMobileShell>
+      {/* Mobile View */}
+      <div className="flex flex-col space-y-4 md:hidden">
         {boards.map((board) => (
           <div
             key={board.id}
@@ -82,13 +81,9 @@ export function BoardList({ boards }: { boards: Board[] }) {
             <div className="flex items-center justify-between mb-2">
               <span className="font-semibold">{board.name}</span>
               {board.archivedAt ? (
-                <span className="rounded-full bg-muted px-2.5 py-0.5 text-xs font-medium text-muted-foreground">
-                  Archived
-                </span>
+                <Badge variant="secondary">Archived</Badge>
               ) : (
-                <span className="rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-800">
-                  Active
-                </span>
+                <Badge variant="default" className="bg-green-600 hover:bg-green-700">Active</Badge>
               )}
             </div>
             <div className="text-sm text-muted-foreground mb-4 space-y-1">
@@ -99,7 +94,7 @@ export function BoardList({ boards }: { boards: Board[] }) {
             </div>
           </div>
         ))}
-      </DataListMobileShell>
+      </div>
 
       <BoardFormDialog
         board={editingBoard}

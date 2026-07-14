@@ -2,6 +2,12 @@ import { requireAdmin } from "@/lib/auth/permissions";
 import { listImportJobs } from "@/server/services/imports";
 import { ImportHistoryPageClient } from "./client-page";
 
+import {
+  PageHeader,
+  PageHeaderHeading,
+  PageHeaderDescription,
+} from "@/components/layout/page-header";
+
 export default async function AdminImportsPage() {
   await requireAdmin();
 
@@ -13,14 +19,12 @@ export default async function AdminImportsPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <PageHeader>
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Data Imports</h1>
-          <p className="text-muted-foreground mt-1">
-            Import students, questions, and other data.
-          </p>
+          <PageHeaderHeading>Data Imports</PageHeaderHeading>
+          <PageHeaderDescription>Import students, questions, and other data.</PageHeaderDescription>
         </div>
-      </div>
+      </PageHeader>
 
       <ImportHistoryPageClient
         initialJobs={result.data.items}

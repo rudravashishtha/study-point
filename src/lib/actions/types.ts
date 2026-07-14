@@ -5,11 +5,15 @@ export type ActionResult<T = void> =
   | { success: true; data: T }
   | { success: false; error: string; fieldErrors?: Record<string, string[]> };
 
+import { unstable_rethrow } from "next/navigation";
+
 export function handleActionError(error: unknown): {
   success: false;
   error: string;
   fieldErrors?: Record<string, string[]>;
 } {
+  unstable_rethrow(error);
+
   if (error instanceof ZodError) {
     return {
       success: false,

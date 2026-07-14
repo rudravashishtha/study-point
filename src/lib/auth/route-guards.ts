@@ -1,6 +1,6 @@
 import type { NextRequest } from "next/server";
 
-export type AppRole = "ADMIN" | "TEACHER" | "STUDENT";
+type AppRole = "ADMIN" | "TEACHER" | "STUDENT";
 
 export function roleHome(role?: string | null): string {
   switch (role) {

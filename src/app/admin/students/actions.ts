@@ -1,8 +1,5 @@
 "use server";
 
-import { requireAdmin } from "@/lib/auth/permissions";
-import { ActorContext } from "@/lib/domain/actor";
-import { ActionResult, handleActionError } from "@/lib/actions/types";
 import {
   createStudent,
   updateStudent,
@@ -11,70 +8,61 @@ import {
   createStudentSchema,
   updateStudentSchema,
 } from "@/server/services/students";
+import { withActor, withAuthorization, withRevalidation } from "@/lib/actions/wrappers";
 
-import { revalidatePath } from "next/cache";
+export const createStudentAction = withActor(
+  withAuthorization(
+    "ADMIN",
+    withRevalidation(
+      ["/admin/students"],
+      async (actor, data: unknown) => {
+        const parsed = createStudentSchema.parse(data);
+        await createStudent(parsed, actor.userId);
+        return { success: true, data: undefined };
+      }
+    )
+  )
+);
 
-async function getActor(): Promise<ActorContext> {
-  const appUser = await requireAdmin();
-  return {
-    userId: appUser.id,
-    role: appUser.role,
-    metadata: {
-      role: appUser.role,
-      status: appUser.status,
-      email: appUser.email || undefined,
-    },
-  };
-}
+export const updateStudentAction = withActor(
+  withAuthorization(
+    "ADMIN",
+    withRevalidation(
+      () => ["/admin/students"],
+      async (actor, id: string, data: unknown) => {
+        const parsed = updateStudentSchema.parse({
+          id,
+          ...(data as Record<string, unknown>),
+        });
+        await updateStudent(parsed, actor.userId);
+        return { success: true, data: undefined };
+      }
+    )
+  )
+);
 
-export async function createStudentAction(data: unknown): Promise<ActionResult> {
-  try {
-    const actor = await getActor();
-    const parsed = createStudentSchema.parse(data);
-    await createStudent(parsed, actor.userId);
-    revalidatePath("/admin/students");
-    return { success: true, data: undefined };
-  } catch (error) {
-    return handleActionError(error);
-  }
-}
+export const archiveStudentAction = withActor(
+  withAuthorization(
+    "ADMIN",
+    withRevalidation(
+      () => ["/admin/students"],
+      async (actor, id: string) => {
+        await archiveStudent(id, actor.userId);
+        return { success: true, data: undefined };
+      }
+    )
+  )
+);
 
-export async function updateStudentAction(
-  id: string,
-  data: unknown,
-): Promise<ActionResult> {
-  try {
-    const actor = await getActor();
-    const parsed = updateStudentSchema.parse({
-      id,
-      ...(data as Record<string, unknown>),
-    });
-    await updateStudent(parsed, actor.userId);
-    revalidatePath("/admin/students");
-    return { success: true, data: undefined };
-  } catch (error) {
-    return handleActionError(error);
-  }
-}
-
-export async function archiveStudentAction(id: string): Promise<ActionResult> {
-  try {
-    const actor = await getActor();
-    await archiveStudent(id, actor.userId);
-    revalidatePath("/admin/students");
-    return { success: true, data: undefined };
-  } catch (error) {
-    return handleActionError(error);
-  }
-}
-
-export async function restoreStudentAction(id: string): Promise<ActionResult> {
-  try {
-    const actor = await getActor();
-    await restoreStudent(id, actor.userId);
-    revalidatePath("/admin/students");
-    return { success: true, data: undefined };
-  } catch (error) {
-    return handleActionError(error);
-  }
-}
+export const restoreStudentAction = withActor(
+  withAuthorization(
+    "ADMIN",
+    withRevalidation(
+      () => ["/admin/students"],
+      async (actor, id: string) => {
+        await restoreStudent(id, actor.userId);
+        return { success: true, data: undefined };
+      }
+    )
+  )
+);

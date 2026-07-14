@@ -1,7 +1,5 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
-import { ActorContext } from "@/lib/domain/actor";
 import {
   createTrack,
   updateTrack,
@@ -12,99 +10,61 @@ import {
   createCurriculumTrackSchema,
   updateCurriculumTrackSchema,
 } from "@/lib/validation/curriculum";
+import { withActor, withAuthorization, withRevalidation } from "@/lib/actions/wrappers";
 
-import { requireAdmin } from "@/lib/auth/permissions";
+export const createTrackAction = withActor(
+  withAuthorization(
+    "ADMIN",
+    withRevalidation(
+      ["/admin/curriculum/curriculum-tracks"],
+      async (actor, data: unknown) => {
+        const parsed = createCurriculumTrackSchema.parse(data);
+        await createTrack(actor, {
+          ...parsed,
+          programmeId: parsed.programmeId ?? null,
+        });
+        return { success: true, data: undefined };
+      }
+    )
+  )
+);
 
-async function getActor(): Promise<ActorContext> {
-  const appUser = await requireAdmin();
-  return {
-    userId: appUser.id,
-    role: appUser.role,
-    metadata: {
-      role: appUser.role,
-      status: appUser.status,
-      email: appUser.email || undefined,
-    },
-  };
-}
+export const updateTrackAction = withActor(
+  withAuthorization(
+    "ADMIN",
+    withRevalidation(
+      () => ["/admin/curriculum/curriculum-tracks"],
+      async (actor, id: string, data: unknown) => {
+        const parsed = updateCurriculumTrackSchema.parse(data);
+        await updateTrack(actor, id, parsed);
+        return { success: true, data: undefined };
+      }
+    )
+  )
+);
 
-export async function createTrackAction(data: unknown) {
-  try {
-    const actor = await getActor();
-    const parsed = createCurriculumTrackSchema.parse(data);
+export const archiveTrackAction = withActor(
+  withAuthorization(
+    "ADMIN",
+    withRevalidation(
+      () => ["/admin/curriculum/curriculum-tracks"],
+      async (actor, id: string) => {
+        await archiveTrack(actor, id);
+        return { success: true, data: undefined };
+      }
+    )
+  )
+);
 
-    await createTrack(actor, {
-      ...parsed,
-      programmeId: parsed.programmeId ?? null,
-    });
-
-    revalidatePath("/admin/curriculum/curriculum-tracks");
-    return { success: true };
-  } catch (error: unknown) {
-    if (error instanceof Error && error.name === "ZodError") {
-      return {
-        success: false,
-        error: (error as unknown as { errors: { message: string }[] }).errors[0].message,
-      };
-    }
-    return {
-      success: false,
-      error: error instanceof Error ? error.message : "Failed to create curriculum track",
-    };
-  }
-}
-
-export async function updateTrackAction(id: string, data: unknown) {
-  try {
-    const actor = await getActor();
-    const parsed = updateCurriculumTrackSchema.parse(data);
-
-    await updateTrack(actor, id, parsed);
-
-    revalidatePath("/admin/curriculum/curriculum-tracks");
-    return { success: true };
-  } catch (error: unknown) {
-    if (error instanceof Error && error.name === "ZodError") {
-      return {
-        success: false,
-        error: (error as unknown as { errors: { message: string }[] }).errors[0].message,
-      };
-    }
-    return {
-      success: false,
-      error: error instanceof Error ? error.message : "Failed to update curriculum track",
-    };
-  }
-}
-
-export async function archiveTrackAction(id: string) {
-  try {
-    const actor = await getActor();
-    await archiveTrack(actor, id);
-
-    revalidatePath("/admin/curriculum/curriculum-tracks");
-    return { success: true };
-  } catch (error: unknown) {
-    return {
-      success: false,
-      error:
-        error instanceof Error ? error.message : "Failed to archive curriculum track",
-    };
-  }
-}
-
-export async function restoreTrackAction(id: string) {
-  try {
-    const actor = await getActor();
-    await restoreTrack(actor, id);
-
-    revalidatePath("/admin/curriculum/curriculum-tracks");
-    return { success: true };
-  } catch (error: unknown) {
-    return {
-      success: false,
-      error:
-        error instanceof Error ? error.message : "Failed to restore curriculum track",
-    };
-  }
-}
+export const restoreTrackAction = withActor(
+  withAuthorization(
+    "ADMIN",
+    withRevalidation(
+      () => ["/admin/curriculum/curriculum-tracks"],
+      async (actor, id: string) => {
+        await restoreTrack(actor, id);
+        return { success: true, data: undefined };
+      }
+    )
+  )
+);

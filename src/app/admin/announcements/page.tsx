@@ -1,5 +1,10 @@
 import { requireAdmin } from "@/lib/auth/permissions";
 import { db } from "@/lib/db";
+import {
+  PageHeader,
+  PageHeaderHeading,
+  PageHeaderDescription,
+} from "@/components/layout/page-header";
 import { AnnouncementList } from "@/features/announcements/components/AnnouncementList";
 
 export default async function AdminAnnouncementsPage() {
@@ -28,9 +33,12 @@ export default async function AdminAnnouncementsPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold tracking-tight">Notices</h1>
-      </div>
+      <PageHeader>
+        <div>
+          <PageHeaderHeading>Notices</PageHeaderHeading>
+          <PageHeaderDescription>Manage institute announcements and notices.</PageHeaderDescription>
+        </div>
+      </PageHeader>
 
       <AnnouncementList
         announcements={announcements}

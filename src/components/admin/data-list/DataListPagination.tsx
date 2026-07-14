@@ -2,6 +2,7 @@
 
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useTransition } from "react";
+import { Button } from "@/components/ui/button";
 
 interface DataListPaginationProps {
   totalItems: number;
@@ -46,23 +47,25 @@ export function DataListPagination({
         {Math.min(currentPage * pageSize, totalItems)} of {totalItems} entries
       </div>
       <div className="flex items-center space-x-2">
-        <button
+        <Button
+          variant="outline"
+          size="sm"
           onClick={() => goToPage(currentPage - 1)}
           disabled={currentPage <= 1 || isPending}
-          className="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 border border-input bg-transparent shadow-sm hover:bg-accent hover:text-accent-foreground h-9 px-4 py-2"
         >
           Previous
-        </button>
+        </Button>
         <div className="text-sm font-medium">
           Page {currentPage} of {totalPages}
         </div>
-        <button
+        <Button
+          variant="outline"
+          size="sm"
           onClick={() => goToPage(currentPage + 1)}
           disabled={currentPage >= totalPages || isPending}
-          className="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 border border-input bg-transparent shadow-sm hover:bg-accent hover:text-accent-foreground h-9 px-4 py-2"
         >
           Next
-        </button>
+        </Button>
       </div>
     </div>
   );

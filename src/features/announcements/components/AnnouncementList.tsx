@@ -2,8 +2,14 @@
 
 import React, { useState, useMemo } from "react";
 import { Prisma, AnnouncementAudience, AnnouncementPriority } from "@prisma/client";
-import { DataListTableShell } from "@/components/admin/data-list/DataListTableShell";
-import { DataListMobileShell } from "@/components/admin/data-list/DataListMobileShell";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { DataListEmpty } from "@/components/admin/data-list/DataListEmpty";
 import { AnnouncementRowActions } from "./AnnouncementRowActions";
 import dynamic from "next/dynamic";
@@ -172,71 +178,8 @@ export function AnnouncementList({
         />
       ) : (
         <>
-          <DataListTableShell
-            headers={
-              <>
-                <th className="h-10 px-4 text-left font-medium text-muted-foreground">
-                  Title
-                </th>
-                <th className="h-10 px-4 text-left font-medium text-muted-foreground">
-                  Audience
-                </th>
-                <th className="h-10 px-4 text-left font-medium text-muted-foreground">
-                  Priority
-                </th>
-                <th className="h-10 px-4 text-left font-medium text-muted-foreground">
-                  Session
-                </th>
-                <th className="h-10 px-4 text-left font-medium text-muted-foreground">
-                  Status
-                </th>
-                <th className="h-10 px-4 text-right font-medium text-muted-foreground">
-                  Actions
-                </th>
-              </>
-            }
-          >
-            {filteredAnnouncements.map((a) => (
-              <tr key={a.id} className="border-b transition-colors hover:bg-muted/50">
-                <td className="p-4 font-medium">
-                  <div className="flex items-center space-x-2">
-                    <span className="max-w-[200px] truncate">{a.title}</span>
-                  </div>
-                </td>
-                <td className="p-4 text-sm text-muted-foreground">
-                  <span>{audienceLabel[a.audience]}</span>
-                  {a.curriculumTrack && (
-                    <span className="ml-1 text-xs">
-                      ({a.curriculumTrack.displayName})
-                    </span>
-                  )}
-                  {a.batch && <span className="ml-1 text-xs">({a.batch.name})</span>}
-                </td>
-                <td className="p-4 text-sm">
-                  <span
-                    className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${priorityColor[a.priority]}`}
-                  >
-                    {priorityLabel[a.priority]}
-                  </span>
-                </td>
-                <td className="p-4 text-sm text-muted-foreground">
-                  {a.academicSession?.name || "-"}
-                </td>
-                <td className="p-4 text-sm">
-                  <span
-                    className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${statusLabel(a).color}`}
-                  >
-                    {statusLabel(a).label}
-                  </span>
-                </td>
-                <td className="p-4 text-right">
-                  <AnnouncementRowActions announcement={a} onEdit={() => handleEdit(a)} />
-                </td>
-              </tr>
-            ))}
-          </DataListTableShell>
-
-          <DataListMobileShell>
+          {/* Mobile View */}
+          <div className="flex flex-col space-y-4 md:hidden">
             {filteredAnnouncements.map((a) => (
               <div
                 key={a.id}
@@ -295,7 +238,63 @@ export function AnnouncementList({
                 </div>
               </div>
             ))}
-          </DataListMobileShell>
+          </div>
+
+          {/* Desktop View */}
+          <div className="hidden w-full overflow-auto rounded-md border md:block bg-card">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Title</TableHead>
+                  <TableHead>Audience</TableHead>
+                  <TableHead>Priority</TableHead>
+                  <TableHead>Session</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead className="text-right">Actions</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {filteredAnnouncements.map((a) => (
+                  <TableRow key={a.id}>
+                    <TableCell className="font-medium">
+                      <div className="flex items-center space-x-2">
+                        <span className="max-w-[200px] truncate">{a.title}</span>
+                      </div>
+                    </TableCell>
+                    <TableCell className="text-muted-foreground">
+                      <span>{audienceLabel[a.audience]}</span>
+                      {a.curriculumTrack && (
+                        <span className="ml-1 text-xs">
+                          ({a.curriculumTrack.displayName})
+                        </span>
+                      )}
+                      {a.batch && <span className="ml-1 text-xs">({a.batch.name})</span>}
+                    </TableCell>
+                    <TableCell>
+                      <span
+                        className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${priorityColor[a.priority]}`}
+                      >
+                        {priorityLabel[a.priority]}
+                      </span>
+                    </TableCell>
+                    <TableCell className="text-muted-foreground">
+                      {a.academicSession?.name || "-"}
+                    </TableCell>
+                    <TableCell>
+                      <span
+                        className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${statusLabel(a).color}`}
+                      >
+                        {statusLabel(a).label}
+                      </span>
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <AnnouncementRowActions announcement={a} onEdit={() => handleEdit(a)} />
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
         </>
       )}
 

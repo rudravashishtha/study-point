@@ -2,6 +2,12 @@ import { requireAdmin } from "@/lib/auth/permissions";
 import { db } from "@/lib/db";
 import { FeeAssignmentList } from "@/features/fees/components/FeeAssignmentList";
 
+import {
+  PageHeader,
+  PageHeaderHeading,
+  PageHeaderDescription,
+} from "@/components/layout/page-header";
+
 export default async function AdminFeeAssignmentsPage() {
   await requireAdmin();
 
@@ -41,9 +47,12 @@ export default async function AdminFeeAssignmentsPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold tracking-tight">Fee Assignments</h1>
-      </div>
+      <PageHeader>
+        <div>
+          <PageHeaderHeading>Fee Assignments</PageHeaderHeading>
+          <PageHeaderDescription>Manage student fee plan assignments.</PageHeaderDescription>
+        </div>
+      </PageHeader>
       <FeeAssignmentList
         assignments={assignments}
         feePlans={feePlans}

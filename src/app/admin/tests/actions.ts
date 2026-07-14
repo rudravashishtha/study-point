@@ -1,6 +1,5 @@
 "use server";
 
-import { requireAdmin } from "@/lib/auth/permissions";
 import {
   createTest,
   updateTest,
@@ -9,40 +8,69 @@ import {
   CreateTestInput,
   UpdateTestInput,
 } from "@/server/services/tests";
-import { revalidatePath } from "next/cache";
+import { withActor, withAuthorization, withRevalidation } from "@/lib/actions/wrappers";
+import { DomainError } from "@/lib/domain/errors";
 
-export async function createAdminTestAction(input: CreateTestInput) {
-  const admin = await requireAdmin();
-  const res = await createTest(admin.id, input);
-  if (res.success) {
-    revalidatePath("/admin/tests");
-  }
-  return res;
-}
+export const createAdminTestAction = withActor(
+  withAuthorization(
+    "ADMIN",
+    withRevalidation(
+      ["/admin/tests"],
+      async (actor, input: CreateTestInput) => {
+        const res = await createTest(actor.userId, input);
+        if (!res.success) {
+          throw new DomainError((res.error?.code as any) || "INTERNAL_ERROR", res.error?.message || "Failed to create test");
+        }
+        return { success: true, data: res.data };
+      }
+    )
+  )
+);
 
-export async function updateAdminTestAction(id: string, input: UpdateTestInput) {
-  const admin = await requireAdmin();
-  const res = await updateTest(admin.id, id, input);
-  if (res.success) {
-    revalidatePath("/admin/tests");
-  }
-  return res;
-}
+export const updateAdminTestAction = withActor(
+  withAuthorization(
+    "ADMIN",
+    withRevalidation(
+      () => ["/admin/tests"],
+      async (actor, id: string, input: UpdateTestInput) => {
+        const res = await updateTest(actor.userId, id, input);
+        if (!res.success) {
+          throw new DomainError((res.error?.code as any) || "INTERNAL_ERROR", res.error?.message || "Failed to update test");
+        }
+        return { success: true, data: res.data };
+      }
+    )
+  )
+);
 
-export async function publishAdminTestAction(id: string) {
-  const admin = await requireAdmin();
-  const res = await publishTest(admin.id, id);
-  if (res.success) {
-    revalidatePath("/admin/tests");
-  }
-  return res;
-}
+export const publishAdminTestAction = withActor(
+  withAuthorization(
+    "ADMIN",
+    withRevalidation(
+      () => ["/admin/tests"],
+      async (actor, id: string) => {
+        const res = await publishTest(actor.userId, id);
+        if (!res.success) {
+          throw new DomainError((res.error?.code as any) || "INTERNAL_ERROR", res.error?.message || "Failed to publish test");
+        }
+        return { success: true, data: res.data };
+      }
+    )
+  )
+);
 
-export async function archiveAdminTestAction(id: string) {
-  const admin = await requireAdmin();
-  const res = await archiveTest(admin.id, id);
-  if (res.success) {
-    revalidatePath("/admin/tests");
-  }
-  return res;
-}
+export const archiveAdminTestAction = withActor(
+  withAuthorization(
+    "ADMIN",
+    withRevalidation(
+      () => ["/admin/tests"],
+      async (actor, id: string) => {
+        const res = await archiveTest(actor.userId, id);
+        if (!res.success) {
+          throw new DomainError((res.error?.code as any) || "INTERNAL_ERROR", res.error?.message || "Failed to archive test");
+        }
+        return { success: true, data: res.data };
+      }
+    )
+  )
+);

@@ -23,7 +23,7 @@ function formatDate(date: Date | string): string {
   });
 }
 
-export interface FeeDue {
+interface FeeDue {
   id: string;
   label: string;
   dueDate: string | Date;

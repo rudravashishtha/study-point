@@ -1,12 +1,13 @@
 "use client";
 
-import React, { useState, useTransition } from "react";
+import React from "react";
 import { toast } from "sonner";
 import { AcademicSession } from "@prisma/client";
 import {
   createSessionAction,
   updateSessionAction,
 } from "@/app/admin/academic-sessions/actions";
+import { useServerAction } from "@/hooks/use-server-action";
 import { useRouter } from "next/navigation";
 import {
   Dialog,
@@ -27,12 +28,12 @@ export function SessionFormDialog({
   onOpenChange: (open: boolean) => void;
 }) {
   const router = useRouter();
-  const [isPending, startTransition] = useTransition();
-  const [error, setError] = useState<string | null>(null);
+  const { isPending, error, execute } = useServerAction(
+    session ? updateSessionAction : createSessionAction
+  );
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setError(null);
     const formData = new FormData(e.currentTarget);
     const payload = {
       name: formData.get("name") as string,
@@ -40,18 +41,12 @@ export function SessionFormDialog({
       endsOn: (formData.get("endsOn") as string) || "",
     };
 
-    startTransition(async () => {
-      const res = session
-        ? await updateSessionAction(session.id, payload)
-        : await createSessionAction(payload);
+    const actionArgs = session ? [session.id, payload] : [payload];
 
-      if (!res.success) {
-        setError(res.error);
-        toast.error(res.error);
-      } else {
-        toast.success(
-          session ? "Session updated successfully" : "Session created successfully",
-        );
+    execute(actionArgs as any, {
+      onError: (err) => toast.error(err),
+      onSuccess: () => {
+        toast.success(session ? "Session updated successfully" : "Session created successfully");
         onOpenChange(false);
         router.refresh();
       }

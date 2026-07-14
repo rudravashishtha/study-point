@@ -9,6 +9,13 @@ import { StudentAccountStatusFilter } from "@/features/students/components/Stude
 import { DataListPagination } from "@/components/admin/data-list/DataListPagination";
 import { DataListEmpty } from "@/components/admin/data-list/DataListEmpty";
 import { CreateStudentButton } from "./CreateStudentButton";
+import {
+  PageHeader,
+  PageHeaderHeading,
+  PageHeaderDescription,
+  PageHeaderActions,
+} from "@/components/layout/page-header";
+import { DataListToolbar, DataListFilters } from "@/components/layout/data-list-toolbar";
 
 export default async function StudentsPage({
   searchParams,
@@ -62,18 +69,23 @@ export default async function StudentsPage({
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold tracking-tight">Students</h1>
-        <CreateStudentButton />
-      </div>
+      <PageHeader>
+        <div>
+          <PageHeaderHeading>Students</PageHeaderHeading>
+          <PageHeaderDescription>Manage student enrolment and access.</PageHeaderDescription>
+        </div>
+        <PageHeaderActions>
+          <CreateStudentButton />
+        </PageHeaderActions>
+      </PageHeader>
 
-      <div className="flex flex-col space-y-4 md:flex-row md:items-center md:justify-between md:space-y-0">
+      <DataListToolbar>
         <DataListSearch placeholder="Search by name or code..." />
-        <div className="flex items-center space-x-2">
+        <DataListFilters>
           <StudentAccountStatusFilter />
           <DataListArchiveFilter />
-        </div>
-      </div>
+        </DataListFilters>
+      </DataListToolbar>
 
       {students.length === 0 ? (
         <DataListEmpty

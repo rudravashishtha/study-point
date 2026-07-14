@@ -49,7 +49,7 @@ export function TeacherRowActions({ teacher, onActionComplete }: TeacherRowActio
         result = await restoreTeacherAction(teacher.id);
       }
 
-      if (result.error) {
+      if (!result.success) {
         toast.error("Action Failed", {
           description: result.error,
         });

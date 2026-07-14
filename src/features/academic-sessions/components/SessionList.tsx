@@ -2,8 +2,15 @@
 
 import React, { useState } from "react";
 import { AcademicSession } from "@prisma/client";
-import { DataListTableShell } from "@/components/admin/data-list/DataListTableShell";
-import { DataListMobileShell } from "@/components/admin/data-list/DataListMobileShell";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Badge } from "@/components/ui/badge";
 import { SessionRowActions } from "./SessionRowActions";
 import { SessionFormDialog } from "./SessionFormDialog";
 
@@ -23,8 +30,7 @@ export function SessionList({ sessions }: { sessions: AcademicSession[] }) {
 
   return (
     <div className="space-y-4">
-      <div className="flex justify-between items-center">
-        <h2 className="text-xl font-bold">Academic Sessions</h2>
+      <div className="flex justify-end items-center">
         <button
           onClick={handleCreate}
           className="rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90"
@@ -33,64 +39,59 @@ export function SessionList({ sessions }: { sessions: AcademicSession[] }) {
         </button>
       </div>
 
-      <DataListTableShell
-        headers={
-          <>
-            <th className="h-10 px-4 text-left font-medium text-muted-foreground">
-              Name
-            </th>
-            <th className="h-10 px-4 text-left font-medium text-muted-foreground">
-              Status
-            </th>
-            <th className="h-10 px-4 text-left font-medium text-muted-foreground">
-              Starts On
-            </th>
-            <th className="h-10 px-4 text-left font-medium text-muted-foreground">
-              Ends On
-            </th>
-            <th className="h-10 px-4 text-right font-medium text-muted-foreground">
-              Actions
-            </th>
-          </>
-        }
-      >
-        {sessions.map((session) => (
-          <tr key={session.id} className="border-b transition-colors hover:bg-muted/50">
-            <td className="p-4 font-medium">
-              {session.name}
-              {session.archivedAt && (
-                <span className="ml-2 rounded-full bg-muted px-2 py-0.5 text-xs text-muted-foreground">
-                  Archived
-                </span>
-              )}
-            </td>
-            <td className="p-4">
-              {session.isActive ? (
-                <span className="rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-800">
-                  Active
-                </span>
-              ) : (
-                <span className="text-sm text-muted-foreground">Inactive</span>
-              )}
-            </td>
-            <td className="p-4 text-sm text-muted-foreground">
-              {session.startsOn
-                ? new Date(session.startsOn).toLocaleDateString("en-GB")
-                : "-"}
-            </td>
-            <td className="p-4 text-sm text-muted-foreground">
-              {session.endsOn
-                ? new Date(session.endsOn).toLocaleDateString("en-GB")
-                : "-"}
-            </td>
-            <td className="p-4 text-right">
-              <SessionRowActions session={session} onEdit={() => handleEdit(session)} />
-            </td>
-          </tr>
-        ))}
-      </DataListTableShell>
+      {/* Desktop View */}
+      <div className="hidden w-full overflow-auto rounded-md border md:block bg-card">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Name</TableHead>
+              <TableHead>Status</TableHead>
+              <TableHead>Starts On</TableHead>
+              <TableHead>Ends On</TableHead>
+              <TableHead className="text-right">Actions</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {sessions.map((session) => (
+              <TableRow key={session.id}>
+                <TableCell className="font-medium">
+                  {session.name}
+                  {session.archivedAt && (
+                    <Badge variant="secondary" className="ml-2">
+                      Archived
+                    </Badge>
+                  )}
+                </TableCell>
+                <TableCell>
+                  {session.isActive ? (
+                    <Badge variant="default" className="bg-green-600 hover:bg-green-700">
+                      Active
+                    </Badge>
+                  ) : (
+                    <span className="text-sm text-muted-foreground">Inactive</span>
+                  )}
+                </TableCell>
+                <TableCell className="text-muted-foreground">
+                  {session.startsOn
+                    ? new Date(session.startsOn).toLocaleDateString("en-GB")
+                    : "-"}
+                </TableCell>
+                <TableCell className="text-muted-foreground">
+                  {session.endsOn
+                    ? new Date(session.endsOn).toLocaleDateString("en-GB")
+                    : "-"}
+                </TableCell>
+                <TableCell className="text-right">
+                  <SessionRowActions session={session} onEdit={() => handleEdit(session)} />
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </div>
 
-      <DataListMobileShell>
+      {/* Mobile View */}
+      <div className="flex flex-col space-y-4 md:hidden">
         {sessions.map((session) => (
           <div
             key={session.id}
@@ -99,14 +100,14 @@ export function SessionList({ sessions }: { sessions: AcademicSession[] }) {
             <div className="flex items-center justify-between mb-2">
               <span className="font-semibold">{session.name}</span>
               {session.isActive && (
-                <span className="rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-800">
+                <Badge variant="default" className="bg-green-600 hover:bg-green-700">
                   Active
-                </span>
+                </Badge>
               )}
               {session.archivedAt && (
-                <span className="rounded-full bg-muted px-2 py-0.5 text-xs text-muted-foreground">
+                <Badge variant="secondary">
                   Archived
-                </span>
+                </Badge>
               )}
             </div>
             <div className="text-sm text-muted-foreground mb-4 space-y-1">
@@ -128,7 +129,7 @@ export function SessionList({ sessions }: { sessions: AcademicSession[] }) {
             </div>
           </div>
         ))}
-      </DataListMobileShell>
+      </div>
 
       <SessionFormDialog
         session={editingSession}

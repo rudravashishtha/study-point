@@ -17,6 +17,14 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 
 type FeePlanWithRelations = Prisma.FeePlanGetPayload<{
   include: {
@@ -340,31 +348,20 @@ export function FeeAssignmentPreviewDialog({
               )}
 
               {/* Per-Enrolment Dues */}
-              <div className="overflow-x-auto rounded-md border">
-                <table className="w-full caption-bottom text-sm">
-                  <thead className="[&_tr]:border-b">
-                    <tr className="border-b">
-                      <th className="h-10 px-4 text-left font-medium text-muted-foreground whitespace-nowrap">
-                        Student
-                      </th>
-                      <th className="h-10 px-4 text-left font-medium text-muted-foreground whitespace-nowrap">
-                        Status
-                      </th>
-                      <th className="h-10 px-4 text-left font-medium text-muted-foreground whitespace-nowrap">
-                        Dues
-                      </th>
-                      <th className="h-10 px-4 text-right font-medium text-muted-foreground whitespace-nowrap">
-                        Total
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody className="[&_tr:last-child]:border-0">
+              <div className="overflow-x-auto rounded-md border w-full">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead className="whitespace-nowrap">Student</TableHead>
+                      <TableHead className="whitespace-nowrap">Status</TableHead>
+                      <TableHead className="whitespace-nowrap">Dues</TableHead>
+                      <TableHead className="text-right whitespace-nowrap">Total</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
                     {previewResult.items.map((item) => (
-                      <tr
-                        key={item.enrolmentId}
-                        className="border-b transition-colors hover:bg-muted/50"
-                      >
-                        <td className="p-4">
+                      <TableRow key={item.enrolmentId}>
+                        <TableCell>
                           <div className="font-medium">
                             {item.studentName ?? "Unknown"}
                           </div>
@@ -373,8 +370,8 @@ export function FeeAssignmentPreviewDialog({
                               {item.studentCode}
                             </div>
                           )}
-                        </td>
-                        <td className="p-4">
+                        </TableCell>
+                        <TableCell>
                           {item.hasExistingActiveAssignment ? (
                             <span className="rounded-full bg-yellow-100 px-2.5 py-0.5 text-xs font-medium text-yellow-800">
                               Skipped
@@ -388,8 +385,8 @@ export function FeeAssignmentPreviewDialog({
                               Invalid
                             </span>
                           )}
-                        </td>
-                        <td className="p-4 text-xs text-muted-foreground">
+                        </TableCell>
+                        <TableCell className="text-xs text-muted-foreground">
                           {item.proposedDues.length > 0 ? (
                             <ul className="list-disc list-inside">
                               {item.proposedDues.map((d, i) => (
@@ -402,14 +399,14 @@ export function FeeAssignmentPreviewDialog({
                           ) : (
                             <span className="text-muted-foreground">-</span>
                           )}
-                        </td>
-                        <td className="p-4 text-right font-medium">
+                        </TableCell>
+                        <TableCell className="text-right font-medium">
                           {formatAmount(item.totalAmount)}
-                        </td>
-                      </tr>
+                        </TableCell>
+                      </TableRow>
                     ))}
-                  </tbody>
-                </table>
+                  </TableBody>
+                </Table>
               </div>
 
               {/* Confirm Button */}

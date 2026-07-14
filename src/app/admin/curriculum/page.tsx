@@ -1,21 +1,26 @@
 import { BookMarked, GraduationCap, Library, LayoutTemplate } from "lucide-react";
 import Link from "next/link";
 import { requireAdmin } from "@/lib/auth/permissions";
+import {
+  PageHeader,
+  PageHeaderHeading,
+  PageHeaderDescription,
+} from "@/components/layout/page-header";
 
 export default async function AdminCurriculumPage() {
   await requireAdmin();
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center space-x-3 pb-4 border-b">
-        <BookMarked className="h-8 w-8 text-primary" />
-        <div>
-          <h1 className="text-2xl font-bold tracking-tight">Curriculum</h1>
-          <p className="text-muted-foreground">
-            Manage boards, programmes, subjects, and curriculum tracks.
-          </p>
+      <PageHeader>
+        <div className="flex items-center space-x-3">
+          <BookMarked className="h-8 w-8 text-primary" />
+          <div>
+            <PageHeaderHeading>Curriculum</PageHeaderHeading>
+            <PageHeaderDescription>Manage boards, programmes, subjects, and curriculum tracks.</PageHeaderDescription>
+          </div>
         </div>
-      </div>
+      </PageHeader>
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         <Link

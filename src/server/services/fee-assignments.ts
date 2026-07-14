@@ -14,14 +14,14 @@ export interface FeeAssignmentTargetInput {
   endsOn?: string | null; // YYYY-MM-DD
 }
 
-export interface PreviewDue {
+interface PreviewDue {
   label: string;
   dueDate: string; // ISO string
   amountDue: number;
   feePlanInstallmentId: string;
 }
 
-export interface PreviewItem {
+interface PreviewItem {
   enrolmentId: string;
   studentName: string | null;
   studentCode: string | null;
@@ -47,7 +47,7 @@ export interface PreviewFeeAssignmentResult {
   warnings: string[];
 }
 
-export interface ConfirmItem {
+interface ConfirmItem {
   enrolmentId: string;
   status: "created" | "skipped" | "failed";
   assignmentId?: string;
@@ -61,14 +61,14 @@ export interface ConfirmFeeAssignmentResult {
   items: ConfirmItem[];
 }
 
-export interface ListAssignmentsParams {
+interface ListAssignmentsParams {
   query?: string;
   status?: FeeAssignmentStatus;
   page?: number;
   pageSize?: number;
 }
 
-export interface ListAssignmentRow {
+interface ListAssignmentRow {
   id: string;
   enrolmentId: string;
   feePlanId: string;
@@ -83,7 +83,7 @@ export interface ListAssignmentRow {
   dueCount: number;
 }
 
-export interface ListAssignmentsResult {
+interface ListAssignmentsResult {
   items: ListAssignmentRow[];
   total: number;
   page: number;

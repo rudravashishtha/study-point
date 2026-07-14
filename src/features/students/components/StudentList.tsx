@@ -3,6 +3,14 @@
 import React, { useState } from "react";
 import { Student } from "@prisma/client";
 import { Archive, ArchiveRestore, Pencil, Power } from "lucide-react";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { archiveStudentAction, restoreStudentAction } from "@/app/admin/students/actions";
 import { inviteStudentAction } from "@/app/admin/students/activate/actions";
 import { toast } from "sonner";
@@ -41,103 +49,99 @@ export function StudentList({ students }: { students: Student[] }) {
 
   return (
     <>
-      <div className="rounded-md border bg-card">
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="border-b bg-muted/50 text-left font-medium text-muted-foreground">
-                <th className="p-4">Student Code</th>
-                <th className="p-4">Full Name</th>
-                <th className="p-4">Account Status</th>
-                <th className="p-4">Joining Date</th>
-                <th className="p-4">Status</th>
-                <th className="p-4 w-[50px]"></th>
-              </tr>
-            </thead>
-            <tbody>
-              {students.map((student) => (
-                <tr
-                  key={student.id}
-                  className={`border-b last:border-0 ${
-                    student.archivedAt ? "opacity-60 bg-muted/30" : ""
-                  }`}
-                >
-                  <td className="p-4 font-mono text-xs">{student.studentCode}</td>
-                  <td className="p-4 font-medium">
-                    {student.fullName}
-                    {student.email && (
-                      <div className="text-xs text-muted-foreground font-normal">
-                        {student.email}
-                      </div>
-                    )}
-                  </td>
-                  <td className="p-4">
-                    <span className="inline-flex items-center rounded-full bg-secondary px-2.5 py-0.5 text-xs font-medium text-secondary-foreground">
-                      {student.accountStatus}
+      <div className="rounded-md border bg-card w-full overflow-auto">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Student Code</TableHead>
+              <TableHead>Full Name</TableHead>
+              <TableHead>Account Status</TableHead>
+              <TableHead>Joining Date</TableHead>
+              <TableHead>Status</TableHead>
+              <TableHead className="w-[50px]"></TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {students.map((student) => (
+              <TableRow
+                key={student.id}
+                className={student.archivedAt ? "opacity-60 bg-muted/30" : ""}
+              >
+                <TableCell className="font-mono text-xs">{student.studentCode}</TableCell>
+                <TableCell className="font-medium">
+                  {student.fullName}
+                  {student.email && (
+                    <div className="text-xs text-muted-foreground font-normal">
+                      {student.email}
+                    </div>
+                  )}
+                </TableCell>
+                <TableCell>
+                  <span className="inline-flex items-center rounded-full bg-secondary px-2.5 py-0.5 text-xs font-medium text-secondary-foreground">
+                    {student.accountStatus}
+                  </span>
+                </TableCell>
+                <TableCell>
+                  {student.joiningDate
+                    ? new Date(student.joiningDate).toLocaleDateString("en-GB")
+                    : "-"}
+                </TableCell>
+                <TableCell>
+                  {student.archivedAt ? (
+                    <span className="inline-flex items-center rounded-full bg-destructive/10 px-2.5 py-0.5 text-xs font-medium text-destructive">
+                      Archived
                     </span>
-                  </td>
-                  <td className="p-4">
-                    {student.joiningDate
-                      ? new Date(student.joiningDate).toLocaleDateString("en-GB")
-                      : "-"}
-                  </td>
-                  <td className="p-4">
-                    {student.archivedAt ? (
-                      <span className="inline-flex items-center rounded-full bg-destructive/10 px-2.5 py-0.5 text-xs font-medium text-destructive">
-                        Archived
-                      </span>
-                    ) : (
-                      <span className="inline-flex items-center rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-800 dark:bg-green-900/30 dark:text-green-400">
-                        Active
-                      </span>
-                    )}
-                  </td>
-                  <td className="p-4 flex items-center justify-end space-x-2">
-                    {!student.archivedAt ? (
-                      <>
-                        {student.accountStatus === "none" && (
-                          <button
-                            onClick={() => handleActivate(student.id)}
-                            className="flex h-8 w-8 items-center justify-center rounded-md text-emerald-600 hover:bg-emerald-100 dark:hover:bg-emerald-900/30"
-                            title="Activate account"
-                          >
-                            <Power className="h-4 w-4" />
-                            <span className="sr-only">Activate account</span>
-                          </button>
-                        )}
+                  ) : (
+                    <span className="inline-flex items-center rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-800 dark:bg-green-900/30 dark:text-green-400">
+                      Active
+                    </span>
+                  )}
+                </TableCell>
+                <TableCell className="flex items-center justify-end space-x-2">
+                  {!student.archivedAt ? (
+                    <>
+                      {student.accountStatus === "none" && (
                         <button
-                          onClick={() => setEditingStudent(student)}
-                          className="flex h-8 w-8 items-center justify-center rounded-md hover:bg-muted"
-                          title="Edit"
+                          onClick={() => handleActivate(student.id)}
+                          className="flex h-8 w-8 items-center justify-center rounded-md text-emerald-600 hover:bg-emerald-100 dark:hover:bg-emerald-900/30"
+                          title="Activate account"
                         >
-                          <Pencil className="h-4 w-4" />
-                          <span className="sr-only">Edit</span>
+                          <Power className="h-4 w-4" />
+                          <span className="sr-only">Activate account</span>
                         </button>
-                        <button
-                          onClick={() => handleArchive(student.id)}
-                          className="flex h-8 w-8 items-center justify-center rounded-md text-destructive hover:bg-destructive/10"
-                          title="Archive"
-                        >
-                          <Archive className="h-4 w-4" />
-                          <span className="sr-only">Archive</span>
-                        </button>
-                      </>
-                    ) : (
+                      )}
                       <button
-                        onClick={() => handleRestore(student.id)}
+                        onClick={() => setEditingStudent(student)}
                         className="flex h-8 w-8 items-center justify-center rounded-md hover:bg-muted"
-                        title="Restore"
+                        title="Edit"
                       >
-                        <ArchiveRestore className="h-4 w-4" />
-                        <span className="sr-only">Restore</span>
+                        <Pencil className="h-4 w-4" />
+                        <span className="sr-only">Edit</span>
                       </button>
-                    )}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+                      <button
+                        onClick={() => handleArchive(student.id)}
+                        className="flex h-8 w-8 items-center justify-center rounded-md text-destructive hover:bg-destructive/10"
+                        title="Archive"
+                      >
+                        <Archive className="h-4 w-4" />
+                        <span className="sr-only">Archive</span>
+                      </button>
+                    </>
+                  ) : (
+                    <button
+                      onClick={() => handleRestore(student.id)}
+                      className="flex h-8 w-8 items-center justify-center rounded-md hover:bg-muted"
+                      title="Restore"
+                    >
+                      <ArchiveRestore className="h-4 w-4" />
+                      <span className="sr-only">Restore</span>
+                    </button>
+                  )}
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
       </div>
 
       <StudentFormDialog

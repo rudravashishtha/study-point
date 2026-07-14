@@ -2,6 +2,12 @@ import { requireAdmin } from "@/lib/auth/permissions";
 import { db } from "@/lib/db";
 import { FeePlanList } from "@/features/fees/components/FeePlanList";
 
+import {
+  PageHeader,
+  PageHeaderHeading,
+  PageHeaderDescription,
+} from "@/components/layout/page-header";
+
 export default async function AdminFeesPage() {
   await requireAdmin();
 
@@ -22,9 +28,12 @@ export default async function AdminFeesPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold tracking-tight">Fee Plans</h1>
-      </div>
+      <PageHeader>
+        <div>
+          <PageHeaderHeading>Fee Plans</PageHeaderHeading>
+          <PageHeaderDescription>Manage institute fee structures and plans.</PageHeaderDescription>
+        </div>
+      </PageHeader>
 
       <FeePlanList
         feePlans={feePlans}

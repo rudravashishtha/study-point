@@ -1,6 +1,6 @@
 import { db } from "../../lib/db";
 
-export interface PublicCourseTrack {
+interface PublicCourseTrack {
   id: string;
   displayName: string;
   classLevel: string;

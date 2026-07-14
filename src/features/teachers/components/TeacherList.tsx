@@ -1,8 +1,13 @@
 import type { Teacher } from "@prisma/client";
 import { Badge } from "@/components/ui/badge";
-import { TableCell, TableHead, TableRow } from "@/components/ui/table";
-import { DataListMobileShell } from "@/components/admin/data-list/DataListMobileShell";
-import { DataListTableShell } from "@/components/admin/data-list/DataListTableShell";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { DataListEmpty } from "@/components/admin/data-list/DataListEmpty";
 import { TeacherRowActions } from "./TeacherRowActions";
 import { getProvisioningDisplayStatus } from "../domain/provisioning";
@@ -28,7 +33,8 @@ export function TeacherList({ teachers }: TeacherListProps) {
 
   return (
     <>
-      <DataListMobileShell>
+      {/* Mobile View */}
+      <div className="flex flex-col space-y-4 md:hidden">
         {teachers.map((teacher) => (
           <div
             key={teacher.id}
@@ -57,53 +63,57 @@ export function TeacherList({ teachers }: TeacherListProps) {
             </div>
           </div>
         ))}
-      </DataListMobileShell>
+      </div>
 
-      <DataListTableShell
-        headers={
-          <TableRow>
-            <TableHead>Name</TableHead>
-            <TableHead>Contact</TableHead>
-            <TableHead>Status</TableHead>
-            <TableHead>Provisioning</TableHead>
-            <TableHead className="text-right">Actions</TableHead>
-          </TableRow>
-        }
-      >
-        {teachers.map((teacher) => (
-          <TableRow key={teacher.id}>
-            <TableCell className="font-medium">{teacher.displayName}</TableCell>
-            <TableCell>
-              <div className="text-sm">
-                {teacher.email && <div>{teacher.email}</div>}
-                {teacher.phone && (
-                  <div className="text-muted-foreground">{teacher.phone}</div>
-                )}
-                {!teacher.email && !teacher.phone && (
-                  <span className="text-muted-foreground italic">
-                    No contact provided
-                  </span>
-                )}
-              </div>
-            </TableCell>
-            <TableCell>
-              <Badge variant={teacher.active ? "default" : "secondary"}>
-                {teacher.active ? "Active" : "Inactive"}
-              </Badge>
-            </TableCell>
-            <TableCell>
-              <Badge variant="outline">
-                {getProvisioningDisplayStatus(
-                  teacher.appUser?.status as AppUserStatus | null,
-                )}
-              </Badge>
-            </TableCell>
-            <TableCell className="text-right">
-              <TeacherRowActions teacher={teacher} />
-            </TableCell>
-          </TableRow>
-        ))}
-      </DataListTableShell>
+      {/* Desktop View */}
+      <div className="hidden w-full overflow-auto rounded-md border md:block bg-card">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Name</TableHead>
+              <TableHead>Contact</TableHead>
+              <TableHead>Status</TableHead>
+              <TableHead>Provisioning</TableHead>
+              <TableHead className="text-right">Actions</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {teachers.map((teacher) => (
+              <TableRow key={teacher.id}>
+                <TableCell className="font-medium">{teacher.displayName}</TableCell>
+                <TableCell>
+                  <div className="text-sm">
+                    {teacher.email && <div>{teacher.email}</div>}
+                    {teacher.phone && (
+                      <div className="text-muted-foreground">{teacher.phone}</div>
+                    )}
+                    {!teacher.email && !teacher.phone && (
+                      <span className="text-muted-foreground italic">
+                        No contact provided
+                      </span>
+                    )}
+                  </div>
+                </TableCell>
+                <TableCell>
+                  <Badge variant={teacher.active ? "default" : "secondary"}>
+                    {teacher.active ? "Active" : "Inactive"}
+                  </Badge>
+                </TableCell>
+                <TableCell>
+                  <Badge variant="outline">
+                    {getProvisioningDisplayStatus(
+                      teacher.appUser?.status as AppUserStatus | null,
+                    )}
+                  </Badge>
+                </TableCell>
+                <TableCell className="text-right">
+                  <TeacherRowActions teacher={teacher} />
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </div>
     </>
   );
 }

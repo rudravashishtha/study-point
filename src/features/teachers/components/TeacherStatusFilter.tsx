@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useCallback, useTransition } from "react";
-import { useRouter, useSearchParams, usePathname } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { useCallback, useTransition } from "react";
 import {
   Select,
   SelectContent,
@@ -10,27 +10,24 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-export function StudentAccountStatusFilter() {
+export function TeacherStatusFilter() {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const [isPending, startTransition] = useTransition();
 
-  const currentStatus = searchParams.get("accountStatus") || "all";
+  const currentStatus = searchParams.get("status") || "active";
 
   const handleChange = useCallback(
     (value: string | null) => {
       if (!value) return;
       const params = new URLSearchParams(searchParams.toString());
-
-      // Reset to page 1 on filter change
-      params.delete("page");
-
-      if (value === "all") {
-        params.delete("accountStatus");
+      if (value === "active") {
+        params.delete("status"); // active is default
       } else {
-        params.set("accountStatus", value);
+        params.set("status", value);
       }
+      params.set("page", "1");
 
       startTransition(() => {
         router.push(`${pathname}?${params.toString()}`);
@@ -41,15 +38,13 @@ export function StudentAccountStatusFilter() {
 
   return (
     <Select value={currentStatus} onValueChange={handleChange} disabled={isPending}>
-      <SelectTrigger className="w-[180px]">
-        <SelectValue placeholder="Filter by account status" />
+      <SelectTrigger className="w-full sm:w-[180px]">
+        <SelectValue placeholder="Status" />
       </SelectTrigger>
       <SelectContent>
-        <SelectItem value="all">All Accounts</SelectItem>
-        <SelectItem value="none">No Account</SelectItem>
-        <SelectItem value="invited">Invited</SelectItem>
         <SelectItem value="active">Active</SelectItem>
-        <SelectItem value="disabled">Disabled</SelectItem>
+        <SelectItem value="inactive">Inactive</SelectItem>
+        <SelectItem value="all">All</SelectItem>
       </SelectContent>
     </Select>
   );

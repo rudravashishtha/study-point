@@ -77,7 +77,7 @@ export function TeacherFormDialog({
           ? await createTeacherAction(values)
           : await updateTeacherAction(teacher!.id, values as UpdateTeacherInput);
 
-      if (result.error) {
+      if (!result.success) {
         toast.error("Error", { description: result.error });
       } else {
         toast.success("Success", {

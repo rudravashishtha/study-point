@@ -34,14 +34,14 @@ type AdminAnnouncementRow = Prisma.AnnouncementGetPayload<{
   };
 }>;
 
-export interface ListAdminParams {
+interface ListAdminParams {
   query?: string;
   audience?: AnnouncementAudience;
   archiveState?: "active" | "archived" | "all";
   academicSessionId?: string;
 }
 
-export type AnnouncementListResult = {
+type AnnouncementListResult = {
   items: AdminAnnouncementRow[];
   total: number;
 };

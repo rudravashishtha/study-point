@@ -6,13 +6,14 @@ import { DataListSearch } from "@/components/admin/data-list/DataListSearch";
 import { DataListPagination } from "@/components/admin/data-list/DataListPagination";
 import { Plus } from "lucide-react";
 import { TeacherFormDialog } from "@/features/teachers/components/TeacherFormDialog";
+import { TeacherStatusFilter } from "@/features/teachers/components/TeacherStatusFilter";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+  PageHeader,
+  PageHeaderHeading,
+  PageHeaderDescription,
+  PageHeaderActions,
+} from "@/components/layout/page-header";
+import { DataListToolbar, DataListFilters } from "@/components/layout/data-list-toolbar";
 
 export default async function TeachersPage({
   searchParams,
@@ -46,60 +47,32 @@ export default async function TeachersPage({
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-4">
+      <PageHeader>
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Teachers</h1>
-          <p className="text-muted-foreground mt-1">
+          <PageHeaderHeading>Teachers</PageHeaderHeading>
+          <PageHeaderDescription>
             Manage teacher profiles and access.
-          </p>
+          </PageHeaderDescription>
         </div>
-        <TeacherFormDialog
-          mode="create"
-          trigger={
-            <Button>
-              <Plus className="size-4 mr-2" />
-              Add Teacher
-            </Button>
-          }
-        />
-      </div>
+        <PageHeaderActions>
+          <TeacherFormDialog
+            mode="create"
+            trigger={
+              <Button>
+                <Plus className="size-4 mr-2" />
+                Add Teacher
+              </Button>
+            }
+          />
+        </PageHeaderActions>
+      </PageHeader>
 
-      <div className="flex flex-col sm:flex-row gap-4 items-center justify-between">
+      <DataListToolbar>
         <DataListSearch placeholder="Search teachers..." />
-
-        {/* Simple status filter for now, ideally built as a generic component but this suffices */}
-        <form className="w-full sm:w-auto" method="GET">
-          {/* Preserve other query params */}
-          <input type="hidden" name="q" value={q} />
-          {resolvedParams.page && <input type="hidden" name="page" value="1" />}
-          {resolvedParams.sort && (
-            <input type="hidden" name="sort" value={resolvedParams.sort} />
-          )}
-          {resolvedParams.direction && (
-            <input type="hidden" name="direction" value={resolvedParams.direction} />
-          )}
-
-          <Select
-            name="status"
-            defaultValue={status}
-            onValueChange={(val) => {
-              const url = new URL(window.location.href);
-              url.searchParams.set("status", val ?? "");
-              url.searchParams.set("page", "1");
-              window.location.href = url.pathname + url.search;
-            }}
-          >
-            <SelectTrigger className="w-full sm:w-[180px]">
-              <SelectValue placeholder="Status" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="active">Active</SelectItem>
-              <SelectItem value="inactive">Inactive</SelectItem>
-              <SelectItem value="all">All</SelectItem>
-            </SelectContent>
-          </Select>
-        </form>
-      </div>
+        <DataListFilters>
+          <TeacherStatusFilter />
+        </DataListFilters>
+      </DataListToolbar>
 
       <TeacherList teachers={items} />
 

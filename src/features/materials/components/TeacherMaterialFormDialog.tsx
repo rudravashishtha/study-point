@@ -98,7 +98,7 @@ export function TeacherMaterialFormDialog({
         : await createTeacherMaterialAction(batchId, payload);
 
       if (!res.success) {
-        throw new Error(res.error.message);
+        throw new Error(typeof res.error === 'string' ? res.error : (res.error as any)?.message || 'Unknown error');
       }
       toast.success("Success", { description: "Material saved" });
       onOpenChange(false);

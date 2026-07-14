@@ -2,6 +2,12 @@ import { requireAdmin } from "@/lib/auth/permissions";
 import { db } from "@/lib/db";
 import { HomeworkList } from "@/features/homework/components/HomeworkList";
 
+import {
+  PageHeader,
+  PageHeaderHeading,
+  PageHeaderDescription,
+} from "@/components/layout/page-header";
+
 export default async function AdminHomeworkPage() {
   await requireAdmin();
 
@@ -40,13 +46,19 @@ export default async function AdminHomeworkPage() {
     batch: h.batch ? { name: h.batch.name, archivedAt: h.batch.archivedAt } : null,
     chapter: h.chapter ? { name: h.chapter.name } : null,
     topic: h.topic ? { name: h.topic.name } : null,
+    fileAsset: h.fileAsset ? { originalFilename: h.fileAsset.originalFilename } : null,
+    createdAt: h.createdAt,
+    archivedAt: h.archivedAt,
   }));
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold tracking-tight">Homework</h1>
-      </div>
+      <PageHeader>
+        <div>
+          <PageHeaderHeading>Homework</PageHeaderHeading>
+          <PageHeaderDescription>Manage student assignments and tasks.</PageHeaderDescription>
+        </div>
+      </PageHeader>
 
       <HomeworkList
         homework={homeworkItems}

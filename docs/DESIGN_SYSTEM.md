@@ -95,3 +95,10 @@ Semantic design tokens are used to style the application. Literal colour values 
 - All interactions must remain accessible to screen readers.
 - Respect `prefers-reduced-motion` for all `motion/react` animations.
 - Maintain strict performance budgets: Do not load multiple overlapping animation libraries. Fonts are bundled via `@fontsource` to avoid live external fetches during builds.
+
+## Component Composition
+
+- Prefer **composition over configuration**.
+- Construct larger UI patterns by composing existing shared shadcn primitives (`Table`, `Input`, `Button`, `Select`, etc.) instead of introducing new wrapper components with massive prop APIs.
+- Avoid "God components".
+- Maintain structural components like `PageHeader` and `DataListToolbar` strictly for layout semantics (they should not be aware of business logic, routing, or specific entities).

@@ -2,6 +2,12 @@ import { requireAdmin } from "@/lib/auth/permissions";
 import { db } from "@/lib/db";
 import { MaterialList } from "@/features/materials/components/MaterialList";
 
+import {
+  PageHeader,
+  PageHeaderHeading,
+  PageHeaderDescription,
+} from "@/components/layout/page-header";
+
 export default async function AdminMaterialsPage() {
   await requireAdmin();
 
@@ -17,9 +23,12 @@ export default async function AdminMaterialsPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold tracking-tight">Study Materials</h1>
-      </div>
+      <PageHeader>
+        <div>
+          <PageHeaderHeading>Study Materials</PageHeaderHeading>
+          <PageHeaderDescription>Manage course resources and materials.</PageHeaderDescription>
+        </div>
+      </PageHeader>
 
       <MaterialList
         materials={materials}

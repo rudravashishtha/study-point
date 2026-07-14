@@ -1,6 +1,5 @@
 "use server";
 
-import { requireAdmin } from "@/lib/auth/permissions";
 import {
   createHomework,
   updateHomework,
@@ -9,40 +8,69 @@ import {
   CreateHomeworkInput,
   UpdateHomeworkInput,
 } from "@/server/services/homework";
-import { revalidatePath } from "next/cache";
+import { withActor, withAuthorization, withRevalidation } from "@/lib/actions/wrappers";
+import { DomainError } from "@/lib/domain/errors";
 
-export async function createAdminHomeworkAction(input: CreateHomeworkInput) {
-  const admin = await requireAdmin();
-  const res = await createHomework(admin.id, input);
-  if (res.success) {
-    revalidatePath("/admin/homework");
-  }
-  return res;
-}
+export const createAdminHomeworkAction = withActor(
+  withAuthorization(
+    "ADMIN",
+    withRevalidation(
+      ["/admin/homework"],
+      async (actor, input: CreateHomeworkInput) => {
+        const res = await createHomework(actor.userId, input);
+        if (!res.success) {
+          throw new DomainError((res.error?.code as any) || "INTERNAL_ERROR", res.error?.message || "Failed to create homework");
+        }
+        return { success: true, data: res.data };
+      }
+    )
+  )
+);
 
-export async function updateAdminHomeworkAction(id: string, input: UpdateHomeworkInput) {
-  const admin = await requireAdmin();
-  const res = await updateHomework(admin.id, id, input);
-  if (res.success) {
-    revalidatePath("/admin/homework");
-  }
-  return res;
-}
+export const updateAdminHomeworkAction = withActor(
+  withAuthorization(
+    "ADMIN",
+    withRevalidation(
+      () => ["/admin/homework"],
+      async (actor, id: string, input: UpdateHomeworkInput) => {
+        const res = await updateHomework(actor.userId, id, input);
+        if (!res.success) {
+          throw new DomainError((res.error?.code as any) || "INTERNAL_ERROR", res.error?.message || "Failed to update homework");
+        }
+        return { success: true, data: res.data };
+      }
+    )
+  )
+);
 
-export async function publishAdminHomeworkAction(id: string) {
-  const admin = await requireAdmin();
-  const res = await publishHomework(admin.id, id);
-  if (res.success) {
-    revalidatePath("/admin/homework");
-  }
-  return res;
-}
+export const publishAdminHomeworkAction = withActor(
+  withAuthorization(
+    "ADMIN",
+    withRevalidation(
+      () => ["/admin/homework"],
+      async (actor, id: string) => {
+        const res = await publishHomework(actor.userId, id);
+        if (!res.success) {
+          throw new DomainError((res.error?.code as any) || "INTERNAL_ERROR", res.error?.message || "Failed to publish homework");
+        }
+        return { success: true, data: res.data };
+      }
+    )
+  )
+);
 
-export async function archiveAdminHomeworkAction(id: string) {
-  const admin = await requireAdmin();
-  const res = await archiveHomework(admin.id, id);
-  if (res.success) {
-    revalidatePath("/admin/homework");
-  }
-  return res;
-}
+export const archiveAdminHomeworkAction = withActor(
+  withAuthorization(
+    "ADMIN",
+    withRevalidation(
+      () => ["/admin/homework"],
+      async (actor, id: string) => {
+        const res = await archiveHomework(actor.userId, id);
+        if (!res.success) {
+          throw new DomainError((res.error?.code as any) || "INTERNAL_ERROR", res.error?.message || "Failed to archive homework");
+        }
+        return { success: true, data: res.data };
+      }
+    )
+  )
+);

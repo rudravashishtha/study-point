@@ -4,7 +4,7 @@ import { ActorContext } from "../../lib/domain/actor";
 import { createAuditLog } from "../../lib/domain/audit";
 import { DomainError } from "../../lib/domain/errors";
 
-export type FeePlanWithInstallments = FeePlan & { instalments: FeePlanInstallment[] };
+type FeePlanWithInstallments = FeePlan & { instalments: FeePlanInstallment[] };
 
 export async function listFeePlans(params: {
   query: string;

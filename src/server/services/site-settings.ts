@@ -34,29 +34,7 @@ export interface SiteSettingsData {
   updatedBy: string | null;
 }
 
-export interface UpdateSiteSettingsInput {
-  instituteName?: string;
-  tagline?: string | null;
-  phone?: string | null;
-  whatsappNumber?: string | null;
-  email?: string | null;
-  address?: string | null;
-  landmark?: string | null;
-  mapUrl?: string | null;
-  openingHours?: string | null;
-  logoFileId?: string | null;
-  faviconFileId?: string | null;
-  defaultTitle?: string | null;
-  defaultDescription?: string | null;
-  ogImageFileId?: string | null;
-  socialLinks?: Prisma.JsonValue | null;
-  heroHeadline?: string | null;
-  heroSubheadline?: string | null;
-  heroCtaText?: string | null;
-  heroCtaTarget?: string | null;
-  feeDisplayEnabled?: boolean;
-  [key: string]: unknown;
-}
+
 
 const DEFAULT_SETTINGS: Omit<
   SiteSettingsData,

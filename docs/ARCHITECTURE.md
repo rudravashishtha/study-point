@@ -460,3 +460,48 @@ Login, password-reset requests, and account-activation are protected by a lightw
 ## Phase 0 Decision
 
 The architecture is ready for review, but Phase 1 must not begin until the product, database, route, and implementation plans are approved.
+
+## Server Action Architecture & Wrappers
+
+All authenticated and authorized mutations must use the established wrapper pipeline in `src/lib/actions/wrappers.ts` to ensure consistent security boundaries, error handling, and cache revalidation.
+
+The wrapper composition order is strictly:
+`Authenticate -> Authorize -> Business Logic -> Revalidate`
+
+```typescript
+export const updateEntityAction = withActor(
+  withAuthorization(
+    "ADMIN",
+    withRevalidation(
+      () => ["/admin/entities"],
+      async (actor, entityId: string, data: unknown) => {
+        // Business Logic
+      }
+    )
+  )
+);
+```
+
+### `unstable_rethrow` Usage
+
+The Next.js 15+ `unstable_rethrow` API is utilized exclusively in `src/lib/actions/types.ts` (`handleActionError`).
+It is isolated here for the following reasons:
+- **Centralized Handling**: It is only used in one centralized error handler.
+- **Top of Catch**: It is invoked as the very first statement inside the `catch` block.
+- **Framework Preservation**: Its sole intended purpose is to preserve framework-controlled exceptions like `redirect()` and `notFound()`.
+
+Isolating this unstable API minimizes the blast radius if the Next.js API contract changes in future versions.
+
+## Abstraction Guidelines
+
+When determining whether to abstract UI components or business logic, adhere to the **Rule of Three**: Do not prematurely abstract code. A pattern must be repeated in three distinct feature areas before being eligible for shared abstraction.
+
+### When **not** to abstract
+
+- One-off components
+- Feature-specific dialogs
+- Small readable duplication
+- Business logic that differs slightly in intent
+- Components with fewer than three meaningful consumers
+
+This prevents contributors from undoing work by introducing unnecessary "God components" or configuration-heavy abstractions.

@@ -3,7 +3,7 @@ import { db } from "../../lib/db";
 import { ActorContext } from "../../lib/domain/actor";
 import { ServiceResult, success, failure } from "./types";
 
-export type ScheduleWithBatch = Prisma.BatchScheduleGetPayload<{
+type ScheduleWithBatch = Prisma.BatchScheduleGetPayload<{
   include: {
     batch: {
       include: {

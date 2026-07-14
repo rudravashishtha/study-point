@@ -1,8 +1,5 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
-import { requireAdmin } from "@/lib/auth/permissions";
-import { ActorContext } from "@/lib/domain/actor";
 import {
   createTeacher,
   updateTeacher,
@@ -13,129 +10,96 @@ import {
 } from "@/server/services/teachers";
 import { inviteTeacher } from "@/server/services/provisioning";
 import { createTeacherSchema, updateTeacherSchema } from "@/lib/validation/teachers";
-import { ActionResult, handleActionError } from "@/lib/actions/types";
+import { DomainError } from "@/lib/domain/errors";
+import { withActor, withAuthorization, withRevalidation } from "@/lib/actions/wrappers";
 
-async function getActor(): Promise<ActorContext> {
-  const appUser = await requireAdmin();
-  return {
-    userId: appUser.id,
-    role: appUser.role,
-    metadata: {
-      role: appUser.role,
-      status: appUser.status,
-      email: appUser.email || undefined,
-    },
-  };
-}
+export const createTeacherAction = withActor(
+  withAuthorization(
+    "ADMIN",
+    withRevalidation(
+      ["/admin/teachers", "/", "/about"],
+      async (actor, data: CreateTeacherParams) => {
+        const parsed = createTeacherSchema.parse(data);
+        const result = await createTeacher(actor, parsed);
+        if (result.type !== "SUCCESS") {
+          throw new DomainError("INTERNAL_ERROR", "Failed to create teacher");
+        }
+        return { success: true, data: { teacherId: result.data.id } };
+      }
+    )
+  )
+);
 
-export async function createTeacherAction(data: CreateTeacherParams) {
-  const actor = await getActor();
+export const updateTeacherAction = withActor(
+  withAuthorization(
+    "ADMIN",
+    withRevalidation(
+      (_actor, id) => ["/admin/teachers", `/admin/teachers/${id}`, "/", "/about"],
+      async (actor, id: string, data: UpdateTeacherParams) => {
+        const parsed = updateTeacherSchema.parse(data);
+        const result = await updateTeacher(actor, id, parsed);
 
-  const parsed = createTeacherSchema.safeParse(data);
-  if (!parsed.success) {
-    return { error: parsed.error.issues.map((i) => i.message).join(", ") };
-  }
+        if (result.type === "NOT_FOUND") {
+          throw new DomainError("NOT_FOUND", "Teacher not found");
+        }
 
-  try {
-    const result = await createTeacher(actor, parsed.data);
-    if (result.type !== "SUCCESS") {
-      // Create teacher only returns SUCCESS in current signature, but handling anyway
-      return { error: "Failed to create teacher" };
-    }
-    revalidatePath("/admin/teachers");
-    revalidatePath("/");
-    revalidatePath("/about");
-    return { success: true, teacherId: result.data.id };
-  } catch (error: unknown) {
-    return {
-      error: error instanceof Error ? error.message : "An unexpected error occurred",
-    };
-  }
-}
+        if (result.type === "INVALID_LIFECYCLE") {
+          throw new DomainError("INVALID_LIFECYCLE", result.reason || "Invalid lifecycle state");
+        }
 
-export async function updateTeacherAction(id: string, data: UpdateTeacherParams) {
-  const actor = await getActor();
+        return { success: true, data: undefined };
+      }
+    )
+  )
+);
 
-  const parsed = updateTeacherSchema.safeParse(data);
-  if (!parsed.success) {
-    return { error: parsed.error.issues.map((i) => i.message).join(", ") };
-  }
+export const archiveTeacherAction = withActor(
+  withAuthorization(
+    "ADMIN",
+    withRevalidation(
+      (_actor, id) => ["/admin/teachers", `/admin/teachers/${id}`, "/", "/about"],
+      async (actor, id: string) => {
+        const result = await archiveTeacher(actor, id);
+        if (result.type === "ARCHIVE_BLOCKED") {
+          throw new DomainError(
+            "ARCHIVE_BLOCKED",
+            "Cannot deactivate teacher with active batch assignments. Remove them from active batches first."
+          );
+        }
+        if (result.type === "INVALID_LIFECYCLE") {
+          throw new DomainError("INVALID_LIFECYCLE", "Cannot deactivate this teacher");
+        }
+        return { success: true, data: undefined };
+      }
+    )
+  )
+);
 
-  try {
-    const result = await updateTeacher(actor, id, parsed.data);
+export const restoreTeacherAction = withActor(
+  withAuthorization(
+    "ADMIN",
+    withRevalidation(
+      (_actor, id) => ["/admin/teachers", `/admin/teachers/${id}`, "/", "/about"],
+      async (actor, id: string) => {
+        const result = await restoreTeacher(actor, id);
+        if (result.type !== "SUCCESS") {
+          throw new DomainError("INVALID_LIFECYCLE", "Cannot reactivate this teacher");
+        }
+        return { success: true, data: undefined };
+      }
+    )
+  )
+);
 
-    if (result.type === "NOT_FOUND") {
-      return { error: "Teacher not found" };
-    }
-
-    if (result.type === "INVALID_LIFECYCLE") {
-      return { error: result.reason || "Invalid lifecycle state" };
-    }
-
-    revalidatePath("/admin/teachers");
-    revalidatePath(`/admin/teachers/${id}`);
-    revalidatePath("/");
-    revalidatePath("/about");
-    return { success: true };
-  } catch (error: unknown) {
-    return {
-      error: error instanceof Error ? error.message : "An unexpected error occurred",
-    };
-  }
-}
-
-export async function archiveTeacherAction(id: string) {
-  const actor = await getActor();
-  try {
-    const result = await archiveTeacher(actor, id);
-    if (result.type === "ARCHIVE_BLOCKED") {
-      return {
-        error:
-          "Cannot deactivate teacher with active batch assignments. Remove them from active batches first.",
-      };
-    }
-    if (result.type === "INVALID_LIFECYCLE") {
-      return { error: "Cannot deactivate this teacher" };
-    }
-    revalidatePath("/admin/teachers");
-    revalidatePath(`/admin/teachers/${id}`);
-    revalidatePath("/");
-    revalidatePath("/about");
-    return { success: true };
-  } catch (error: unknown) {
-    return {
-      error: error instanceof Error ? error.message : "An unexpected error occurred",
-    };
-  }
-}
-
-export async function restoreTeacherAction(id: string) {
-  const actor = await getActor();
-  try {
-    const result = await restoreTeacher(actor, id);
-    if (result.type !== "SUCCESS") {
-      return { error: "Cannot reactivate this teacher" };
-    }
-    revalidatePath("/admin/teachers");
-    revalidatePath(`/admin/teachers/${id}`);
-    revalidatePath("/");
-    revalidatePath("/about");
-    return { success: true };
-  } catch (error: unknown) {
-    return {
-      error: error instanceof Error ? error.message : "An unexpected error occurred",
-    };
-  }
-}
-
-export async function inviteTeacherAction(id: string): Promise<ActionResult> {
-  try {
-    const actor = await getActor();
-    await inviteTeacher(actor, id);
-    revalidatePath("/admin/teachers");
-    revalidatePath(`/admin/teachers/${id}`);
-    return { success: true, data: undefined };
-  } catch (error: unknown) {
-    return handleActionError(error);
-  }
-}
+export const inviteTeacherAction = withActor(
+  withAuthorization(
+    "ADMIN",
+    withRevalidation(
+      (_actor, id) => ["/admin/teachers", `/admin/teachers/${id}`],
+      async (actor, id: string) => {
+        await inviteTeacher(actor, id);
+        return { success: true, data: undefined };
+      }
+    )
+  )
+);
