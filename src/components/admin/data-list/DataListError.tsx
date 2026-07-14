@@ -8,7 +8,10 @@ export function DataListError({
   retry?: () => void;
 }) {
   return (
-    <div className="flex min-h-[400px] flex-col items-center justify-center rounded-md border border-destructive/20 bg-destructive/5 p-8 text-center animate-in fade-in-50">
+    <div
+      role="alert"
+      className="flex min-h-[400px] flex-col items-center justify-center rounded-md border border-destructive/20 bg-destructive/5 p-8 text-center animate-in fade-in-50"
+    >
       <div className="mx-auto flex max-w-[420px] flex-col items-center justify-center text-center">
         <div className="flex h-10 w-10 items-center justify-center rounded-full bg-destructive/10">
           <span className="text-lg font-bold text-destructive">!</span>

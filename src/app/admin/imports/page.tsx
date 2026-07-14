@@ -2,8 +2,6 @@ import { requireAdmin } from "@/lib/auth/permissions";
 import { listImportJobs } from "@/server/services/imports";
 import { ImportHistoryPageClient } from "./client-page";
 
-export const dynamic = "force-dynamic";
-
 export default async function AdminImportsPage() {
   await requireAdmin();
 

@@ -485,7 +485,7 @@ Likely public:
 
 - `NEXT_PUBLIC_APP_URL`.
 - `NEXT_PUBLIC_SUPABASE_URL`.
-- `NEXT_PUBLIC_SUPABASE_ANON_KEY`.
+- `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`.
 
 Server-only:
 
@@ -560,19 +560,24 @@ E2E tests:
 - Phase 7: Completed (Fees and Announcements).
 - Phase 8: Completed (Student Portal).
   - `f7dbb38 feat: Phase 8 — Student Portal enhancements`.
-- Phase 9: In progress (Public Website), delivered as 5 compressed slices 9A.1–9A.5 (design doc `PHASE_9A_PUBLIC_WEBSITE_DESIGN.md` suggested 10; its 9A.6 "Resources" = actual 9A.5).
+- Phase 9: Completed (Public Website), delivered as 8 compressed slices 9A.1–9A.8 covering SiteSettings, public layout, home, courses, resources, contact, admissions, and SEO polish.
   - 9A.1 (SiteSettings foundation): Completed — `060825d`.
   - 9A.2 (Public Layout & Footer): Completed — `b1bee68`.
   - 9A.3 (Public Home page): Completed — `0961926`.
   - 9A.4 (Public Courses page): Completed — `f495a9b`.
-  - 9A.5 (Public Resources page): Completed and pushed — `11d3273`. Design reconciled to the implemented schema (no `PUBLIC` visibility / `expiresAt`); public-resource query unified into `listPublicResources` (CURRICULUM_TRACK + PUBLISHED); added `PublicResourceCard` unit test; deleted stray `scripts/verify-slice4a-db.ts`.
-  - 9A.6 (Public Contact page): Completed and pushed — `b300c72`. Contact page renders real `SiteSettings` (phone, WhatsApp prefilled CTA, email, address, landmark, hours, social, Google Maps embed + directions); `revalidate = 3600` added to `/`, `/courses`, `/resources`, `/contact` (announcements stays `force-dynamic`); `WhatsAppButton` is the single `wa.me` implementation and replaced duplicated links in `PublicHeader`, `PublicFooter`, `HeroSection`.
-  - 9A.7 (Public Admissions page + About/Privacy/Terms nav fixes): Completed and pushed — `ac12010`. `/admissions` page (premium hero, "why choose us", 5-step process, classes IX–XII, enquiry form, direct phone/WhatsApp CTA, address/hours/map); WhatsApp-only best-effort flow (no `AdmissionsEnquiry` persistence); `AdmissionsForm` client component (validation, pre-filled wa.me redirect, duplicate-submit guard) using `buildWhatsAppHref` + `buildAdmissionsEnquiryMessage`; `LocationMap` shared component reused by Contact and Admissions; `revalidate = 3600`. Also resolved broken public nav: new `/about` (teacher profile), `/privacy`, `/terms` pages; repointed `CourseCard` dead `/courses/[trackId]` link to `/admissions`. History rewrite removed `Co-authored-by` trailers (`--force-with-lease`); version-controlled pre-push hygiene hook added (`3fd1c8c`).
-  - 9A.8 (SEO & Public Website Polish): Completed (pending push) — Global SEO: `metadataBase`, default Open Graph + Twitter cards, `robots` index/follow in root layout; per-page `alternates.canonical` on all 9 public routes; explicit `metadata` added to `/` and `/announcements` (the only pages previously missing it). `app/sitemap.ts` (9 routes) and `app/robots.ts` added. Organization JSON-LD (`OrganizationJsonLd`, using `SiteSettings` values where available, falling back to `siteConfig`) injected in `PublicShell` on every public page. No raster images in public site (no `next/image` gap); fonts self-hosted via `@fontsource`; H1/landmark/a11y verified. Deferred: Course / FAQ / Breadcrumb JSON-LD — no course-detail pages, FAQ page, or breadcrumb UI exist yet.
+  - 9A.5 (Public Resources page): Completed and pushed — `11d3273`.
+  - 9A.6 (Public Contact page): Completed and pushed — `b300c72`.
+  - 9A.7 (Public Admissions page + About/Privacy/Terms nav fixes): Completed and pushed — `ac12010`.
+  - 9A.8 (SEO & Public Website Polish): Completed.
 
-- Phase 10: In progress (Authentication & Account Experience).
-  - Phase 10A (Authentication Foundation): Completed and pushed — `8e1669d`. Next.js 16 `src/proxy.ts` session refresh + coarse role-aware routing; shared themed `/login` and `/login/[role]`; server-side `signIn`/`signOut` actions; `/unauthorized`, `/session-expired`, `/teacher` placeholder; logout wired into admin/student shells. JWT role claim used for routing only; DB `AppUser.role` via `getAppUser`/`requireRole`/`requireAdmin` remains the authorization source of truth.
-  - Phase 10B (Account Experience): Complete — account activation, invitation flow, forgot/reset password, password strength meter, rate limiting, authorization hardening of existing admin/student pages.
+- Phase 10: Completed (Authentication & Account Experience).
+  - Phase 10A (Authentication Foundation): Completed — `8e1669d`. Next.js 16 `proxy.ts` session refresh, themed login, server-side auth actions, unauthorized/session-expired pages.
+  - Phase 10B (Account Experience): Completed — account activation, invitation flow, forgot/reset password, password strength, rate limiting, authorization hardening.
+
+- Phase 11: Completed (PWA and Production Hardening).
+  - Phase 11A (PWA): Serwist service worker, offline fallback, manifest, icons.
+  - Phase 11B: Production hardening including security (CSP, headers, HSTS, env validation), monitoring (Sentry), deployment (docs, CI/CD), accessibility (skip-to-content, ARIA, reduced motion, axe-core), design refinement (consistent border radius, color tokens, shell issues), and rendering/performance optimization (dynamic imports, ISR tuning, cache invalidation, react.cache deduplication, bundle size reduction).
+  - Phase 11 sub-phases: 11A.1–2 (PWA), 11A.5–6 (Design), 11B.1 (Security), 11B.2 (Monitoring), 11B.3 (Deployment), 11B.4 (Accessibility), 11B.5 (Rendering/Performance), 11B.5.5 (Production Metrics).
 
 ## Phase 0 Stop
 
@@ -583,30 +588,35 @@ Stop here and wait for human approval before application initialization or Phase
 ## Status Block
 
 ```text
-Phase: 10 (10A + 10B)
-Status: Implementation complete — Phase 10 officially CLOSED
+Phase: 12 (Release Readiness)
+Status: Phase 12.1 (Production Validation) complete
 Working tree: Clean
 
-Completed (Phase 10A — Authentication Foundation):
-- src/proxy.ts (Next 16 proxy): session refresh + coarse role-aware optimistic routing only
-- Shared auth layout + themed /login and /login/[role] (student/teacher/admin)
-- Server-side signIn / signOut actions (signIn syncs JWT role claim best-effort; DB AppUser.role is source of truth)
-- /unauthorized, /session-expired, /teacher (placeholder) pages
-- Logout wired into AdminShell and StudentShell
+Completed (Phase 12.1 — Production Validation):
+- Production build verifies: 59 routes, all correctly classified (ISR public pages, dynamic authenticated pages)
+- Lighthouse: A11y 98-100, SEO 100, BP 100, Perf 85-91 across 8 key pages
+- Security headers: CSP, HSTS, XFO, XCTO, Referrer-Policy, Permissions-Policy all present and correct
+- PWA: Manifest, icons, service worker (104 precache entries), offline page verified
+- Health endpoint: {"status":"ok","db":"connected"}
+- Sentry: 5 config files (server, edge, client, instrumentation, next.config)
+- Dependency audit: 2 moderate advisories (dev-only / transitive, no production risk)
+- Release Readiness Report: docs/RELEASE_READINESS.md
 
-Completed (Phase 10B — Account Experience):
-- /auth/callback PKCE exchange + safe `next` validation
-- /reset-password (unified invite + recovery) with password strength meter + Referrer-Policy
-- /forgot-password + generic (non-enumerating) requestPasswordReset
-- Admin activation: inviteStudent + bulkInviteStudents actions (Supabase invite, INVITED -> ACTIVE)
-- INVITED gate in requireAppUser -> /reset-password
-- Rate limiting on signIn, requestPasswordReset, and activation actions (existing in-memory limiter)
+Completed (Phase 11 — PWA and Production Hardening):
+- 11A (PWA): Serwist SW, offline fallback, manifest, icons
+- 11A.5-6 (Design Audit): Consistent border radius, color tokens, shell issues resolved
+- 11B.1 (Security): CSP, HSTS, env validation, health endpoint, upload origin validation
+- 11B.2 (Monitoring): @sentry/nextjs v10, server/edge/client configs, instrumentation
+- 11B.3 (Deployment): README.md, docs/DEPLOYMENT.md, CI/CD, .env.example
+- 11B.4 (Accessibility): Skip-to-content, ARIA, reduced motion, dialog cleanup, axe-core
+- 11B.5 (Rendering/Performance): Dynamic imports (-13KB largest chunk), ISR tuning, revalidatePath on admin mutations, react.cache deduplication, searchParams Promise fix, missing requireAdmin() fix
 
-Commits: 8e1669d (10A), bf73ca7 + 636b8e1 (10B), 5ba5ede (docs cleanup), <this commit> (activation rate-limit closure)
-Push: done
+Known non-blocking issues:
+- LCP 3.4-4.4s (font loading; migrate to next/font post-release)
+- 2 moderate dependency advisories (no production impact)
 
 Next planned phase:
-Phase 11 — PWA And Production Hardening (PWA, accessibility, performance, security, monitoring, deployment).
+Phase 12.2-12.6 — Manual browser validation, critical user journeys, production deployment, release candidate
 
 Outstanding blockers:
 - None

@@ -6,7 +6,12 @@ import { DataListTableShell } from "@/components/admin/data-list/DataListTableSh
 import { DataListMobileShell } from "@/components/admin/data-list/DataListMobileShell";
 import { DataListEmpty } from "@/components/admin/data-list/DataListEmpty";
 import { AnnouncementRowActions } from "./AnnouncementRowActions";
-import { AnnouncementFormDialog } from "./AnnouncementFormDialog";
+import dynamic from "next/dynamic";
+
+const AnnouncementFormDialog = dynamic(
+  () => import("./AnnouncementFormDialog").then((m) => m.AnnouncementFormDialog),
+  { loading: () => null },
+);
 
 type AnnouncementRow = Prisma.AnnouncementGetPayload<{
   include: {

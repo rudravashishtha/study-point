@@ -25,6 +25,7 @@ export function PublicNavigation() {
           <Link
             key={link.href}
             href={link.href}
+            aria-current={isActive ? "page" : undefined}
             className={`relative rounded-full px-5 py-2.5 text-base font-semibold outline-none transition-colors focus-visible:ring-2 focus-visible:ring-brand-glow ${
               isActive
                 ? "text-foreground"

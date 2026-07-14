@@ -392,7 +392,7 @@ describe("FeeAssignmentList UI", () => {
     expect(screen.queryAllByText("Bob").length).toBe(0);
   });
 
-  it("8. assign button and preview dialog open", () => {
+  it("8. assign button and preview dialog open", async () => {
     render(
       <FeeAssignmentList
         assignments={[]}
@@ -406,8 +406,8 @@ describe("FeeAssignmentList UI", () => {
     const btn = screen.getByRole("button", { name: /assign fee plan/i });
     expect(btn).toBeInTheDocument();
     fireEvent.click(btn);
-    expect(screen.getByText("Assign Fee Plan to Students")).toBeInTheDocument();
-    expect(screen.getByText(/select a fee plan/i)).toBeInTheDocument();
+    expect(await screen.findByText("Assign Fee Plan to Students")).toBeInTheDocument();
+    expect(await screen.findByText(/select a fee plan/i)).toBeInTheDocument();
   });
 
   it("9. 'Assign Fee Plan' button is present", () => {

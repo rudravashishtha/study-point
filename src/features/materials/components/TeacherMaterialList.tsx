@@ -24,7 +24,12 @@ import {
   publishTeacherMaterialAction,
   archiveTeacherMaterialAction,
 } from "@/app/teacher/batches/[batchId]/actions";
-import { TeacherMaterialFormDialog } from "./TeacherMaterialFormDialog";
+import dynamic from "next/dynamic";
+
+const TeacherMaterialFormDialog = dynamic(
+  () => import("./TeacherMaterialFormDialog").then((m) => m.TeacherMaterialFormDialog),
+  { loading: () => null },
+);
 import { Input } from "@/components/ui/input";
 import {
   Select,

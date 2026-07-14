@@ -82,6 +82,7 @@ export function AdminNavigation({
                 key={href}
                 href={href}
                 onClick={closeMobileNav}
+                aria-current={isActive ? "page" : undefined}
                 className="group relative flex h-9 items-center gap-3 rounded-lg px-3 text-sm font-medium outline-none transition-colors"
               >
                 {isActive && (

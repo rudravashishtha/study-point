@@ -19,7 +19,7 @@ export default async function TermsPage() {
     : "Study Point Mathematics";
 
   return (
-    <main className="py-16 md:py-24">
+    <div className="py-16 md:py-24">
       <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
         <h1 className="text-3xl font-bold font-heading tracking-tight text-foreground md:text-4xl">
           Terms of Use
@@ -89,6 +89,6 @@ export default async function TermsPage() {
           </section>
         </div>
       </div>
-    </main>
+    </div>
   );
 }

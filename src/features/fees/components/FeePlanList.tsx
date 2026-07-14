@@ -6,7 +6,12 @@ import { DataListTableShell } from "@/components/admin/data-list/DataListTableSh
 import { DataListMobileShell } from "@/components/admin/data-list/DataListMobileShell";
 import { DataListEmpty } from "@/components/admin/data-list/DataListEmpty";
 import { FeePlanRowActions } from "./FeePlanRowActions";
-import { FeePlanFormDialog } from "./FeePlanFormDialog";
+import dynamic from "next/dynamic";
+
+const FeePlanFormDialog = dynamic(
+  () => import("./FeePlanFormDialog").then((m) => m.FeePlanFormDialog),
+  { loading: () => null },
+);
 
 type FeePlanWithRelations = Prisma.FeePlanGetPayload<{
   include: {

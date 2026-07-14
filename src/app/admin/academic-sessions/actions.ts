@@ -36,6 +36,8 @@ export async function createSessionAction(data: unknown): Promise<ActionResult> 
     const parsed = SessionCreateSchema.parse(data);
     await createSession(actor, parsed);
     revalidatePath("/admin/academic-sessions");
+    revalidatePath("/");
+    revalidatePath("/courses");
     return { success: true, data: undefined };
   } catch (error) {
     return handleActionError(error);
@@ -51,6 +53,8 @@ export async function updateSessionAction(
     const parsed = SessionUpdateSchema.parse(data);
     await updateSession(actor, id, parsed);
     revalidatePath("/admin/academic-sessions");
+    revalidatePath("/");
+    revalidatePath("/courses");
     return { success: true, data: undefined };
   } catch (error) {
     return handleActionError(error);
@@ -62,6 +66,8 @@ export async function activateSessionAction(id: string): Promise<ActionResult> {
     const actor = await getActor();
     await activateSession(actor, id);
     revalidatePath("/admin/academic-sessions");
+    revalidatePath("/");
+    revalidatePath("/courses");
     return { success: true, data: undefined };
   } catch (error) {
     return handleActionError(error);
@@ -73,6 +79,8 @@ export async function archiveSessionAction(id: string): Promise<ActionResult> {
     const actor = await getActor();
     await archiveSession(actor, id);
     revalidatePath("/admin/academic-sessions");
+    revalidatePath("/");
+    revalidatePath("/courses");
     return { success: true, data: undefined };
   } catch (error) {
     return handleActionError(error);
@@ -84,6 +92,8 @@ export async function restoreSessionAction(id: string): Promise<ActionResult> {
     const actor = await getActor();
     await restoreSession(actor, id);
     revalidatePath("/admin/academic-sessions");
+    revalidatePath("/");
+    revalidatePath("/courses");
     return { success: true, data: undefined };
   } catch (error) {
     return handleActionError(error);

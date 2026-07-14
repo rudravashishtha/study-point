@@ -24,7 +24,12 @@ import {
   publishTeacherHomeworkAction,
   archiveTeacherHomeworkAction,
 } from "@/app/teacher/batches/[batchId]/actions";
-import { TeacherHomeworkFormDialog } from "./TeacherHomeworkFormDialog";
+import dynamic from "next/dynamic";
+
+const TeacherHomeworkFormDialog = dynamic(
+  () => import("./TeacherHomeworkFormDialog").then((m) => m.TeacherHomeworkFormDialog),
+  { loading: () => null },
+);
 import { Input } from "@/components/ui/input";
 import {
   Select,

@@ -9,6 +9,14 @@ import type {
   PreviewFeeAssignmentResult,
 } from "@/server/services/fee-assignments";
 import type { Prisma } from "@prisma/client";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
 
 type FeePlanWithRelations = Prisma.FeePlanGetPayload<{
   include: {
@@ -116,8 +124,6 @@ export function FeeAssignmentPreviewDialog({
     setShowConfirm(false);
   };
 
-  if (!open) return null;
-
   const formatAmount = (amount: number | { toNumber: () => number }) => {
     const num = typeof amount === "number" ? amount : amount.toNumber();
     return `\u20B9${num.toFixed(2)}`;
@@ -134,9 +140,11 @@ export function FeeAssignmentPreviewDialog({
 
   return (
     <>
-      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-        <div className="w-full max-w-3xl max-h-[90vh] overflow-y-auto rounded-md border bg-background p-6 shadow-lg">
-          <h2 className="mb-4 text-lg font-semibold">Assign Fee Plan to Students</h2>
+      <Dialog open={open} onOpenChange={onOpenChange}>
+        <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Assign Fee Plan to Students</DialogTitle>
+          </DialogHeader>
 
           {/* Fee Plan Selector */}
           <div className="space-y-2 mb-4">
@@ -277,14 +285,13 @@ export function FeeAssignmentPreviewDialog({
 
               {/* Preview Button */}
               <div className="flex justify-end mb-4">
-                <button
+                <Button
                   type="button"
                   onClick={handlePreview}
                   disabled={loading || !startsOn || selectedEnrolmentIds.size === 0}
-                  className="rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground disabled:opacity-50"
                 >
                   {loading ? "Generating Preview..." : "Generate Preview"}
-                </button>
+                </Button>
               </div>
             </>
           )}
@@ -407,39 +414,30 @@ export function FeeAssignmentPreviewDialog({
 
               {/* Confirm Button */}
               <div className="flex justify-end gap-2">
-                <button
-                  type="button"
-                  onClick={handleReset}
-                  className="rounded-md px-4 py-2 text-sm font-medium hover:bg-muted"
-                >
+                <Button type="button" variant="outline" onClick={handleReset}>
                   Reset
-                </button>
-                <button
+                </Button>
+                <Button
                   type="button"
                   onClick={() => setShowConfirm(true)}
                   disabled={previewResult.totals.valid === 0}
-                  className="rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground disabled:opacity-50"
                 >
                   Confirm Assignment
-                </button>
+                </Button>
               </div>
             </div>
           )}
 
           {/* Cancel / Close */}
           {!previewResult && (
-            <div className="flex justify-end">
-              <button
-                type="button"
-                onClick={() => onOpenChange(false)}
-                className="rounded-md px-4 py-2 text-sm font-medium hover:bg-muted"
-              >
+            <DialogFooter>
+              <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
                 Cancel
-              </button>
-            </div>
+              </Button>
+            </DialogFooter>
           )}
-        </div>
-      </div>
+        </DialogContent>
+      </Dialog>
 
       <FeeAssignmentConfirmDialog
         open={showConfirm}

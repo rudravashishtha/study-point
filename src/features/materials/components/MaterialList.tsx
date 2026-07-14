@@ -24,7 +24,7 @@ import {
   publishAdminMaterialAction,
   archiveAdminMaterialAction,
 } from "@/app/admin/materials/actions";
-import { MaterialFormDialog } from "./MaterialFormDialog";
+import dynamic from "next/dynamic";
 import { Input } from "@/components/ui/input";
 import {
   Select,
@@ -35,6 +35,11 @@ import {
 } from "@/components/ui/select";
 import { StudyMaterialVisibility, StudyMaterialResourceType } from "@prisma/client";
 import type { MaterialFormBatch, MaterialFormTrack } from "./MaterialFormDialog";
+
+const MaterialFormDialog = dynamic(
+  () => import("./MaterialFormDialog").then((m) => m.MaterialFormDialog),
+  { loading: () => null },
+);
 
 interface MaterialListItem {
   id: string;

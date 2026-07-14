@@ -51,7 +51,7 @@ export default async function AboutPage() {
   const instituteName = settings?.instituteName ?? "Study Point Mathematics";
 
   return (
-    <main>
+    <div className="flex-1">
       <section className="bg-gradient-to-b from-brand/5 to-transparent py-16 md:py-24">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="mx-auto max-w-3xl text-center">
@@ -139,6 +139,6 @@ export default async function AboutPage() {
           </div>
         </div>
       </section>
-    </main>
+    </div>
   );
 }

@@ -2,8 +2,6 @@ import { requireAdmin } from "@/lib/auth/permissions";
 import { listStudentActivationCandidates } from "@/server/services/provisioning";
 import { StudentActivationQueue } from "@/features/students/components/StudentActivationQueue";
 
-export const dynamic = "force-dynamic";
-
 export default async function StudentActivationPage() {
   const appUser = await requireAdmin();
   const actor = {

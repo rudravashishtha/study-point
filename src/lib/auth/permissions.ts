@@ -1,3 +1,4 @@
+import { cache } from "react";
 import { createClient } from "@/lib/supabase/server";
 import { db } from "@/lib/db";
 import { AppUserStatus, Role } from "@prisma/client";
@@ -5,8 +6,9 @@ import { redirect } from "next/navigation";
 
 /**
  * Retrieves the current trusted Supabase authentication user.
+ * Wrapped in react.cache() to deduplicate calls within the same render pass.
  */
-export async function getAuthUser() {
+export const getAuthUser = cache(async function getAuthUser() {
   const supabase = await createClient();
   const {
     data: { user },
@@ -14,7 +16,7 @@ export async function getAuthUser() {
   } = await supabase.auth.getUser();
   if (error || !user) return null;
   return user;
-}
+});
 
 /**
  * Retrieves the application user mapped to the current Supabase auth user.

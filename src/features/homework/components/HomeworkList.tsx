@@ -24,7 +24,13 @@ import {
   publishAdminHomeworkAction,
   archiveAdminHomeworkAction,
 } from "@/app/admin/homework/actions";
-import { HomeworkFormDialog, type HomeworkFormData } from "./HomeworkFormDialog";
+import dynamic from "next/dynamic";
+import type { HomeworkFormData } from "./HomeworkFormDialog";
+
+const HomeworkFormDialog = dynamic(
+  () => import("./HomeworkFormDialog").then((m) => m.HomeworkFormDialog),
+  { loading: () => null },
+);
 import { Input } from "@/components/ui/input";
 import {
   Select,

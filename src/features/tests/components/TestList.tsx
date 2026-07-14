@@ -24,7 +24,12 @@ import {
   publishAdminTestAction,
   archiveAdminTestAction,
 } from "@/app/admin/tests/actions";
-import { TestFormDialog } from "./TestFormDialog";
+import dynamic from "next/dynamic";
+
+const TestFormDialog = dynamic(
+  () => import("./TestFormDialog").then((m) => m.TestFormDialog),
+  { loading: () => null },
+);
 import { Input } from "@/components/ui/input";
 import {
   Select,

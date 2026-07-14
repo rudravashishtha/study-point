@@ -1,8 +1,10 @@
+import { requireAdmin } from "@/lib/auth/permissions";
 import { ClipboardList } from "lucide-react";
 
 import { EmptyState } from "@/components/feedback/empty-state";
 
-export default function AdminQuestionsPage() {
+export default async function AdminQuestionsPage() {
+  await requireAdmin();
   return (
     <EmptyState
       icon={ClipboardList}

@@ -43,6 +43,8 @@ export async function createTeacherAction(data: CreateTeacherParams) {
       return { error: "Failed to create teacher" };
     }
     revalidatePath("/admin/teachers");
+    revalidatePath("/");
+    revalidatePath("/about");
     return { success: true, teacherId: result.data.id };
   } catch (error: unknown) {
     return {
@@ -72,6 +74,8 @@ export async function updateTeacherAction(id: string, data: UpdateTeacherParams)
 
     revalidatePath("/admin/teachers");
     revalidatePath(`/admin/teachers/${id}`);
+    revalidatePath("/");
+    revalidatePath("/about");
     return { success: true };
   } catch (error: unknown) {
     return {
@@ -95,6 +99,8 @@ export async function archiveTeacherAction(id: string) {
     }
     revalidatePath("/admin/teachers");
     revalidatePath(`/admin/teachers/${id}`);
+    revalidatePath("/");
+    revalidatePath("/about");
     return { success: true };
   } catch (error: unknown) {
     return {
@@ -112,6 +118,8 @@ export async function restoreTeacherAction(id: string) {
     }
     revalidatePath("/admin/teachers");
     revalidatePath(`/admin/teachers/${id}`);
+    revalidatePath("/");
+    revalidatePath("/about");
     return { success: true };
   } catch (error: unknown) {
     return {

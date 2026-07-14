@@ -1,7 +1,13 @@
 import { requireAdmin } from "@/lib/auth/permissions";
-import { QuestionImportWizard } from "@/features/imports/components/QuestionImportWizard";
+import dynamicImport from "next/dynamic";
 
-export const dynamic = "force-dynamic";
+const QuestionImportWizard = dynamicImport(
+  () =>
+    import("@/features/imports/components/QuestionImportWizard").then(
+      (m) => m.QuestionImportWizard,
+    ),
+  { loading: () => <div className="h-96 animate-pulse rounded-md bg-muted" /> },
+);
 
 export default async function QuestionImportPage() {
   await requireAdmin();

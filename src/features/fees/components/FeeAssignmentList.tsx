@@ -7,7 +7,12 @@ import { DataListTableShell } from "@/components/admin/data-list/DataListTableSh
 import { DataListMobileShell } from "@/components/admin/data-list/DataListMobileShell";
 import { DataListEmpty } from "@/components/admin/data-list/DataListEmpty";
 import { FeeAssignmentRowActions } from "./FeeAssignmentRowActions";
-import { FeeAssignmentPreviewDialog } from "./FeeAssignmentPreviewDialog";
+import dynamic from "next/dynamic";
+
+const FeeAssignmentPreviewDialog = dynamic(
+  () => import("./FeeAssignmentPreviewDialog").then((m) => m.FeeAssignmentPreviewDialog),
+  { loading: () => null },
+);
 
 type AssignmentWithRelations = Prisma.StudentFeeAssignmentGetPayload<{
   include: {

@@ -100,23 +100,21 @@ describe("Admin Test UI", () => {
   ];
   const tracks = [{ id: "track-1", name: "Track 1" }];
 
-  function fillCreateForm() {
-    fireEvent.change(screen.getByLabelText("Title"), {
-      target: { value: "New Test" },
-    });
+  async function fillCreateForm() {
+    const titleInput = await screen.findByLabelText("Title");
+    fireEvent.change(titleInput, { target: { value: "New Test" } });
     const dialog = screen.getByRole("dialog");
     const comboboxes = within(dialog).getAllByRole("combobox");
     fireEvent.click(comboboxes[0]);
-    return screen.findByRole("option", { name: /batch a/i }).then((option) => {
-      fireEvent.click(option);
-      fireEvent.change(screen.getByLabelText("Maximum Marks"), {
-        target: { value: "30" },
-      });
-      fireEvent.change(screen.getByLabelText("Test Date & Time"), {
-        target: { value: "2026-08-01T10:00" },
-      });
-      return dialog;
+    const option = await screen.findByRole("option", { name: /batch a/i });
+    fireEvent.click(option);
+    fireEvent.change(await screen.findByLabelText("Maximum Marks"), {
+      target: { value: "30" },
     });
+    fireEvent.change(await screen.findByLabelText("Test Date & Time"), {
+      target: { value: "2026-08-01T10:00" },
+    });
+    return dialog;
   }
 
   it("1. Admin can create test", () => {

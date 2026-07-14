@@ -11,7 +11,9 @@ export default async function PublicShell({ children }: { children: React.ReactN
     <div className="min-h-dvh bg-surface text-foreground font-sans antialiased flex flex-col">
       <PublicHeader settings={settings} />
 
-      <main className="flex-1 w-full">{children}</main>
+      <main id="main-content" className="flex-1 w-full">
+        {children}
+      </main>
 
       <PublicFooter settings={settings} />
 

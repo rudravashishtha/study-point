@@ -1,5 +1,4 @@
-"use client";
-
+import { requireAdmin } from "@/lib/auth/permissions";
 import {
   Users,
   Calendar,
@@ -11,7 +10,8 @@ import {
   CheckCircle2,
 } from "lucide-react";
 
-export default function AdminDashboard() {
+export default async function AdminDashboard() {
+  await requireAdmin();
   return (
     <div className="flex flex-col gap-6 pb-12">
       {/* 1. & 2. Search and Primary Actions */}

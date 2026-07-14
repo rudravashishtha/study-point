@@ -26,6 +26,10 @@ export async function updateSiteSettingsAction(data: unknown): Promise<ActionRes
     const parsed = SiteSettingsUpdateSchema.parse(data);
     await updateSiteSettings(actor, parsed);
     revalidatePath("/admin/settings");
+    revalidatePath("/");
+    revalidatePath("/about");
+    revalidatePath("/admissions");
+    revalidatePath("/contact");
     return { success: true, data: undefined };
   } catch (error) {
     return handleActionError(error);

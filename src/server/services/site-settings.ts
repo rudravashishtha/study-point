@@ -1,3 +1,4 @@
+import { cache } from "react";
 import { db } from "../../lib/db";
 import { ActorContext } from "../../lib/domain/actor";
 import { createAuditLog } from "../../lib/domain/audit";
@@ -96,7 +97,9 @@ async function getOrCreateSingleton() {
   return settings;
 }
 
-export async function getSiteSettings(): Promise<ServiceResult<SiteSettingsData>> {
+export const getSiteSettings = cache(async function getSiteSettings(): Promise<
+  ServiceResult<SiteSettingsData>
+> {
   try {
     const settings = await getOrCreateSingleton();
     return success({
@@ -106,7 +109,7 @@ export async function getSiteSettings(): Promise<ServiceResult<SiteSettingsData>
   } catch {
     return failure("INTERNAL_ERROR", "Failed to fetch site settings");
   }
-}
+});
 
 export async function updateSiteSettings(
   actor: ActorContext,

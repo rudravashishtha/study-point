@@ -23,7 +23,7 @@ vi.mock("../../lib/db", () => ({
 vi.mock("../../lib/env", () => ({
   publicEnv: {
     NEXT_PUBLIC_SUPABASE_URL: "https://fake.supabase.co",
-    NEXT_PUBLIC_SUPABASE_ANON_KEY: "fake-anon-key",
+    NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: "fake-publishable-key",
   },
   serverEnv: {
     SUPABASE_SECRET_KEY: "fake-secret-key",

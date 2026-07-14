@@ -208,13 +208,13 @@ describe("Admin Homework UI", () => {
     fireEvent.click(screen.getByRole("button", { name: /create homework/i }));
 
     // Fill required text/date fields (these use <Input> with proper labels)
-    fireEvent.change(screen.getByLabelText("Title"), {
+    fireEvent.change(await screen.findByLabelText("Title"), {
       target: { value: "Optional Attachment HW" },
     });
-    fireEvent.change(screen.getByLabelText("Assigned Date"), {
+    fireEvent.change(await screen.findByLabelText("Assigned Date"), {
       target: { value: "2026-07-01" },
     });
-    fireEvent.change(screen.getByLabelText("Due Date"), {
+    fireEvent.change(await screen.findByLabelText("Due Date"), {
       target: { value: "2026-07-10" },
     });
 
@@ -350,13 +350,13 @@ describe("Teacher Homework UI", () => {
 
     fireEvent.click(screen.getAllByRole("button", { name: /create homework/i })[0]);
 
-    fireEvent.change(screen.getByLabelText("Title"), {
+    fireEvent.change(await screen.findByLabelText("Title"), {
       target: { value: "New Homework" },
     });
-    fireEvent.change(screen.getByLabelText("Assigned Date"), {
+    fireEvent.change(await screen.findByLabelText("Assigned Date"), {
       target: { value: "2026-07-01" },
     });
-    fireEvent.change(screen.getByLabelText("Due Date"), {
+    fireEvent.change(await screen.findByLabelText("Due Date"), {
       target: { value: "2026-07-10" },
     });
 

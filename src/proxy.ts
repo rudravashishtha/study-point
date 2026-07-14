@@ -5,10 +5,15 @@ import { guardPortal, hasAuthCookie, roleHome } from "@/lib/auth/route-guards";
 export async function proxy(request: NextRequest) {
   let response = NextResponse.next({ request });
 
+  const isProduction = process.env.NODE_ENV === "production";
+
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!,
     {
+      cookieOptions: {
+        ...(isProduction ? { secure: true } : {}),
+      },
       cookies: {
         getAll() {
           return request.cookies.getAll();

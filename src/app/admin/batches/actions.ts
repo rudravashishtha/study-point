@@ -17,6 +17,8 @@ export async function createBatchAction(data: CreateBatchInput) {
 
   if (result.success) {
     revalidatePath("/admin/batches");
+    revalidatePath("/");
+    revalidatePath("/courses");
   }
   return result;
 }
@@ -34,6 +36,8 @@ export async function updateBatchDetailsAction(id: string, data: UpdateBatchInpu
   if (result.success) {
     revalidatePath("/admin/batches");
     revalidatePath(`/admin/batches/${id}`);
+    revalidatePath("/");
+    revalidatePath("/courses");
   }
   return result;
 }
@@ -45,6 +49,8 @@ export async function archiveBatchAction(id: string) {
   if (result.success) {
     revalidatePath("/admin/batches");
     revalidatePath(`/admin/batches/${id}`);
+    revalidatePath("/");
+    revalidatePath("/courses");
   }
   return result;
 }
@@ -56,6 +62,8 @@ export async function restoreBatchAction(id: string) {
   if (result.success) {
     revalidatePath("/admin/batches");
     revalidatePath(`/admin/batches/${id}`);
+    revalidatePath("/");
+    revalidatePath("/courses");
   }
   return result;
 }

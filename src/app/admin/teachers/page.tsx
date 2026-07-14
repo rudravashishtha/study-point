@@ -17,21 +17,23 @@ import {
 export default async function TeachersPage({
   searchParams,
 }: {
-  searchParams: {
+  searchParams: Promise<{
     q?: string;
     status?: string;
     page?: string;
     sort?: string;
     direction?: string;
-  };
+  }>;
 }) {
   await requireAdmin();
+  const resolvedParams = await searchParams;
 
-  const q = searchParams.q || "";
-  const status = (searchParams.status as ListTeachersOptions["status"]) || "active";
-  const page = searchParams.page ? parseInt(searchParams.page, 10) : 1;
-  const sort = (searchParams.sort as ListTeachersOptions["sort"]) || "displayName";
-  const direction = (searchParams.direction as ListTeachersOptions["direction"]) || "asc";
+  const q = resolvedParams.q || "";
+  const status = (resolvedParams.status as ListTeachersOptions["status"]) || "active";
+  const page = resolvedParams.page ? parseInt(resolvedParams.page, 10) : 1;
+  const sort = (resolvedParams.sort as ListTeachersOptions["sort"]) || "displayName";
+  const direction =
+    (resolvedParams.direction as ListTeachersOptions["direction"]) || "asc";
 
   const { items, total, limit } = await listTeachers({
     q,
@@ -69,12 +71,12 @@ export default async function TeachersPage({
         <form className="w-full sm:w-auto" method="GET">
           {/* Preserve other query params */}
           <input type="hidden" name="q" value={q} />
-          {searchParams.page && <input type="hidden" name="page" value="1" />}
-          {searchParams.sort && (
-            <input type="hidden" name="sort" value={searchParams.sort} />
+          {resolvedParams.page && <input type="hidden" name="page" value="1" />}
+          {resolvedParams.sort && (
+            <input type="hidden" name="sort" value={resolvedParams.sort} />
           )}
-          {searchParams.direction && (
-            <input type="hidden" name="direction" value={searchParams.direction} />
+          {resolvedParams.direction && (
+            <input type="hidden" name="direction" value={resolvedParams.direction} />
           )}
 
           <Select

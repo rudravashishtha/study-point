@@ -12,6 +12,7 @@ import { siteConfig } from "@/config/site";
 import { siteUrl } from "@/lib/seo";
 import { Toaster } from "@/components/ui/toaster";
 import { SerwistProvider } from "./serwist";
+import { AccessibilityChecker } from "@/components/accessibility/axe-checker";
 
 export const metadata: Metadata = {
   applicationName: siteConfig.name,
@@ -58,6 +59,13 @@ export default function RootLayout({
   return (
     <html lang="en" className="h-full antialiased">
       <body className="min-h-full flex flex-col font-sans">
+        <a
+          href="#main-content"
+          className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[100] focus:px-4 focus:py-2 focus:bg-primary focus:text-primary-foreground focus:rounded-md focus:shadow-lg focus:outline-none"
+        >
+          Skip to main content
+        </a>
+        <AccessibilityChecker />
         <SerwistProvider
           swUrl="/serwist/sw.js"
           disable={process.env.NODE_ENV === "development"}

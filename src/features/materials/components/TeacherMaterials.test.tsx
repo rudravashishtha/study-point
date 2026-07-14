@@ -116,7 +116,7 @@ describe("Teacher Materials UI", () => {
     expect(screen.queryByText("Specific Batch")).not.toBeInTheDocument();
 
     // Form is purely content-focused
-    expect(screen.getByLabelText("Title")).toBeInTheDocument();
+    expect(await screen.findByLabelText("Title")).toBeInTheDocument();
   });
 
   it("Archived material exposes no mutation controls even with canManage", () => {
@@ -183,7 +183,9 @@ describe("Teacher Materials UI", () => {
 
     fireEvent.click(screen.getAllByRole("button", { name: /create material/i })[0]);
 
-    fireEvent.change(screen.getByLabelText("Title"), { target: { value: "New Notes" } });
+    fireEvent.change(await screen.findByLabelText("Title"), {
+      target: { value: "New Notes" },
+    });
 
     // Mock the upload so validation passes
     fireEvent.click(screen.getByTestId("mock-upload"));

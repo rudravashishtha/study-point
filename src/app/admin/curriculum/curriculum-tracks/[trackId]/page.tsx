@@ -5,7 +5,15 @@ import { requireAdmin } from "@/lib/auth/permissions";
 import { DataListArchiveFilter } from "@/components/admin/data-list/DataListArchiveFilter";
 import { LayoutTemplate } from "lucide-react";
 import Link from "next/link";
-import { ChapterTopicBuilder } from "@/features/curriculum/components/tracks/builder/ChapterTopicBuilder";
+import dynamic from "next/dynamic";
+
+const ChapterTopicBuilder = dynamic(
+  () =>
+    import("@/features/curriculum/components/tracks/builder/ChapterTopicBuilder").then(
+      (m) => m.ChapterTopicBuilder,
+    ),
+  { loading: () => <div className="h-96 animate-pulse rounded-md bg-muted" /> },
+);
 
 export default async function AdminCurriculumBuilderPage({
   params,

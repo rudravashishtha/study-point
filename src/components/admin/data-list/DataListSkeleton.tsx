@@ -2,7 +2,11 @@ import React from "react";
 
 export function DataListSkeleton({ rows = 5 }: { rows?: number }) {
   return (
-    <div className="w-full space-y-3 animate-in fade-in-50">
+    <div
+      aria-busy="true"
+      aria-label="Loading data"
+      className="w-full space-y-3 animate-in fade-in-50"
+    >
       <div className="hidden md:block w-full overflow-hidden rounded-md border">
         <table className="w-full">
           <thead>

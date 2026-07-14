@@ -16,6 +16,8 @@ export async function createAdminMaterialAction(input: CreateStudyMaterialInput)
   const res = await createStudyMaterial(admin.id, input);
   if (res.success) {
     revalidatePath("/admin/materials");
+    revalidatePath("/resources");
+    revalidatePath("/");
   }
   return res;
 }
@@ -28,6 +30,8 @@ export async function updateAdminMaterialAction(
   const res = await updateStudyMaterial(admin.id, id, input);
   if (res.success) {
     revalidatePath("/admin/materials");
+    revalidatePath("/resources");
+    revalidatePath("/");
   }
   return res;
 }
@@ -37,6 +41,8 @@ export async function publishAdminMaterialAction(id: string) {
   const res = await publishStudyMaterial(admin.id, id);
   if (res.success) {
     revalidatePath("/admin/materials");
+    revalidatePath("/resources");
+    revalidatePath("/");
   }
   return res;
 }
@@ -46,6 +52,8 @@ export async function archiveAdminMaterialAction(id: string) {
   const res = await archiveStudyMaterial(admin.id, id);
   if (res.success) {
     revalidatePath("/admin/materials");
+    revalidatePath("/resources");
+    revalidatePath("/");
   }
   return res;
 }

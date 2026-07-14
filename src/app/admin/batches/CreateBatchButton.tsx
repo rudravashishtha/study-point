@@ -3,7 +3,15 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
-import { BatchFormDialog } from "@/features/batches/components/BatchFormDialog";
+import dynamic from "next/dynamic";
+
+const BatchFormDialog = dynamic(
+  () =>
+    import("@/features/batches/components/BatchFormDialog").then(
+      (m) => m.BatchFormDialog,
+    ),
+  { loading: () => null },
+);
 import {
   AcademicSession,
   CurriculumTrack,

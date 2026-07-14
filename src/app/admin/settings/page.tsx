@@ -1,8 +1,10 @@
+import { requireAdmin } from "@/lib/auth/permissions";
 import { Settings } from "lucide-react";
 
 import { EmptyState } from "@/components/feedback/empty-state";
 
-export default function AdminSettingsPage() {
+export default async function AdminSettingsPage() {
+  await requireAdmin();
   return (
     <EmptyState
       icon={Settings}

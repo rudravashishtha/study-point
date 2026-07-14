@@ -3,7 +3,7 @@
 import { AdminNavigation } from "./admin-navigation";
 import { siteConfig } from "@/config/site";
 import { Menu, X, LogOut, Bell } from "lucide-react";
-import { useState } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -12,6 +12,48 @@ import { signOut } from "@/features/auth/actions";
 export function AdminShell({ children }: { children: React.ReactNode }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const pathname = usePathname();
+  const drawerRef = useRef<HTMLDivElement>(null);
+  const menuButtonRef = useRef<HTMLButtonElement>(null);
+
+  const closeDrawer = useCallback(() => {
+    setMobileMenuOpen(false);
+    menuButtonRef.current?.focus();
+  }, []);
+
+  useEffect(() => {
+    if (!mobileMenuOpen) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        closeDrawer();
+        return;
+      }
+      if (e.key === "Tab") {
+        const focusable = drawerRef.current?.querySelectorAll<HTMLElement>(
+          'a[href], button:not([disabled]), textarea, input, select, [tabindex]:not([tabindex="-1"])',
+        );
+        if (!focusable || focusable.length === 0) return;
+        const first = focusable[0];
+        const last = focusable[focusable.length - 1];
+        if (e.shiftKey && document.activeElement === first) {
+          e.preventDefault();
+          last.focus();
+        } else if (!e.shiftKey && document.activeElement === last) {
+          e.preventDefault();
+          first.focus();
+        }
+      }
+    };
+    // Focus close button on open
+    const closeBtn = drawerRef.current?.querySelector<HTMLButtonElement>(
+      'button[aria-label="Close menu"]',
+    );
+    const timer = requestAnimationFrame(() => closeBtn?.focus());
+    document.addEventListener("keydown", handleKeyDown);
+    return () => {
+      cancelAnimationFrame(timer);
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [mobileMenuOpen, closeDrawer]);
 
   // Very simple breadcrumb derivation for top bar
   const segments = pathname.split("/").filter(Boolean);
@@ -54,15 +96,20 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
       <header className="md:hidden flex h-14 items-center justify-between px-4 border-b border-border/40 bg-surface-elevated sticky top-0 z-40 shrink-0">
         <div className="flex items-center gap-3">
           <button
+            ref={menuButtonRef}
             onClick={() => setMobileMenuOpen(true)}
             className="p-1.5 -ml-1.5 rounded-md hover:bg-surface-interactive transition-colors"
             aria-label="Open menu"
+            aria-expanded={mobileMenuOpen}
           >
             <Menu className="size-5" />
           </button>
           <span className="text-sm font-bold font-heading">{currentPage}</span>
         </div>
-        <button className="p-1.5 -mr-1.5 rounded-full hover:bg-surface-interactive transition-colors text-muted-foreground">
+        <button
+          className="p-1.5 -mr-1.5 rounded-full hover:bg-surface-interactive transition-colors text-muted-foreground"
+          aria-label="Notifications"
+        >
           <Bell className="size-4" />
         </button>
       </header>
@@ -77,9 +124,14 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
               exit={{ opacity: 0 }}
               transition={{ duration: 0.2 }}
               className="fixed inset-0 bg-background/80 backdrop-blur-sm z-50 md:hidden"
-              onClick={() => setMobileMenuOpen(false)}
+              onClick={closeDrawer}
+              aria-hidden="true"
             />
             <motion.div
+              ref={drawerRef}
+              role="dialog"
+              aria-modal="true"
+              aria-label="Navigation menu"
               initial={{ x: "-100%" }}
               animate={{ x: 0 }}
               exit={{ x: "-100%" }}
@@ -94,7 +146,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
                   <span className="text-sm font-bold font-heading">Workspace</span>
                 </div>
                 <button
-                  onClick={() => setMobileMenuOpen(false)}
+                  onClick={closeDrawer}
                   className="p-1.5 rounded-md hover:bg-surface-interactive transition-colors"
                   aria-label="Close menu"
                 >
@@ -119,7 +171,10 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
         <header className="hidden md:flex h-16 items-center justify-between px-8 border-b border-border/40 bg-surface/50 backdrop-blur-md sticky top-0 z-30 shrink-0">
           <h1 className="text-lg font-bold font-heading">{currentPage}</h1>
           <div className="flex items-center gap-4">
-            <button className="p-2 rounded-full hover:bg-surface-interactive transition-colors text-muted-foreground relative">
+            <button
+              className="p-2 rounded-full hover:bg-surface-interactive transition-colors text-muted-foreground relative"
+              aria-label="Notifications"
+            >
               <Bell className="size-5" />
               <span className="absolute top-2 right-2.5 size-2 rounded-full bg-brand-glow shadow-[0_0_8px_rgba(var(--brand-glow),0.8)]" />
             </button>
@@ -130,7 +185,10 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
         </header>
 
         {/* Workspace Content */}
-        <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 bg-surface">
+        <main
+          id="main-content"
+          className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 bg-surface"
+        >
           <div className="max-w-6xl mx-auto w-full">{children}</div>
         </main>
       </div>

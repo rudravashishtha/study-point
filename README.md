@@ -2,17 +2,20 @@
 
 Production-grade platform for a small mathematics coaching institute teaching CBSE and CISCE Mathematics for Classes IX, X, XI, and XII.
 
-This repository is being built in explicit phases. Phase 2 introduces the core data foundation, curriculum models, Supabase authentication integration, and application authorization.
+Built with Next.js 16, TypeScript, Prisma, Supabase, Tailwind CSS, and shadcn/ui.
+
+## Documentation
+
+- **[Architecture](./docs/ARCHITECTURE.md)** — System design, component decisions, security model.
+- **[Database Design](./docs/DATABASE_DESIGN.md)** — Schema, relationships, indexes, enums.
+- **[Implementation Plan](./docs/IMPLEMENTATION_PLAN.md)** — Current phase, completed work, next steps.
+- **[Routes and Permissions](./docs/ROUTES_AND_PERMISSIONS.md)** — Route structure, role-based access control.
+- **[Deployment Guide](./docs/DEPLOYMENT.md)** — Full deployment, CI/CD, backup/restore, rollback, smoke tests.
 
 ## Prerequisites
 
-- Node.js 22.
-- npm.
-
-Verified during Phase 1:
-
-- Node.js `v22.23.0`.
-- npm `10.9.8`.
+- Node.js 22
+- npm 10+
 
 ## Installation
 
@@ -22,55 +25,37 @@ npm install
 
 ## Environment Setup
 
-Copy `.env.example` to `.env` or `.env.local` for local development.
+Copy `.env.example` to `.env` or `.env.local`:
 
-Phase 2 requires Supabase and database connection variables. Refer to `.env.example` for the required keys. Make sure to keep `SUPABASE_SECRET_KEY` server-only and do not expose it to the browser.
+```sh
+cp .env.example .env
+```
+
+All required variables are documented in `.env.example`. The application will fail to start if any required variable is missing.
 
 ## Supabase Setup
 
-1. Create a new Supabase project.
-2. Obtain the Project URL (`NEXT_PUBLIC_SUPABASE_URL`).
-3. Obtain the Publishable Key (`NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`) and Secret Key (`SUPABASE_SECRET_KEY`).
-4. Update `.env`.
+1. Create a Supabase project.
+2. Obtain the Project URL (`NEXT_PUBLIC_SUPABASE_URL`) and keys.
+3. Update `.env` with your Supabase credentials.
+4. Run database migrations (see below).
 
-## Database Setup and Migration
-
-This project uses Prisma and requires a custom PostgreSQL migration to enforce critical partial unique indexes (e.g., exactly one active AcademicSession, and CurriculumTrack uniqueness for nullable programmeId).
-
-**Do not use `prisma db push` for database setup or deployment.**
-
-To generate the initial migration when a development database is available:
-
-1. Ensure your `DATABASE_URL` is configured in `.env`.
-2. Generate the migration structure without applying it:
-   ```sh
-   npx prisma migrate dev --create-only
-   ```
-3. Locate the newly created `migration.sql` file in the `prisma/migrations/` directory.
-4. Open `prisma/partial_indexes.sql` and copy its entire contents.
-5. Append the copied SQL to the end of the generated `migration.sql` file.
-6. Apply the complete migration to your development database:
-   ```sh
-   npx prisma migrate dev
-   ```
-
-For production deployments, simply run:
+## Database Migration
 
 ```sh
-npx prisma migrate deploy
+npx prisma migrate dev        # Local development
+npx prisma migrate deploy     # Production
 ```
+
+**Do not use `prisma db push` for schema changes.** Always use migrations.
+
+See [docs/DEPLOYMENT.md](./docs/DEPLOYMENT.md#database-migrations) for details on custom indexes.
 
 ## Initial Admin Creation
 
-Admin creation relies on a server-only script rather than a public endpoint.
-
-1. Sign up or invite the initial user via your Supabase Dashboard.
-2. Obtain that user's Supabase Auth User ID (UUID).
-3. Run the bootstrap script locally (with `.env` populated):
-   ```sh
-   npx tsx scripts/bootstrap-admin.ts <supabase-auth-user-id>
-   ```
-   This will create the `AppUser` record with the `ADMIN` role. No passwords are handled or stored by the application directly.
+```sh
+npx tsx scripts/bootstrap-admin.ts <supabase-auth-user-id>
+```
 
 ## Running Locally
 
@@ -80,48 +65,39 @@ npm run dev
 
 The app runs at `http://localhost:3000` by default.
 
-## Running Tests
-
-Phase 2 introduces automated tests for curriculum invariants and permission helpers using Vitest.
-
-```sh
-npx vitest run
-```
-
-## Validation
-
-```sh
-npm run lint
-npm run typecheck
-npm run build
-```
-
-## Current Routes
-
-- `/`: public website shell.
-- `/courses`: public courses shell.
-- `/resources`: public resources shell.
-- `/announcements`: public announcements shell.
-- `/contact`: public contact shell.
-- `/admin`: admin dashboard shell.
-- `/student`: student portal shell.
-
-These routes are visual and structural foundations only. They do not enforce authentication or load business data yet.
-
-## Seed Process
-
-Deferred until data models and import mechanisms exist. Do not seed fake production users automatically.
-
 ## Production Build
 
 ```sh
+npm ci
 npm run build
+npm start
 ```
+
+## Quality Checks
+
+```sh
+npm run lint        # ESLint
+npm run typecheck   # TypeScript
+npm run test        # Vitest
+npm run build       # Next.js production build
+```
+
+## Key Features
+
+- **Public Website**: Home, courses, methodology, resources, contact, announcements, FAQ.
+- **Student Portal**: Dashboard, timetable, study materials, homework, tests, fees, announcements.
+- **Admin Dashboard**: Students, batches, enrolment, timetable, materials, homework, tests, question bank, fees, imports, announcements, website content.
+- **PWA**: Installable, offline fallback, runtime caching.
+- **Monitoring**: Sentry error tracking with performance monitoring.
+- **Security**: CSP, HSTS, strict env validation, cookie-based auth, Origin validation on mutations.
 
 ## Deployment
 
-Deployment documentation will be completed after authentication, database, environment, storage, and PWA decisions are fully finalized in later phases.
+See the full [Deployment Guide](./docs/DEPLOYMENT.md) for:
 
-## Storage Setup
-
-Deferred to later phases. Storage planning is documented in `docs/ARCHITECTURE.md` and `docs/DATABASE_DESIGN.md`.
+- CI/CD pipeline setup
+- Health checks and monitoring
+- Backup and restore procedures
+- Release process and versioning
+- Rollback procedures
+- Post-deployment smoke tests

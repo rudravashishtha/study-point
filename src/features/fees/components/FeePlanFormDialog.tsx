@@ -5,6 +5,14 @@ import { toast } from "sonner";
 import { Prisma, FeePlanFrequency } from "@prisma/client";
 import { createFeePlanAction, updateFeePlanAction } from "@/app/admin/fees/actions";
 import { useRouter } from "next/navigation";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
 
 type FeePlanWithRelations = Prisma.FeePlanGetPayload<{
   include: {
@@ -136,25 +144,21 @@ export function FeePlanFormDialog({
     setInstalments(updated);
   };
 
-  if (!open) return null;
-
   const totalFromInstalments = instalments
     .filter((i) => i.amount)
     .reduce((sum, i) => sum + parseFloat(i.amount || "0"), 0);
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-      <div className="w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-md border bg-background p-6 shadow-lg">
-        <h2 className="mb-4 text-lg font-semibold">
-          {plan ? "Edit Fee Plan" : "Create Fee Plan"}
-        </h2>
-
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+        <DialogHeader>
+          <DialogTitle>{plan ? "Edit Fee Plan" : "Create Fee Plan"}</DialogTitle>
+        </DialogHeader>
         {error && (
           <div className="mb-4 rounded-md bg-destructive/10 p-3 text-sm text-destructive">
             {error}
           </div>
         )}
-
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
             <label htmlFor="name" className="text-sm font-medium">
@@ -392,24 +396,16 @@ export function FeePlanFormDialog({
             ))}
           </div>
 
-          <div className="mt-6 flex justify-end space-x-2">
-            <button
-              type="button"
-              onClick={() => onOpenChange(false)}
-              className="rounded-md px-4 py-2 text-sm font-medium hover:bg-muted"
-            >
+          <DialogFooter>
+            <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
               Cancel
-            </button>
-            <button
-              type="submit"
-              disabled={isPending}
-              className="rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground disabled:opacity-50"
-            >
+            </Button>
+            <Button type="submit" disabled={isPending}>
               {isPending ? "Saving..." : plan ? "Save Changes" : "Create Fee Plan"}
-            </button>
-          </div>
+            </Button>
+          </DialogFooter>
         </form>
-      </div>
-    </div>
+      </DialogContent>
+    </Dialog>
   );
 }

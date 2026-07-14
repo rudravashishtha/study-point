@@ -38,6 +38,7 @@ export function StudentNavigation() {
             <Link
               key={href}
               href={href}
+              aria-current={isActive ? "page" : undefined}
               className="relative flex min-h-[4.5rem] sm:min-h-12 flex-1 sm:flex-none flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2 sm:rounded-full sm:px-4 text-xs sm:text-sm font-medium outline-none transition-colors"
             >
               {isActive && (

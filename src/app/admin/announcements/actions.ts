@@ -35,6 +35,8 @@ export async function createAnnouncementAction(data: unknown): Promise<ActionRes
     const parsed = AnnouncementCreateSchema.parse(data);
     await createAnnouncement(actor, parsed);
     revalidatePath("/admin/announcements");
+    revalidatePath("/announcements");
+    revalidatePath("/");
     return { success: true, data: undefined };
   } catch (error) {
     return handleActionError(error);
@@ -50,6 +52,8 @@ export async function updateAnnouncementAction(
     const parsed = AnnouncementUpdateSchema.parse(data);
     await updateAnnouncement(actor, id, parsed);
     revalidatePath("/admin/announcements");
+    revalidatePath("/announcements");
+    revalidatePath("/");
     return { success: true, data: undefined };
   } catch (error) {
     return handleActionError(error);
@@ -61,6 +65,8 @@ export async function publishAnnouncementAction(id: string): Promise<ActionResul
     const actor = await getActor();
     await publishAnnouncement(actor, id);
     revalidatePath("/admin/announcements");
+    revalidatePath("/announcements");
+    revalidatePath("/");
     return { success: true, data: undefined };
   } catch (error) {
     return handleActionError(error);
@@ -72,6 +78,8 @@ export async function archiveAnnouncementAction(id: string): Promise<ActionResul
     const actor = await getActor();
     await archiveAnnouncement(actor, id);
     revalidatePath("/admin/announcements");
+    revalidatePath("/announcements");
+    revalidatePath("/");
     return { success: true, data: undefined };
   } catch (error) {
     return handleActionError(error);
@@ -83,6 +91,8 @@ export async function restoreAnnouncementAction(id: string): Promise<ActionResul
     const actor = await getActor();
     await restoreAnnouncement(actor, id);
     revalidatePath("/admin/announcements");
+    revalidatePath("/announcements");
+    revalidatePath("/");
     return { success: true, data: undefined };
   } catch (error) {
     return handleActionError(error);

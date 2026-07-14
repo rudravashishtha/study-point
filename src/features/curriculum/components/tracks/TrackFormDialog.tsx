@@ -13,6 +13,14 @@ import {
   updateTrackAction,
 } from "@/app/admin/curriculum/curriculum-tracks/actions";
 import { z } from "zod";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
 
 type CreateInput = z.infer<typeof createCurriculumTrackSchema>;
 
@@ -116,12 +124,11 @@ export function TrackFormDialog({
     : [];
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-      <div className="w-full max-w-md rounded-md border bg-background p-6 shadow-lg max-h-[90vh] overflow-y-auto">
-        <h2 className="mb-4 text-lg font-semibold">
-          {track ? "Edit Track" : "Create Track"}
-        </h2>
-
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="max-w-md">
+        <DialogHeader>
+          <DialogTitle>{track ? "Edit Track" : "Create Track"}</DialogTitle>
+        </DialogHeader>
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           <div className="space-y-2">
             <label className="text-sm font-medium">
@@ -250,24 +257,16 @@ export function TrackFormDialog({
             )}
           </div>
 
-          <div className="mt-6 flex justify-end space-x-2">
-            <button
-              type="button"
-              onClick={() => onOpenChange(false)}
-              className="rounded-md px-4 py-2 text-sm font-medium hover:bg-muted"
-            >
+          <DialogFooter>
+            <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
               Cancel
-            </button>
-            <button
-              type="submit"
-              disabled={isPending}
-              className="rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground disabled:opacity-50"
-            >
+            </Button>
+            <Button type="submit" disabled={isPending}>
               {isPending ? "Saving..." : track ? "Save Changes" : "Create"}
-            </button>
-          </div>
+            </Button>
+          </DialogFooter>
         </form>
-      </div>
-    </div>
+      </DialogContent>
+    </Dialog>
   );
 }

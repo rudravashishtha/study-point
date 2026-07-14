@@ -114,13 +114,13 @@ export function StudyMaterialUpload({
   return (
     <div className="border-2 border-dashed rounded-lg p-6 flex flex-col items-center justify-center space-y-4">
       {status === "success" ? (
-        <div className="text-green-600 flex items-center space-x-2">
+        <div role="status" className="text-green-600 flex items-center space-x-2">
           <span>Upload complete!</span>
         </div>
       ) : (
         <>
           <div className="flex items-center justify-center w-12 h-12 rounded-full bg-primary/10 text-primary">
-            <UploadCloud className="w-6 h-6" />
+            <UploadCloud className="w-6 h-6" aria-hidden="true" />
           </div>
           <div className="text-center">
             <p className="text-sm text-muted-foreground">
@@ -131,6 +131,7 @@ export function StudyMaterialUpload({
             type="file"
             onChange={handleFileChange}
             disabled={uploading}
+            aria-label="Choose a file to upload"
             className="text-sm"
           />
           {file && (
@@ -140,7 +141,10 @@ export function StudyMaterialUpload({
             </Button>
           )}
           {errorMsg && (
-            <div className="text-red-500 text-sm flex items-center space-x-1">
+            <div
+              role="alert"
+              className="text-red-500 text-sm flex items-center space-x-1"
+            >
               <XCircle className="w-4 h-4" />
               <span>{errorMsg}</span>
             </div>

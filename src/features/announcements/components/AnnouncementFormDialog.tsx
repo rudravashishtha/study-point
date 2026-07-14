@@ -8,6 +8,14 @@ import {
   updateAnnouncementAction,
 } from "@/app/admin/announcements/actions";
 import { useRouter } from "next/navigation";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
 
 type AnnouncementRow = Prisma.AnnouncementGetPayload<{
   include: {
@@ -85,8 +93,6 @@ export function AnnouncementFormDialog({
     });
   };
 
-  if (!open) return null;
-
   const audienceOptions: { value: AnnouncementAudience; label: string }[] = [
     { value: "PUBLIC", label: "Public" },
     { value: "ALL_STUDENTS", label: "All Students" },
@@ -95,18 +101,16 @@ export function AnnouncementFormDialog({
   ];
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-      <div className="w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-md border bg-background p-6 shadow-lg">
-        <h2 className="mb-4 text-lg font-semibold">
-          {announcement ? "Edit Notice" : "Create Notice"}
-        </h2>
-
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+        <DialogHeader>
+          <DialogTitle>{announcement ? "Edit Notice" : "Create Notice"}</DialogTitle>
+        </DialogHeader>
         {error && (
-          <div className="mb-4 rounded-md bg-destructive/10 p-3 text-sm text-destructive">
+          <div className="rounded-md bg-destructive/10 p-3 text-sm text-destructive">
             {error}
           </div>
         )}
-
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
             <label htmlFor="title" className="text-sm font-medium">
@@ -270,24 +274,16 @@ export function AnnouncementFormDialog({
             </label>
           )}
 
-          <div className="mt-6 flex justify-end space-x-2">
-            <button
-              type="button"
-              onClick={() => onOpenChange(false)}
-              className="rounded-md px-4 py-2 text-sm font-medium hover:bg-muted"
-            >
+          <DialogFooter>
+            <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
               Cancel
-            </button>
-            <button
-              type="submit"
-              disabled={isPending}
-              className="rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground disabled:opacity-50"
-            >
+            </Button>
+            <Button type="submit" disabled={isPending}>
               {isPending ? "Saving..." : announcement ? "Save Changes" : "Create Notice"}
-            </button>
-          </div>
+            </Button>
+          </DialogFooter>
         </form>
-      </div>
-    </div>
+      </DialogContent>
+    </Dialog>
   );
 }

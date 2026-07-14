@@ -27,7 +27,12 @@ import {
 import { handleActionError } from "@/lib/actions/types";
 import { archiveBatchAction, restoreBatchAction } from "@/app/admin/batches/actions";
 import { useState } from "react";
-import { BatchFormDialog } from "./BatchFormDialog";
+import dynamic from "next/dynamic";
+
+const BatchFormDialog = dynamic(
+  () => import("./BatchFormDialog").then((m) => m.BatchFormDialog),
+  { loading: () => null },
+);
 
 type TrackWithRelations = CurriculumTrack & {
   board: Board;

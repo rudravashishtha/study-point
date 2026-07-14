@@ -1,7 +1,13 @@
 import { requireAdmin } from "@/lib/auth/permissions";
-import { StudentImportWizard } from "@/features/imports/components/StudentImportWizard";
+import dynamicImport from "next/dynamic";
 
-export const dynamic = "force-dynamic";
+const StudentImportWizard = dynamicImport(
+  () =>
+    import("@/features/imports/components/StudentImportWizard").then(
+      (m) => m.StudentImportWizard,
+    ),
+  { loading: () => <div className="h-96 animate-pulse rounded-md bg-muted" /> },
+);
 
 export default async function StudentImportPage() {
   await requireAdmin();
