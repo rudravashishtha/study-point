@@ -13,7 +13,7 @@ describe("Teacher Provisioning Domain", () => {
           email: "t@example.com",
           appUserStatus: null,
         }),
-      ).toEqual({ canInvite: true, reason: "ELIGIBLE" });
+      ).toEqual({ canInvite: true, canReset: false, reason: "ELIGIBLE" });
     });
 
     it("returns INACTIVE_TEACHER for inactive teacher", () => {
@@ -23,7 +23,7 @@ describe("Teacher Provisioning Domain", () => {
           email: "t@example.com",
           appUserStatus: null,
         }),
-      ).toEqual({ canInvite: false, reason: "INACTIVE_TEACHER" });
+      ).toEqual({ canInvite: false, canReset: false, reason: "INACTIVE_TEACHER" });
     });
 
     it("returns MISSING_EMAIL for teacher without email", () => {
@@ -33,17 +33,17 @@ describe("Teacher Provisioning Domain", () => {
           email: null,
           appUserStatus: null,
         }),
-      ).toEqual({ canInvite: false, reason: "MISSING_EMAIL" });
+      ).toEqual({ canInvite: false, canReset: false, reason: "MISSING_EMAIL" });
     });
 
-    it("returns ALREADY_PROVISIONED for INVITED teacher", () => {
+    it("returns canReset=true for INVITED teacher", () => {
       expect(
         getTeacherInvitationEligibility({
           active: true,
           email: "t@example.com",
           appUserStatus: "INVITED",
         }),
-      ).toEqual({ canInvite: false, reason: "ALREADY_PROVISIONED" });
+      ).toEqual({ canInvite: false, canReset: true, reason: "ALREADY_PROVISIONED" });
     });
 
     it("returns ALREADY_PROVISIONED for ACTIVE teacher", () => {
@@ -53,7 +53,7 @@ describe("Teacher Provisioning Domain", () => {
           email: "t@example.com",
           appUserStatus: "ACTIVE",
         }),
-      ).toEqual({ canInvite: false, reason: "ALREADY_PROVISIONED" });
+      ).toEqual({ canInvite: false, canReset: false, reason: "ALREADY_PROVISIONED" });
     });
 
     it("returns ALREADY_PROVISIONED for DISABLED teacher", () => {
@@ -63,7 +63,7 @@ describe("Teacher Provisioning Domain", () => {
           email: "t@example.com",
           appUserStatus: "DISABLED",
         }),
-      ).toEqual({ canInvite: false, reason: "ALREADY_PROVISIONED" });
+      ).toEqual({ canInvite: false, canReset: false, reason: "ALREADY_PROVISIONED" });
     });
   });
 

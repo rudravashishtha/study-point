@@ -6,7 +6,6 @@ import {
   findAuthUserByEmail,
   isExistingSupabaseUserConflict,
 } from "../../lib/supabase/admin";
-import { publicEnv } from "../../lib/env";
 
 export type StudentActivationCandidate = {
   id: string;
@@ -25,10 +24,7 @@ export async function listStudentActivationCandidates(
   const students = await db.student.findMany({
     where: {
       archivedAt: null,
-      OR: [
-        { appUser: null },
-        { appUser: { status: "INVITED" } },
-      ],
+      OR: [{ appUser: null }, { appUser: { status: "INVITED" } }],
     },
     select: {
       id: true,
@@ -212,6 +208,89 @@ export async function resetStudentInvitation(actor: ActorContext, studentId: str
       summary: `Reset invitation for student ${student.email ?? student.studentCode}`,
     });
   });
+}
+
+export async function resetTeacherInvitation(actor: ActorContext, teacherId: string) {
+  requireAdminContext(actor);
+
+  const teacher = await db.teacher.findUnique({
+    where: { id: teacherId },
+    include: { appUser: true },
+  });
+
+  if (!teacher) {
+    throw new Error("Teacher not found");
+  }
+
+  if (!teacher.appUser) {
+    throw new Error("Teacher has no linked account to reset");
+  }
+
+  if (teacher.appUser.status === "ACTIVE") {
+    throw new Error("Cannot reset an already-active account. Disable it first.");
+  }
+
+  const supabase = createAdminClient();
+
+  if (teacher.appUser.supabaseAuthUserId) {
+    try {
+      await supabase.auth.admin.deleteUser(teacher.appUser.supabaseAuthUserId);
+    } catch {
+      // Auth user may already be deleted or not exist
+    }
+  }
+
+  await db.$transaction(async (tx) => {
+    await tx.appUser.delete({ where: { id: teacher.appUser!.id } });
+
+    await createAuditLog(tx, actor, {
+      action: "RESET_PROVISION",
+      entityType: "TEACHER",
+      entityId: teacherId,
+      metadata: { previousEmail: teacher.appUser!.email },
+      summary: `Reset invitation for teacher ${teacher.email ?? teacher.displayName}`,
+    });
+  });
+}
+
+export type TeacherActivationCandidate = {
+  id: string;
+  displayName: string;
+  email: string | null;
+  isEligible: boolean;
+  invitationStatus: "none" | "invited";
+};
+
+export async function listTeacherActivationCandidates(
+  actor: ActorContext,
+): Promise<TeacherActivationCandidate[]> {
+  requireAdminContext(actor);
+
+  const teachers = await db.teacher.findMany({
+    where: {
+      active: true,
+      OR: [{ appUser: null }, { appUser: { status: "INVITED" } }],
+    },
+    select: {
+      id: true,
+      displayName: true,
+      email: true,
+      appUser: {
+        select: { status: true },
+      },
+    },
+    orderBy: {
+      displayName: "asc",
+    },
+  });
+
+  return teachers.map((t) => ({
+    id: t.id,
+    displayName: t.displayName,
+    email: t.email ? t.email.trim().toLowerCase() : null,
+    isEligible: !!t.email,
+    invitationStatus: t.appUser ? "invited" : "none",
+  }));
 }
 
 export async function inviteTeacher(actor: ActorContext, teacherId: string) {

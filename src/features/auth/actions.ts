@@ -59,6 +59,19 @@ export async function signIn(
     };
   }
 
+  // Best-effort: if the user set their password but the INVITED→ACTIVE flip
+  // failed earlier, complete it now.
+  if (appUser.status === AppUserStatus.INVITED) {
+    try {
+      await db.appUser.update({
+        where: { id: appUser.id },
+        data: { status: AppUserStatus.ACTIVE },
+      });
+    } catch {
+      // Non-fatal: routing self-heals from the database state.
+    }
+  }
+
   const role = appUser.role;
 
   // Best-effort: keep the JWT claim in sync so proxy.ts routing is accurate.

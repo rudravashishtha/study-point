@@ -45,6 +45,11 @@ export const adminNavigationGroups = [
       { href: "/admin/students", label: "Students", icon: Users },
       { href: "/admin/students/activate", label: "Activate Accounts", icon: Users },
       { href: "/admin/teachers", label: "Teachers", icon: GraduationCap },
+      {
+        href: "/admin/teachers/activate",
+        label: "Teacher Invitations",
+        icon: GraduationCap,
+      },
     ],
   },
   {

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { MoreHorizontal, Edit, Power, PowerOff } from "lucide-react";
+import { MoreHorizontal, Edit, Power, PowerOff, RotateCcw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -97,6 +97,32 @@ export function TeacherRowActions({ teacher, onActionComplete }: TeacherRowActio
     }
   };
 
+  const handleReset = async () => {
+    setIsProcessing(true);
+    try {
+      const { resetTeacherInvitationAction } =
+        await import("@/app/admin/teachers/activate/actions");
+      const result = await resetTeacherInvitationAction(teacher.id);
+
+      if (!result.success) {
+        toast.error("Reset Failed", {
+          description: "error" in result ? result.error : "Unknown error",
+        });
+      } else {
+        toast.success("Invitation reset. You can now re-invite this teacher.");
+        router.refresh();
+        onActionComplete?.();
+      }
+    } catch (error: unknown) {
+      toast.error("Reset Failed", {
+        description:
+          error instanceof Error ? error.message : "An unexpected error occurred",
+      });
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
   const eligibility = getTeacherInvitationEligibility({
     active: teacher.active,
     email: teacher.email,
@@ -124,6 +150,13 @@ export function TeacherRowActions({ teacher, onActionComplete }: TeacherRowActio
             <DropdownMenuItem onClick={handleInvite} disabled={isProcessing}>
               <Power className="mr-2 h-4 w-4" />
               Invite Teacher
+            </DropdownMenuItem>
+          )}
+
+          {eligibility.canReset && (
+            <DropdownMenuItem onClick={handleReset} disabled={isProcessing}>
+              <RotateCcw className="mr-2 h-4 w-4" />
+              Reset Invitation
             </DropdownMenuItem>
           )}
 

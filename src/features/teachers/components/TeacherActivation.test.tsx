@@ -17,6 +17,10 @@ vi.mock("@/app/admin/teachers/actions", () => ({
   restoreTeacherAction: vi.fn(),
 }));
 
+vi.mock("@/app/admin/teachers/activate/actions", () => ({
+  resetTeacherInvitationAction: vi.fn(),
+}));
+
 vi.mock("next/navigation", () => ({
   useRouter: () => ({
     push: vi.fn(),
@@ -44,10 +48,8 @@ describe("TeacherRowActions Provisioning", () => {
   it("eligible active unprovisioned Teacher can be invited", () => {
     render(<TeacherRowActions teacher={baseTeacher} />);
 
-    // Open dropdown
     fireEvent.click(screen.getByRole("button", { name: "Open menu" }));
 
-    // Ensure "Invite Teacher" is present
     const inviteItem = screen.getByText("Invite Teacher");
     expect(inviteItem).toBeInTheDocument();
   });
@@ -64,28 +66,31 @@ describe("TeacherRowActions Provisioning", () => {
     expect(screen.queryByText("Invite Teacher")).not.toBeInTheDocument();
   });
 
-  it("INVITED Teacher cannot be invited", () => {
+  it("INVITED Teacher shows Reset Invitation option", () => {
     render(
       <TeacherRowActions teacher={{ ...baseTeacher, appUser: { status: "INVITED" } }} />,
     );
     fireEvent.click(screen.getByRole("button", { name: "Open menu" }));
     expect(screen.queryByText("Invite Teacher")).not.toBeInTheDocument();
+    expect(screen.getByText("Reset Invitation")).toBeInTheDocument();
   });
 
-  it("ACTIVE Teacher cannot be invited", () => {
+  it("ACTIVE Teacher cannot be invited or reset", () => {
     render(
       <TeacherRowActions teacher={{ ...baseTeacher, appUser: { status: "ACTIVE" } }} />,
     );
     fireEvent.click(screen.getByRole("button", { name: "Open menu" }));
     expect(screen.queryByText("Invite Teacher")).not.toBeInTheDocument();
+    expect(screen.queryByText("Reset Invitation")).not.toBeInTheDocument();
   });
 
-  it("DISABLED Teacher cannot be invited", () => {
+  it("DISABLED Teacher cannot be invited or reset", () => {
     render(
       <TeacherRowActions teacher={{ ...baseTeacher, appUser: { status: "DISABLED" } }} />,
     );
     fireEvent.click(screen.getByRole("button", { name: "Open menu" }));
     expect(screen.queryByText("Invite Teacher")).not.toBeInTheDocument();
+    expect(screen.queryByText("Reset Invitation")).not.toBeInTheDocument();
   });
 
   it("Teacher client submits no role or Supabase Auth ID", async () => {
@@ -103,7 +108,6 @@ describe("TeacherRowActions Provisioning", () => {
     await waitFor(() => {
       expect(actions.inviteTeacherAction).toHaveBeenCalledWith("t1");
     });
-    // Ensure only the ID is passed
     expect(vi.mocked(actions.inviteTeacherAction).mock.calls[0].length).toBe(1);
   });
 });
