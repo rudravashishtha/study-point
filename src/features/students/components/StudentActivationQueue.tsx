@@ -3,7 +3,10 @@
 import { useState } from "react";
 import { StudentActivationCandidate } from "@/server/services/provisioning";
 import { InviteStudentButton } from "./InviteStudentButton";
-import { bulkInviteStudentsAction } from "@/app/admin/students/activate/actions";
+import {
+  bulkInviteStudentsAction,
+  resetStudentInvitationAction,
+} from "@/app/admin/students/activate/actions";
 import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -16,6 +19,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { DataListEmpty } from "@/components/admin/data-list/DataListEmpty";
+import { RotateCcw } from "lucide-react";
 
 interface StudentActivationQueueProps {
   candidates: StudentActivationCandidate[];
@@ -24,6 +28,7 @@ interface StudentActivationQueueProps {
 export function StudentActivationQueue({ candidates }: StudentActivationQueueProps) {
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [isBulkPending, setIsBulkPending] = useState(false);
+  const [resettingId, setResettingId] = useState<string | null>(null);
 
   if (candidates.length === 0) {
     return (
@@ -34,7 +39,9 @@ export function StudentActivationQueue({ candidates }: StudentActivationQueuePro
     );
   }
 
-  const eligibleIds = candidates.filter((c) => c.isEligible).map((c) => c.id);
+  const eligibleIds = candidates
+    .filter((c) => c.isEligible && c.invitationStatus === "none")
+    .map((c) => c.id);
   const allSelected =
     eligibleIds.length > 0 && eligibleIds.every((id) => selected.has(id));
 
@@ -70,6 +77,25 @@ export function StudentActivationQueue({ candidates }: StudentActivationQueuePro
     }
   };
 
+  const handleReset = async (studentId: string) => {
+    setResettingId(studentId);
+    try {
+      const result = await resetStudentInvitationAction(studentId);
+      if (!result.success) {
+        toast.error("Reset failed", { description: result.error });
+      } else {
+        toast.success("Invitation reset. You can now correct the email and re-invite.");
+      }
+    } catch (error: unknown) {
+      toast.error("Reset failed", {
+        description:
+          error instanceof Error ? error.message : "An unexpected error occurred",
+      });
+    } finally {
+      setResettingId(null);
+    }
+  };
+
   return (
     <div className="space-y-4">
       <div className="rounded-md border">
@@ -88,7 +114,7 @@ export function StudentActivationQueue({ candidates }: StudentActivationQueuePro
               <TableHead>Student Code</TableHead>
               <TableHead>Name</TableHead>
               <TableHead>Email</TableHead>
-              <TableHead>Eligibility</TableHead>
+              <TableHead>Status</TableHead>
               <TableHead className="text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
@@ -96,13 +122,15 @@ export function StudentActivationQueue({ candidates }: StudentActivationQueuePro
             {candidates.map((candidate) => (
               <TableRow key={candidate.id}>
                 <TableCell>
-                  <input
-                    type="checkbox"
-                    aria-label={`Select ${candidate.fullName}`}
-                    checked={selected.has(candidate.id)}
-                    onChange={() => toggle(candidate.id)}
-                    disabled={!candidate.isEligible}
-                  />
+                  {candidate.invitationStatus === "none" && (
+                    <input
+                      type="checkbox"
+                      aria-label={`Select ${candidate.fullName}`}
+                      checked={selected.has(candidate.id)}
+                      onChange={() => toggle(candidate.id)}
+                      disabled={!candidate.isEligible}
+                    />
+                  )}
                 </TableCell>
                 <TableCell className="font-medium">{candidate.studentCode}</TableCell>
                 <TableCell>{candidate.fullName}</TableCell>
@@ -116,17 +144,31 @@ export function StudentActivationQueue({ candidates }: StudentActivationQueuePro
                   )}
                 </TableCell>
                 <TableCell>
-                  {candidate.isEligible ? (
+                  {candidate.invitationStatus === "invited" ? (
+                    <Badge variant="secondary">Invitation Pending</Badge>
+                  ) : candidate.isEligible ? (
                     <Badge variant="default">Eligible</Badge>
                   ) : (
                     <Badge variant="destructive">Ineligible (Missing Email)</Badge>
                   )}
                 </TableCell>
                 <TableCell className="text-right">
-                  <InviteStudentButton
-                    studentId={candidate.id}
-                    isEligible={candidate.isEligible}
-                  />
+                  {candidate.invitationStatus === "invited" ? (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => handleReset(candidate.id)}
+                      disabled={resettingId === candidate.id}
+                    >
+                      <RotateCcw className="mr-2 h-4 w-4" />
+                      {resettingId === candidate.id ? "Resetting..." : "Reset"}
+                    </Button>
+                  ) : (
+                    <InviteStudentButton
+                      studentId={candidate.id}
+                      isEligible={candidate.isEligible}
+                    />
+                  )}
                 </TableCell>
               </TableRow>
             ))}

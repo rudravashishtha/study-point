@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, useTransition, useRef, useEffect } from "react";
+import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "motion/react";
 import {
   BookOpen,
@@ -38,9 +38,6 @@ const mobileOverflow: LinkItem[] = allLinks.slice(4);
 
 export function StudentNavigation({ unreadCount = 0 }: { unreadCount?: number }) {
   const pathname = usePathname();
-  const router = useRouter();
-  const [isPending, startTransition] = useTransition();
-  const [pendingPath, setPendingPath] = useState<string | null>(null);
   const [overflowOpen, setOverflowOpen] = useState(false);
   const overflowRef = useRef<HTMLDivElement>(null);
 
@@ -62,37 +59,17 @@ export function StudentNavigation({ unreadCount = 0 }: { unreadCount?: number })
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  const handleNavigate = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
-    if (e.ctrlKey || e.metaKey || e.shiftKey || e.altKey) {
-      return;
-    }
-    if (pathname === href) {
-      return;
-    }
-    e.preventDefault();
-    setPendingPath(href);
-    setOverflowOpen(false);
-    startTransition(() => {
-      router.push(href);
-    });
-  };
-
   function NavLink({ href, label, icon: Icon }: LinkItem) {
     const isActive = pathname === href || pathname.startsWith(`${href}/`);
-    const isItemPending = isPending && pendingPath === href;
 
     return (
       <Link
         href={href}
-        onClick={(e) => handleNavigate(e, href)}
+        onClick={() => setOverflowOpen(false)}
         aria-current={isActive ? "page" : undefined}
-        className={`relative flex min-h-[4.5rem] sm:min-h-12 flex-1 sm:flex-none flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2 sm:rounded-full sm:px-4 text-xs sm:text-sm font-medium outline-none transition-all ${
-          isItemPending
-            ? "opacity-60 scale-[0.98] sm:scale-95 bg-surface-interactive/50"
-            : "hover:bg-surface-interactive/30"
-        }`}
+        className={`relative flex min-h-[4.5rem] sm:min-h-12 flex-1 sm:flex-none flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2 sm:rounded-full sm:px-4 text-xs sm:text-sm font-medium outline-none transition-all hover:bg-surface-interactive/30`}
       >
-        {isActive && !isItemPending && (
+        {isActive && (
           <motion.div
             layoutId="student-active-tab"
             className="absolute inset-x-2 top-1 bottom-1 sm:inset-0 rounded-xl sm:rounded-full bg-surface-elevated shadow-sm border border-border/50"
@@ -103,10 +80,7 @@ export function StudentNavigation({ unreadCount = 0 }: { unreadCount?: number })
         <span
           className={`relative z-10 flex flex-col sm:flex-row items-center gap-1 sm:gap-2 ${isActive ? "text-primary" : "text-muted-foreground"}`}
         >
-          <Icon
-            className={`size-5 sm:size-4 ${isItemPending ? "animate-pulse" : ""}`}
-            aria-hidden="true"
-          />
+          <Icon className="size-5 sm:size-4" aria-hidden="true" />
           <span>{label}</span>
           {label === "Notices" && effectiveUnread > 0 && (
             <span className="absolute -right-1.5 -top-0.5 sm:static sm:ml-1 flex size-4 items-center justify-center rounded-full bg-destructive text-[9px] font-bold text-destructive-foreground">
@@ -170,7 +144,7 @@ export function StudentNavigation({ unreadCount = 0 }: { unreadCount?: number })
                     <Link
                       key={href}
                       href={href}
-                      onClick={(e) => handleNavigate(e, href)}
+                      onClick={() => setOverflowOpen(false)}
                       aria-current={isActive ? "page" : undefined}
                       className={`flex items-center gap-3 px-4 py-3 text-sm font-medium transition-colors hover:bg-surface-interactive/30 ${
                         isActive

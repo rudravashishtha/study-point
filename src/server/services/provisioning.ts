@@ -14,6 +14,7 @@ export type StudentActivationCandidate = {
   fullName: string;
   email: string | null;
   isEligible: boolean;
+  invitationStatus: "none" | "invited";
 };
 
 export async function listStudentActivationCandidates(
@@ -23,14 +24,20 @@ export async function listStudentActivationCandidates(
 
   const students = await db.student.findMany({
     where: {
-      appUser: null,
       archivedAt: null,
+      OR: [
+        { appUser: null },
+        { appUser: { status: "INVITED" } },
+      ],
     },
     select: {
       id: true,
       studentCode: true,
       fullName: true,
       email: true,
+      appUser: {
+        select: { status: true },
+      },
     },
     orderBy: {
       studentCode: "asc",
@@ -42,7 +49,8 @@ export async function listStudentActivationCandidates(
     studentCode: s.studentCode,
     fullName: s.fullName,
     email: s.email ? s.email.trim().toLowerCase() : null,
-    isEligible: !!s.email, // Eligible if it has an email, but appUser is already excluded by query
+    isEligible: !!s.email,
+    invitationStatus: s.appUser ? "invited" : "none",
   }));
 }
 
@@ -154,6 +162,55 @@ export async function inviteStudent(actor: ActorContext, studentId: string) {
     });
 
     return appUser;
+  });
+}
+
+export async function resetStudentInvitation(actor: ActorContext, studentId: string) {
+  requireAdminContext(actor);
+
+  const student = await db.student.findUnique({
+    where: { id: studentId },
+    include: { appUser: true },
+  });
+
+  if (!student) {
+    throw new Error("Student not found");
+  }
+
+  if (!student.appUser) {
+    throw new Error("Student has no linked account to reset");
+  }
+
+  if (student.appUser.status === "ACTIVE") {
+    throw new Error("Cannot reset an already-active account. Disable it first.");
+  }
+
+  const supabase = createAdminClient();
+
+  // Delete Supabase auth user if it exists
+  if (student.appUser.supabaseAuthUserId) {
+    try {
+      await supabase.auth.admin.deleteUser(student.appUser.supabaseAuthUserId);
+    } catch {
+      // Auth user may already be deleted or not exist — continue with DB cleanup
+    }
+  }
+
+  await db.$transaction(async (tx) => {
+    await tx.appUser.delete({ where: { id: student.appUser!.id } });
+
+    await tx.student.update({
+      where: { id: studentId },
+      data: { accountStatus: "none" },
+    });
+
+    await createAuditLog(tx, actor, {
+      action: "RESET_PROVISION",
+      entityType: "STUDENT",
+      entityId: studentId,
+      metadata: { previousEmail: student.appUser!.email },
+      summary: `Reset invitation for student ${student.email ?? student.studentCode}`,
+    });
   });
 }
 

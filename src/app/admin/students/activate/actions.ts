@@ -1,6 +1,6 @@
 "use server";
 
-import { inviteStudent } from "@/server/services/provisioning";
+import { inviteStudent, resetStudentInvitation } from "@/server/services/provisioning";
 import { rateLimit } from "@/lib/rate-limit";
 import { withActor, withAuthorization, withRevalidation } from "@/lib/actions/wrappers";
 
@@ -42,6 +42,16 @@ export const bulkInviteStudentsAction = withActor(
           error: `Invited ${invited} of ${ids.length}; ${failed} failed.`,
         };
       }
+      return { success: true, data: undefined };
+    }),
+  ),
+);
+
+export const resetStudentInvitationAction = withActor(
+  withAuthorization(
+    "ADMIN",
+    withRevalidation(["/admin/students/activate"], async (actor, studentId: string) => {
+      await resetStudentInvitation(actor, studentId);
       return { success: true, data: undefined };
     }),
   ),

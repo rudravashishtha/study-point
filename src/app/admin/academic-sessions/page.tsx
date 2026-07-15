@@ -2,11 +2,10 @@ import React from "react";
 import { requireAdmin } from "@/lib/auth/permissions";
 import { parseListParams } from "@/lib/url/search-params";
 import { listAcademicSessions } from "@/server/services/academic-sessions";
-import { SessionList } from "@/features/academic-sessions/components/SessionList";
+import { SessionsView } from "@/features/academic-sessions/components/SessionsView";
 import { DataListSearch } from "@/components/admin/data-list/DataListSearch";
 import { DataListArchiveFilter } from "@/components/admin/data-list/DataListArchiveFilter";
 import { DataListPagination } from "@/components/admin/data-list/DataListPagination";
-import { DataListEmpty } from "@/components/admin/data-list/DataListEmpty";
 import {
   PageHeader,
   PageHeaderHeading,
@@ -57,20 +56,14 @@ export default async function AcademicSessionsPage({
         </DataListFilters>
       </DataListToolbar>
 
-      {sessions.length === 0 ? (
-        <DataListEmpty
-          title="No academic sessions found."
-          isFiltered={params.query !== "" || params.archiveState !== "active"}
+      <SessionsView sessions={sessions} />
+
+      {sessions.length > 0 && (
+        <DataListPagination
+          currentPage={params.page}
+          totalItems={total}
+          pageSize={params.pageSize}
         />
-      ) : (
-        <>
-          <SessionList sessions={sessions} />
-          <DataListPagination
-            currentPage={params.page}
-            totalItems={total}
-            pageSize={params.pageSize}
-          />
-        </>
       )}
     </div>
   );

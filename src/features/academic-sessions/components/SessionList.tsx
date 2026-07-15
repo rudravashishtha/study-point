@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React from "react";
 import { AcademicSession } from "@prisma/client";
 import {
   Table,
@@ -12,33 +12,16 @@ import {
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { SessionRowActions } from "./SessionRowActions";
-import { SessionFormDialog } from "./SessionFormDialog";
 
-export function SessionList({ sessions }: { sessions: AcademicSession[] }) {
-  const [editingSession, setEditingSession] = useState<AcademicSession | undefined>();
-  const [isFormOpen, setIsFormOpen] = useState(false);
-
-  const handleEdit = (session: AcademicSession) => {
-    setEditingSession(session);
-    setIsFormOpen(true);
-  };
-
-  const handleCreate = () => {
-    setEditingSession(undefined);
-    setIsFormOpen(true);
-  };
-
+export function SessionList({
+  sessions,
+  onEdit,
+}: {
+  sessions: AcademicSession[];
+  onEdit: (session: AcademicSession) => void;
+}) {
   return (
     <div className="space-y-4">
-      <div className="flex justify-end items-center">
-        <button
-          onClick={handleCreate}
-          className="rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90"
-        >
-          Create Session
-        </button>
-      </div>
-
       {/* Desktop View */}
       <div className="hidden w-full overflow-auto rounded-md border md:block bg-card">
         <Table>
@@ -82,10 +65,7 @@ export function SessionList({ sessions }: { sessions: AcademicSession[] }) {
                     : "-"}
                 </TableCell>
                 <TableCell className="text-right">
-                  <SessionRowActions
-                    session={session}
-                    onEdit={() => handleEdit(session)}
-                  />
+                  <SessionRowActions session={session} onEdit={() => onEdit(session)} />
                 </TableCell>
               </TableRow>
             ))}
@@ -124,17 +104,11 @@ export function SessionList({ sessions }: { sessions: AcademicSession[] }) {
               </div>
             </div>
             <div className="flex justify-end pt-2 border-t">
-              <SessionRowActions session={session} onEdit={() => handleEdit(session)} />
+              <SessionRowActions session={session} onEdit={() => onEdit(session)} />
             </div>
           </div>
         ))}
       </div>
-
-      <SessionFormDialog
-        session={editingSession}
-        open={isFormOpen}
-        onOpenChange={setIsFormOpen}
-      />
     </div>
   );
 }

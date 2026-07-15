@@ -13,6 +13,7 @@ afterEach(() => {
 vi.mock("@/app/admin/students/activate/actions", () => ({
   inviteStudentAction: vi.fn(),
   bulkInviteStudentsAction: vi.fn(),
+  resetStudentInvitationAction: vi.fn(),
 }));
 
 describe("StudentActivationQueue", () => {
@@ -27,6 +28,7 @@ describe("StudentActivationQueue", () => {
       fullName: "John Doe",
       email: "john@example.com",
       isEligible: true,
+      invitationStatus: "none" as const,
     },
     {
       id: "s2",
@@ -34,6 +36,7 @@ describe("StudentActivationQueue", () => {
       fullName: "Jane Doe",
       email: null,
       isEligible: false,
+      invitationStatus: "none" as const,
     },
   ];
 

@@ -1,8 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
-import { useState, useTransition } from "react";
+import { usePathname } from "next/navigation";
 import { motion } from "motion/react";
 import {
   BookOpen,
@@ -84,34 +83,6 @@ export function AdminNavigation({
   closeMobileNav?: () => void;
 }) {
   const pathname = usePathname();
-  const router = useRouter();
-  const [isPending, startTransition] = useTransition();
-  const [pendingPath, setPendingPath] = useState<string | null>(null);
-
-  // Clear pending state when pathname changes
-  const handleNavigate = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
-    // Let browser handle modifier clicks (ctrl/cmd/shift open in new tab)
-    if (e.ctrlKey || e.metaKey || e.shiftKey || e.altKey) {
-      return;
-    }
-
-    if (pathname === href) {
-      closeMobileNav?.();
-      return;
-    }
-
-    e.preventDefault();
-    setPendingPath(href);
-
-    // Immediate feedback for mobile
-    if (isMobile && closeMobileNav) {
-      closeMobileNav();
-    }
-
-    startTransition(() => {
-      router.push(href);
-    });
-  };
 
   return (
     <nav aria-label="Admin navigation" className="flex flex-col gap-6 py-2">
@@ -121,23 +92,17 @@ export function AdminNavigation({
             {group.name}
           </p>
           {group.links.map(({ href, label, icon: Icon }) => {
-            const isActive =
-              pathname === href || (href !== "/admin" && pathname.startsWith(`${href}/`));
-            const isItemPending = isPending && pendingPath === href;
+            const isActive = pathname === href;
 
             return (
               <Link
                 key={href}
                 href={href}
-                onClick={(e) => handleNavigate(e, href)}
+                onClick={() => isMobile && closeMobileNav?.()}
                 aria-current={isActive ? "page" : undefined}
-                className={`group relative flex h-9 items-center gap-3 rounded-lg px-3 text-sm font-medium outline-none transition-all ${
-                  isItemPending
-                    ? "opacity-60 scale-[0.98] bg-surface-interactive/50"
-                    : "hover:bg-surface-interactive/30"
-                }`}
+                className="group relative flex h-9 items-center gap-3 rounded-lg px-3 text-sm font-medium outline-none transition-all hover:bg-surface-interactive/30"
               >
-                {isActive && !isItemPending && (
+                {isActive && (
                   <motion.div
                     layoutId={
                       isMobile ? "admin-mobile-active-tab" : "admin-desktop-active-tab"
@@ -157,9 +122,7 @@ export function AdminNavigation({
                   className={`relative z-10 flex items-center gap-3 ${isActive ? "text-foreground font-bold" : "text-muted-foreground group-hover:text-foreground"}`}
                 >
                   <Icon
-                    className={`size-4 ${isActive ? "text-brand-glow" : "text-muted-foreground opacity-70 group-hover:opacity-100"} ${
-                      isItemPending ? "animate-pulse" : ""
-                    }`}
+                    className={`size-4 ${isActive ? "text-brand-glow" : "text-muted-foreground opacity-70 group-hover:opacity-100"}`}
                     aria-hidden="true"
                   />
                   <span>{label}</span>
