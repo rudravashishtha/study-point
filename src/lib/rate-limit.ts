@@ -18,6 +18,9 @@ export function rateLimit(
   max: number,
   windowMs: number,
 ): RateLimitResult {
+  if (process.env.E2E_TEST_BYPASS_RATE_LIMIT === "true") {
+    max = 5000; // Bypass rate limit for E2E tests only when explicitly requested
+  }
   const now = Date.now();
 
   if (store.size > MAX_ENTRIES) {

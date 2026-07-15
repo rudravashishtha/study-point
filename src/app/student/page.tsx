@@ -3,9 +3,12 @@ import { requireRole } from "@/lib/auth/permissions";
 import { Role } from "@prisma/client";
 import { db } from "@/lib/db";
 import { getStudentDashboard } from "@/server/services/student-dashboard";
+import { getLiveClassSessionsForStudent } from "@/server/services/live-classes";
 import { StudentDashboard } from "@/features/dashboard/components/StudentDashboard";
+import { AgendaView } from "@/features/live-classes/components/agenda-view";
 import { EmptyState } from "@/components/feedback/empty-state";
-import { Megaphone } from "lucide-react";
+import { Megaphone, BookOpen } from "lucide-react";
+import { startOfDay } from "date-fns";
 
 export default async function StudentDashboardPage() {
   const appUser = await requireRole(Role.STUDENT);
@@ -53,6 +56,13 @@ export default async function StudentDashboardPage() {
     );
   }
 
+  const today = startOfDay(new Date());
+  const nextWeek = new Date(today.getTime() + 7 * 24 * 60 * 60 * 1000);
+  const liveSessions = await getLiveClassSessionsForStudent(appUser.studentId, {
+    from: today,
+    to: nextWeek,
+  });
+
   return (
     <div className="flex flex-col gap-6">
       <div>
@@ -61,6 +71,15 @@ export default async function StudentDashboardPage() {
           Your upcoming classes, homework, tests, and notices.
         </p>
       </div>
+
+      {liveSessions.length > 0 && (
+        <div className="space-y-4">
+          <h2 className="text-xl font-semibold flex items-center gap-2">
+            <BookOpen className="size-5" /> Upcoming Live Classes
+          </h2>
+          <AgendaView sessions={liveSessions} role="STUDENT" />
+        </div>
+      )}
 
       <StudentDashboard data={result.data} />
     </div>

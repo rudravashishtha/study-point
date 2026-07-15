@@ -59,8 +59,8 @@ model Student {
   joiningDate   DateTime?
   accountStatus String    @default("none") // none, invited, active, disabled
 
-  appUser    AppUser?
-  enrolments Enrolment[]
+  appUser           AppUser?
+  enrolments        Enrolment[]
   announcementReads StudentAnnouncementRead[]
 
   archivedAt DateTime?
@@ -79,6 +79,7 @@ model Teacher {
 
   appUser            AppUser?
   teacherAssignments TeacherAssignment[]
+  liveClassSessions  LiveClassSession[]
 }
 
 enum PermissionCapability {
@@ -315,12 +316,13 @@ model Batch {
   // Note: We do NOT use @@unique here.
   // We use a custom migration to create: UNIQUE (academicSessionId, curriculumTrackId, name) WHERE archivedAt IS NULL
 
-  uploadReservations FileAsset[]     @relation("FileAssetBatch")
+  uploadReservations FileAsset[]        @relation("FileAssetBatch")
   studyMaterials     StudyMaterial[]
   homeworks          Homework[]
   tests              Test[]
   feePlans           FeePlan[]
   announcements      Announcement[]
+  liveClassSessions  LiveClassSession[]
 }
 
 model Announcement {
@@ -357,10 +359,10 @@ model Announcement {
 }
 
 model StudentAnnouncementRead {
-  id             String      @id @default(uuid())
+  id             String   @id @default(uuid())
   studentId      String
   announcementId String
-  readAt         DateTime    @default(now())
+  readAt         DateTime @default(now())
 
   student      Student      @relation(fields: [studentId], references: [id], onDelete: Cascade)
   announcement Announcement @relation(fields: [announcementId], references: [id], onDelete: Cascade)
@@ -382,7 +384,8 @@ model BatchSchedule {
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
 
-  batch Batch @relation(fields: [batchId], references: [id], onDelete: Cascade)
+  batch             Batch              @relation(fields: [batchId], references: [id], onDelete: Cascade)
+  liveClassSessions LiveClassSession[]
 }
 
 model Enrolment {
@@ -683,11 +686,11 @@ model FileAsset {
   targetTrack   CurriculumTrack? @relation("FileAssetTrack", fields: [targetTrackId], references: [id])
   uploadedBy    AppUser          @relation("FileAssetUploader", fields: [uploadedById], references: [id])
 
-  studyMaterials   StudyMaterial[]
-  homeworks        Homework[]       @relation("FileAssetHomework")
-  tests            Test[]           @relation("FileAssetTest")
-  testimonials     Testimonial[]    @relation("TestimonialPhoto")
-  galleryItems     GalleryItem[]
+  studyMaterials StudyMaterial[]
+  homeworks      Homework[]      @relation("FileAssetHomework")
+  tests          Test[]          @relation("FileAssetTest")
+  testimonials   Testimonial[]   @relation("TestimonialPhoto")
+  galleryItems   GalleryItem[]
 }
 
 model StudyMaterial {
@@ -707,7 +710,7 @@ model StudyMaterial {
 
   visibility     StudyMaterialVisibility
   lifecycleState StudyMaterialLifecycleState
-  featured       Boolean @default(false)
+  featured       Boolean                     @default(false)
 
   publishedAt DateTime?
   createdAt   DateTime  @default(now())
@@ -771,19 +774,19 @@ model MethodologyStep {
 }
 
 model Testimonial {
-  id            String         @id @default(uuid())
-  studentName   String
-  designation  String?
-  studentClass  ClassLevel?
-  batch         String?
-  year          Int?
+  id                 String      @id @default(uuid())
+  studentName        String
+  designation        String?
+  studentClass       ClassLevel?
+  batch              String?
+  year               Int?
   studentPhotoFileId String?
-  message       String
-  featured      Boolean        @default(false)
-  displayOrder  Int            @default(0)
-  isPublished   Boolean        @default(false)
-  createdAt     DateTime       @default(now())
-  updatedAt     DateTime       @updatedAt
+  message            String
+  featured           Boolean     @default(false)
+  displayOrder       Int         @default(0)
+  isPublished        Boolean     @default(false)
+  createdAt          DateTime    @default(now())
+  updatedAt          DateTime    @updatedAt
 
   studentPhoto FileAsset? @relation("TestimonialPhoto", fields: [studentPhotoFileId], references: [id])
 }
@@ -970,34 +973,67 @@ model Question {
 }
 
 model SiteSettings {
-  id              String   @id @default(uuid())
-  instituteName   String
-  tagline         String?
-  phone           String?
-  whatsappNumber  String?
-  email           String?
-  address         String?
-  landmark        String?
-  mapUrl          String?
-  openingHours    String?
-  logoFileId      String?
-  faviconFileId   String?
-  defaultTitle    String?
-  defaultDescription String?
-  ogImageFileId   String?
-  socialLinks     Json?
-  heroHeadline    String?
-  heroSubheadline String?
-  heroCtaText     String?
-  heroCtaTarget   String?
-  feeDisplayEnabled Boolean @default(true)
-  admissionsOpen  Boolean @default(true)
-  resourcesEnabled Boolean @default(true)
-  resourcesSearchEnabled Boolean @default(true)
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
-  createdBy       String?
-  updatedBy       String?
+  id                     String   @id @default(uuid())
+  instituteName          String
+  tagline                String?
+  phone                  String?
+  whatsappNumber         String?
+  email                  String?
+  address                String?
+  landmark               String?
+  mapUrl                 String?
+  openingHours           String?
+  logoFileId             String?
+  faviconFileId          String?
+  defaultTitle           String?
+  defaultDescription     String?
+  ogImageFileId          String?
+  socialLinks            Json?
+  heroHeadline           String?
+  heroSubheadline        String?
+  heroCtaText            String?
+  heroCtaTarget          String?
+  feeDisplayEnabled      Boolean  @default(true)
+  admissionsOpen         Boolean  @default(true)
+  resourcesEnabled       Boolean  @default(true)
+  resourcesSearchEnabled Boolean  @default(true)
+  createdAt              DateTime @default(now())
+  updatedAt              DateTime @updatedAt
+  createdBy              String?
+  updatedBy              String?
 
   @@index([id])
+}
+
+enum LiveClassSessionStatus {
+  SCHEDULED
+  CANCELLED
+  COMPLETED
+}
+
+model LiveClassSession {
+  id                 String                 @id @default(uuid())
+  batchId            String
+  teacherId          String
+  batchScheduleId    String?
+  title              String
+  scheduledStartTime DateTime
+  scheduledEndTime   DateTime
+  meetingUrl         String?
+  status             LiveClassSessionStatus @default(SCHEDULED)
+  createdAt          DateTime               @default(now())
+  updatedAt          DateTime               @updatedAt
+  createdBy          String?
+  updatedBy          String?
+
+  batch         Batch          @relation(fields: [batchId], references: [id])
+  teacher       Teacher        @relation(fields: [teacherId], references: [id])
+  batchSchedule BatchSchedule? @relation(fields: [batchScheduleId], references: [id])
+
+  @@index([batchId])
+  @@index([teacherId])
+  @@index([scheduledStartTime])
+  @@index([status])
+  @@index([batchId, scheduledStartTime])
+  @@index([teacherId, scheduledStartTime])
 }

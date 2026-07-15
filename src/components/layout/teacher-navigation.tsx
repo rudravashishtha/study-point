@@ -62,6 +62,15 @@ export function TeacherNavigation({
           isMobile={isMobile}
           onNavigate={(e) => handleNavigate(e, "/teacher")}
         />
+        <TeacherNavLink
+          href="/teacher/agenda"
+          label="My Agenda"
+          icon={BookOpen}
+          isActive={pathname === "/teacher/agenda"}
+          isPending={isPending && pendingPath === "/teacher/agenda"}
+          isMobile={isMobile}
+          onNavigate={(e) => handleNavigate(e, "/teacher/agenda")}
+        />
       </div>
 
       {batches.length > 0 && (

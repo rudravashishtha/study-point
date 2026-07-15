@@ -9,7 +9,7 @@ const USERS = {
 async function login(page: import("@playwright/test").Page, email: string, password: string) {
   await page.goto("/login");
   await page.getByPlaceholder("you@example.com").fill(email);
-  await page.getByLabel("Password").fill(password);
+  await page.getByLabel("Password", { exact: true }).fill(password);
   await page.getByRole("button", { name: /sign in/i }).click();
 }
 
@@ -19,7 +19,7 @@ test.describe("CUJ-1: Authentication Lifecycle", () => {
     await page.goto("/login");
     await expect(page.getByRole("heading", { name: /welcome back/i })).toBeVisible();
     await expect(page.getByPlaceholder("you@example.com")).toBeVisible();
-    await expect(page.getByLabel("Password")).toBeVisible();
+    await expect(page.getByLabel("Password", { exact: true })).toBeVisible();
     await expect(page.getByRole("button", { name: /sign in/i })).toBeVisible();
     await expect(page.getByText(/forgot password/i)).toBeVisible();
   });
@@ -27,7 +27,7 @@ test.describe("CUJ-1: Authentication Lifecycle", () => {
   test("Invalid credentials show error", async ({ page }) => {
     await page.goto("/login");
     await page.getByPlaceholder("you@example.com").fill("wrong@example.com");
-    await page.getByLabel("Password").fill("wrongpassword");
+    await page.getByLabel("Password", { exact: true }).fill("wrongpassword");
     await page.getByRole("button", { name: /sign in/i }).click();
     await expect(page.getByText(/invalid email or password/i)).toBeVisible();
   });

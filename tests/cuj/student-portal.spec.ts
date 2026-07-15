@@ -30,7 +30,7 @@ const routes = [
 async function loginAsStudent(page: Page) {
   await page.goto("/login");
   await page.getByPlaceholder("you@example.com").fill(STUDENT.email);
-  await page.getByLabel("Password").fill(STUDENT.password);
+  await page.getByLabel("Password", { exact: true }).fill(STUDENT.password);
   await page.getByRole("button", { name: /sign in/i }).click();
   await page.waitForURL("**/student**");
 }

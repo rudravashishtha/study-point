@@ -28,8 +28,13 @@ export const adminNavigationGroups = [
     name: "Academics",
     links: [
       { href: "/admin/curriculum", label: "Curriculum", icon: BookOpen },
-      { href: "/admin/academic-sessions", label: "Academic Sessions", icon: CalendarRange },
+      {
+        href: "/admin/academic-sessions",
+        label: "Academic Sessions",
+        icon: CalendarRange,
+      },
       { href: "/admin/batches", label: "Batches", icon: Calendar },
+      { href: "/admin/live-classes", label: "Live Classes", icon: Calendar },
       { href: "/admin/materials", label: "Study Materials", icon: FileText },
       { href: "/admin/homework", label: "Homework", icon: FileText },
       { href: "/admin/tests", label: "Tests", icon: FileText },
@@ -97,7 +102,7 @@ export function AdminNavigation({
 
     e.preventDefault();
     setPendingPath(href);
-    
+
     // Immediate feedback for mobile
     if (isMobile && closeMobileNav) {
       closeMobileNav();

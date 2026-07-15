@@ -10,7 +10,7 @@ test.describe("CUJ-2-9: Admin Workflows", () => {
     // --- Login once ---
     await page.goto("/login");
     await page.getByPlaceholder("you@example.com").fill(ADMIN.email);
-    await page.getByLabel("Password").fill(ADMIN.password);
+    await page.getByLabel("Password", { exact: true }).fill(ADMIN.password);
     await page.getByRole("button", { name: /sign in/i }).click();
     await page.waitForURL("**/admin**");
     expect(page.url()).toContain("/admin");
