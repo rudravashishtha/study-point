@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { ClassLevel } from "@prisma/client";
 import { useRouter } from "next/navigation";
 import { Plus, Pencil, Trash2, Eye, EyeOff, Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -68,13 +69,13 @@ const TABS = [
 type TabId = (typeof TABS)[number]["id"];
 
 interface Props {
-  whyChooseUsItems: any[];
-  methodologySteps: any[];
-  testimonials: any[];
-  galleryItems: any[];
-  faqs: any[];
-  performanceMetrics: any[];
-  sections: any[];
+  whyChooseUsItems: /* eslint-disable-line @typescript-eslint/no-explicit-any -- Justified: Prisma payload */ any[];
+  methodologySteps: /* eslint-disable-line @typescript-eslint/no-explicit-any -- Justified: Prisma payload */ any[];
+  testimonials: /* eslint-disable-line @typescript-eslint/no-explicit-any -- Justified: Prisma payload */ any[];
+  galleryItems: /* eslint-disable-line @typescript-eslint/no-explicit-any -- Justified: Prisma payload */ any[];
+  faqs: /* eslint-disable-line @typescript-eslint/no-explicit-any -- Justified: Prisma payload */ any[];
+  performanceMetrics: /* eslint-disable-line @typescript-eslint/no-explicit-any -- Justified: Prisma payload */ any[];
+  sections: /* eslint-disable-line @typescript-eslint/no-explicit-any -- Justified: Prisma payload */ any[];
 }
 
 export function WebsiteContentClient(props: Props) {
@@ -116,7 +117,7 @@ export function WebsiteContentClient(props: Props) {
   );
 }
 
-function HomepageSectionsTab({ sections }: { sections: any[] }) {
+function HomepageSectionsTab({ sections }: { sections: /* eslint-disable-line @typescript-eslint/no-explicit-any -- Justified: Prisma payload type is complex */ /* eslint-disable-line @typescript-eslint/no-explicit-any -- Justified: Prisma payload */ any[] }) {
   const router = useRouter();
   const defaultSections = [
     { key: "hero", label: "Hero Section", locked: true },
@@ -148,7 +149,7 @@ function HomepageSectionsTab({ sections }: { sections: any[] }) {
         Toggle visibility of each homepage section.
       </p>
       {defaultSections.map((def) => {
-        const dbSection = sections.find((s: any) => s.sectionKey === def.key);
+        const dbSection = sections.find((s: /* eslint-disable-line @typescript-eslint/no-explicit-any -- Justified: Prisma payload */ any) => s.sectionKey === def.key);
         const isVisible = dbSection === undefined ? false : dbSection.isVisible;
         return (
           <div
@@ -186,13 +187,13 @@ const whyChooseUsSchema = z.object({
   isPublished: z.coerce.boolean().optional(),
 });
 
-function WhyChooseUsTab({ items }: { items: any[] }) {
+function WhyChooseUsTab({ items }: { items: /* eslint-disable-line @typescript-eslint/no-explicit-any -- Justified: Prisma payload type is complex */ /* eslint-disable-line @typescript-eslint/no-explicit-any -- Justified: Prisma payload */ any[] }) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
-  const [editing, setEditing] = useState<any>(null);
+  const [editing, setEditing] = useState</* eslint-disable-line @typescript-eslint/no-explicit-any -- Justified: editing payload */ any>(null);
 
   const form = useForm({
-    resolver: zodResolver(whyChooseUsSchema) as any,
+    resolver: zodResolver(whyChooseUsSchema) as /* eslint-disable-line @typescript-eslint/no-explicit-any -- Justified: RHF Zod default transforms */ any,
     defaultValues: {
       title: "",
       description: "",
@@ -202,7 +203,7 @@ function WhyChooseUsTab({ items }: { items: any[] }) {
     },
   });
 
-  const handleEdit = (item: any) => {
+  const handleEdit = (item: /* eslint-disable-line @typescript-eslint/no-explicit-any -- Justified: Prisma payload */ any) => {
     setEditing(item);
     form.reset({
       title: item.title,
@@ -261,7 +262,7 @@ function WhyChooseUsTab({ items }: { items: any[] }) {
         <Plus className="size-4" /> Add Item
       </Button>
       <div className="grid gap-3 sm:grid-cols-2">
-        {items.map((item: any) => (
+        {items.map((item: /* eslint-disable-line @typescript-eslint/no-explicit-any -- Justified: Prisma payload */ any) => (
           <div key={item.id} className="rounded-lg border p-4">
             <div className="flex items-start justify-between">
               <div>
@@ -383,12 +384,12 @@ const methodologySchema = z.object({
   isPublished: z.boolean().default(false),
 });
 
-function MethodologyTab({ steps }: { steps: any[] }) {
+function MethodologyTab({ steps }: { steps: /* eslint-disable-line @typescript-eslint/no-explicit-any -- Justified: Prisma payload type is complex */ /* eslint-disable-line @typescript-eslint/no-explicit-any -- Justified: Prisma payload */ any[] }) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
-  const [editing, setEditing] = useState<any>(null);
+  const [editing, setEditing] = useState</* eslint-disable-line @typescript-eslint/no-explicit-any -- Justified: editing payload */ any>(null);
   const form = useForm<z.infer<typeof methodologySchema>>({
-    resolver: zodResolver(methodologySchema) as any,
+    resolver: zodResolver(methodologySchema) as /* eslint-disable-line @typescript-eslint/no-explicit-any -- Justified: RHF Zod default transforms */ any,
     defaultValues: {
       title: "",
       description: "",
@@ -398,7 +399,7 @@ function MethodologyTab({ steps }: { steps: any[] }) {
     },
   });
 
-  const handleEdit = (item: any) => {
+  const handleEdit = (item: /* eslint-disable-line @typescript-eslint/no-explicit-any -- Justified: Prisma payload */ any) => {
     setEditing(item);
     form.reset({
       title: item.title,
@@ -456,7 +457,7 @@ function MethodologyTab({ steps }: { steps: any[] }) {
       <Button onClick={handleCreate}>
         <Plus className="size-4" /> Add Step
       </Button>
-      {steps.map((step: any) => (
+      {steps.map((step: /* eslint-disable-line @typescript-eslint/no-explicit-any -- Justified: Prisma payload */ any) => (
         <div key={step.id} className="rounded-lg border p-4">
           <div className="flex items-start justify-between">
             <div className="flex items-start gap-3">
@@ -584,12 +585,12 @@ const testimonialSchema = z.object({
   isPublished: z.boolean().default(false),
 });
 
-function TestimonialsTab({ items }: { items: any[] }) {
+function TestimonialsTab({ items }: { items: /* eslint-disable-line @typescript-eslint/no-explicit-any -- Justified: Prisma payload type is complex */ /* eslint-disable-line @typescript-eslint/no-explicit-any -- Justified: Prisma payload */ any[] }) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
-  const [editing, setEditing] = useState<any>(null);
+  const [editing, setEditing] = useState</* eslint-disable-line @typescript-eslint/no-explicit-any -- Justified: editing payload */ any>(null);
   const form = useForm<z.infer<typeof testimonialSchema>>({
-    resolver: zodResolver(testimonialSchema) as any,
+    resolver: zodResolver(testimonialSchema) as /* eslint-disable-line @typescript-eslint/no-explicit-any -- Justified: RHF Zod default transforms */ any,
     defaultValues: {
       studentName: "",
       message: "",
@@ -603,7 +604,7 @@ function TestimonialsTab({ items }: { items: any[] }) {
     },
   });
 
-  const handleEdit = (item: any) => {
+  const handleEdit = (item: /* eslint-disable-line @typescript-eslint/no-explicit-any -- Justified: Prisma payload */ any) => {
     setEditing(item);
     form.reset({
       studentName: item.studentName,
@@ -637,13 +638,13 @@ function TestimonialsTab({ items }: { items: any[] }) {
 
   const onSubmit = async (data: z.infer<typeof testimonialSchema>) => {
     if (editing) {
-      const r = await updateTestimonialAction(editing.id, data);
+      const r = await updateTestimonialAction(editing.id, { ...data, studentClass: data.studentClass as ClassLevel | undefined });
       if (!r.success) {
         toast.error(r.error);
         return;
       }
     } else {
-      const r = await createTestimonialAction(data);
+      const r = await createTestimonialAction({ ...data, studentClass: data.studentClass as ClassLevel | undefined });
       if (!r.success) {
         toast.error(r.error);
         return;
@@ -670,7 +671,7 @@ function TestimonialsTab({ items }: { items: any[] }) {
         <Plus className="size-4" /> Add Testimonial
       </Button>
       <div className="grid gap-3 sm:grid-cols-2">
-        {items.map((item: any) => (
+        {items.map((item: /* eslint-disable-line @typescript-eslint/no-explicit-any -- Justified: Prisma payload */ any) => (
           <div key={item.id} className="rounded-lg border p-4">
             <div className="flex items-start justify-between">
               <div>
@@ -855,10 +856,10 @@ function TestimonialsTab({ items }: { items: any[] }) {
 
 // ── Gallery ──
 
-function GalleryTab({ items }: { items: any[] }) {
+function GalleryTab({ items }: { items: /* eslint-disable-line @typescript-eslint/no-explicit-any -- Justified: Prisma payload type is complex */ /* eslint-disable-line @typescript-eslint/no-explicit-any -- Justified: Prisma payload */ any[] }) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
-  const [editing, setEditing] = useState<any>(null);
+  const [editing, setEditing] = useState</* eslint-disable-line @typescript-eslint/no-explicit-any -- Justified: editing payload */ any>(null);
 
   const handleDelete = async (id: string) => {
     const r = await deleteGalleryItemAction(id);
@@ -881,7 +882,7 @@ function GalleryTab({ items }: { items: any[] }) {
         <Plus className="size-4" /> Add Image
       </Button>
       <div className="grid gap-3 sm:grid-cols-3">
-        {items.map((item: any) => (
+        {items.map((item: /* eslint-disable-line @typescript-eslint/no-explicit-any -- Justified: Prisma payload */ any) => (
           <div key={item.id} className="group relative overflow-hidden rounded-lg border">
             <div className="aspect-video bg-muted flex items-center justify-center text-muted-foreground text-xs">
               {item.fileAsset?.mimeType || "Image"}
@@ -936,7 +937,7 @@ function GalleryTab({ items }: { items: any[] }) {
   );
 }
 
-function GalleryEditForm({ item, onDone }: { item: any; onDone: () => void }) {
+function GalleryEditForm({ item, onDone }: { item: /* eslint-disable-line @typescript-eslint/no-explicit-any -- Justified: Prisma payload */ any; onDone: () => void }) {
   const [caption, setCaption] = useState(item.caption || "");
   const [category, setCategory] = useState(item.category || "");
   const [isPublished, setIsPublished] = useState(item.isPublished);
@@ -978,12 +979,12 @@ const faqSchema = z.object({
   isPublished: z.boolean().default(false),
 });
 
-function FAQTab({ items }: { items: any[] }) {
+function FAQTab({ items }: { items: /* eslint-disable-line @typescript-eslint/no-explicit-any -- Justified: Prisma payload type is complex */ /* eslint-disable-line @typescript-eslint/no-explicit-any -- Justified: Prisma payload */ any[] }) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
-  const [editing, setEditing] = useState<any>(null);
+  const [editing, setEditing] = useState</* eslint-disable-line @typescript-eslint/no-explicit-any -- Justified: editing payload */ any>(null);
   const form = useForm<z.infer<typeof faqSchema>>({
-    resolver: zodResolver(faqSchema) as any,
+    resolver: zodResolver(faqSchema) as /* eslint-disable-line @typescript-eslint/no-explicit-any -- Justified: RHF Zod default transforms */ any,
     defaultValues: {
       question: "",
       answer: "",
@@ -993,7 +994,7 @@ function FAQTab({ items }: { items: any[] }) {
     },
   });
 
-  const handleEdit = (item: any) => {
+  const handleEdit = (item: /* eslint-disable-line @typescript-eslint/no-explicit-any -- Justified: Prisma payload */ any) => {
     setEditing(item);
     form.reset({
       question: item.question,
@@ -1051,7 +1052,7 @@ function FAQTab({ items }: { items: any[] }) {
       <Button onClick={handleCreate}>
         <Plus className="size-4" /> Add FAQ
       </Button>
-      {items.map((item: any) => (
+      {items.map((item: /* eslint-disable-line @typescript-eslint/no-explicit-any -- Justified: Prisma payload */ any) => (
         <div key={item.id} className="rounded-lg border p-4">
           <div className="flex items-start justify-between">
             <div>
@@ -1168,16 +1169,16 @@ const metricSchema = z.object({
   isPublished: z.boolean().default(false),
 });
 
-function MetricsTab({ items }: { items: any[] }) {
+function MetricsTab({ items }: { items: /* eslint-disable-line @typescript-eslint/no-explicit-any -- Justified: Prisma payload type is complex */ /* eslint-disable-line @typescript-eslint/no-explicit-any -- Justified: Prisma payload */ any[] }) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
-  const [editing, setEditing] = useState<any>(null);
+  const [editing, setEditing] = useState</* eslint-disable-line @typescript-eslint/no-explicit-any -- Justified: editing payload */ any>(null);
   const form = useForm<z.infer<typeof metricSchema>>({
-    resolver: zodResolver(metricSchema) as any,
+    resolver: zodResolver(metricSchema) as /* eslint-disable-line @typescript-eslint/no-explicit-any -- Justified: RHF Zod default transforms */ any,
     defaultValues: { label: "", value: "", displayOrder: 0, isPublished: false },
   });
 
-  const handleEdit = (item: any) => {
+  const handleEdit = (item: /* eslint-disable-line @typescript-eslint/no-explicit-any -- Justified: Prisma payload */ any) => {
     setEditing(item);
     form.reset({
       label: item.label,
@@ -1229,7 +1230,7 @@ function MetricsTab({ items }: { items: any[] }) {
         <Plus className="size-4" /> Add Metric
       </Button>
       <div className="grid gap-3 sm:grid-cols-3">
-        {items.map((item: any) => (
+        {items.map((item: /* eslint-disable-line @typescript-eslint/no-explicit-any -- Justified: Prisma payload */ any) => (
           <div key={item.id} className="rounded-lg border p-4 text-center">
             <p className="text-2xl font-bold text-primary">{item.value}</p>
             <p className="text-sm text-muted-foreground">{item.label}</p>

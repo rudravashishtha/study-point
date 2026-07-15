@@ -22,6 +22,7 @@ export async function getActor(): Promise<ActorContext> {
  * Injects the actor context and catches/maps all domain errors.
  * This is the outer-most wrapper. It does NOT enforce role boundaries (beyond standard auth).
  */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any -- Justified: any[] is the only sound generic bound for function arguments in TypeScript (unknown[] breaks contravariant inference).
 export function withActor<Args extends any[], Return>(
   action: (actor: ActorContext, ...args: Args) => Promise<ActionResult<Return>>
 ): (...args: Args) => Promise<ActionResult<Return>> {
@@ -39,6 +40,7 @@ export function withActor<Args extends any[], Return>(
  * Asserts authorization before passing to the action.
  * Throws a DomainError if the actor lacks the specified role.
  */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any -- Justified: any[] is required to preserve argument inference for HOFs.
 export function withAuthorization<Args extends any[], Return>(
   role: "ADMIN" | "TEACHER" | "STUDENT",
   action: (actor: ActorContext, ...args: Args) => Promise<ActionResult<Return>>
@@ -54,7 +56,9 @@ export function withAuthorization<Args extends any[], Return>(
 /**
  * Automatically triggers Next.js path revalidation upon a successful action result.
  */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any -- Justified: any[] is required to preserve argument inference for HOFs.
 export function withRevalidation<Args extends any[], Return>(
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Justified: needed to prevent inference collision with Args.
   pathsOrGetPaths: string[] | ((actor: ActorContext, ...args: any[]) => string[]),
   action: (actor: ActorContext, ...args: Args) => Promise<ActionResult<Return>>
 ): (actor: ActorContext, ...args: Args) => Promise<ActionResult<Return>> {

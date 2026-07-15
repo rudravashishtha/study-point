@@ -1,0 +1,70 @@
+
+/Users/rudravashishtha/personal/project-1plus1/src/features/academic-sessions/components/SessionFormDialog.tsx
+  46:27  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/rudravashishtha/personal/project-1plus1/src/features/homework/components/HomeworkFormDialog.tsx
+  143:83  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/rudravashishtha/personal/project-1plus1/src/features/homework/components/HomeworkList.tsx
+  77:11  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/rudravashishtha/personal/project-1plus1/src/features/homework/components/TeacherHomeworkFormDialog.tsx
+  127:83  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/rudravashishtha/personal/project-1plus1/src/features/homework/components/TeacherHomeworkList.tsx
+  65:11  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/rudravashishtha/personal/project-1plus1/src/features/materials/components/MaterialFormDialog.tsx
+  154:83  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/rudravashishtha/personal/project-1plus1/src/features/materials/components/MaterialList.tsx
+  80:11  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/rudravashishtha/personal/project-1plus1/src/features/materials/components/TeacherMaterialFormDialog.tsx
+  102:83  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/rudravashishtha/personal/project-1plus1/src/features/materials/components/TeacherMaterialList.tsx
+  73:11  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/rudravashishtha/personal/project-1plus1/src/features/profile/components/ProfilePage.tsx
+  30:7  error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+/Users/rudravashishtha/personal/project-1plus1/src/features/profile/components/ProfilePage.tsx:30:7
+  28 |   useEffect(() => {
+  29 |     if (phoneState.success) {
+> 30 |       setEditPhoneOpen(false);
+     |       ^^^^^^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  31 |     }
+  32 |   }, [phoneState.success]);
+  33 |  react-hooks/set-state-in-effect
+  37:7  error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+/Users/rudravashishtha/personal/project-1plus1/src/features/profile/components/ProfilePage.tsx:37:7
+  35 |   useEffect(() => {
+  36 |     if (nameState.success) {
+> 37 |       setEditNameOpen(false);
+     |       ^^^^^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  38 |     }
+  39 |   }, [nameState.success]);
+  40 |      react-hooks/set-state-in-effect
+
+/Users/rudravashishtha/personal/project-1plus1/src/features/tests/components/TestFormDialog.tsx
+  145:83  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/rudravashishtha/personal/project-1plus1/src/features/tests/components/TestList.tsx
+  76:11  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+✖ 13 problems (2 errors, 11 warnings)
+

@@ -9,7 +9,7 @@ import {
   UpdateHomeworkInput,
 } from "@/server/services/homework";
 import { withActor, withAuthorization, withRevalidation } from "@/lib/actions/wrappers";
-import { DomainError } from "@/lib/domain/errors";
+import { DomainError, type DomainErrorCode } from "@/lib/domain/errors";
 
 export const createAdminHomeworkAction = withActor(
   withAuthorization(
@@ -19,7 +19,7 @@ export const createAdminHomeworkAction = withActor(
       async (actor, input: CreateHomeworkInput) => {
         const res = await createHomework(actor.userId, input);
         if (!res.success) {
-          throw new DomainError((res.error?.code as any) || "INTERNAL_ERROR", res.error?.message || "Failed to create homework");
+          throw new DomainError((res.error?.code as DomainErrorCode) || "INTERNAL_ERROR", res.error?.message || "Failed to create homework");
         }
         return { success: true, data: res.data };
       }
@@ -35,7 +35,7 @@ export const updateAdminHomeworkAction = withActor(
       async (actor, id: string, input: UpdateHomeworkInput) => {
         const res = await updateHomework(actor.userId, id, input);
         if (!res.success) {
-          throw new DomainError((res.error?.code as any) || "INTERNAL_ERROR", res.error?.message || "Failed to update homework");
+          throw new DomainError((res.error?.code as DomainErrorCode) || "INTERNAL_ERROR", res.error?.message || "Failed to update homework");
         }
         return { success: true, data: res.data };
       }
@@ -51,7 +51,7 @@ export const publishAdminHomeworkAction = withActor(
       async (actor, id: string) => {
         const res = await publishHomework(actor.userId, id);
         if (!res.success) {
-          throw new DomainError((res.error?.code as any) || "INTERNAL_ERROR", res.error?.message || "Failed to publish homework");
+          throw new DomainError((res.error?.code as DomainErrorCode) || "INTERNAL_ERROR", res.error?.message || "Failed to publish homework");
         }
         return { success: true, data: res.data };
       }
@@ -67,7 +67,7 @@ export const archiveAdminHomeworkAction = withActor(
       async (actor, id: string) => {
         const res = await archiveHomework(actor.userId, id);
         if (!res.success) {
-          throw new DomainError((res.error?.code as any) || "INTERNAL_ERROR", res.error?.message || "Failed to archive homework");
+          throw new DomainError((res.error?.code as DomainErrorCode) || "INTERNAL_ERROR", res.error?.message || "Failed to archive homework");
         }
         return { success: true, data: res.data };
       }

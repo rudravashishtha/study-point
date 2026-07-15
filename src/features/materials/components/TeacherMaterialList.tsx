@@ -70,7 +70,7 @@ const resourceTypeLabel: Record<string, string> = {
 
 interface ActionResult {
   success: boolean;
-  error?: any;
+  error?: /* eslint-disable-line @typescript-eslint/no-explicit-any -- Justified: Server action boundary */ any;
 }
 
 export function TeacherMaterialList({

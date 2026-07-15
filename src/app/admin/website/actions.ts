@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { db } from "@/lib/db";
+import { ClassLevel, Prisma } from "@prisma/client";
 import { withActor, withAuthorization } from "@/lib/actions/wrappers";
 import { sanitizeRichText } from "@/lib/sanitize";
 import { createAuditLog } from "@/lib/domain/audit";
@@ -216,7 +217,7 @@ export const createTestimonialAction = withActor(
         studentName: string;
         message: string;
         designation?: string | null;
-        studentClass?: string | null;
+        studentClass?: ClassLevel | null;
         batch?: string | null;
         year?: number | null;
         studentPhotoFileId?: string | null;
@@ -225,7 +226,7 @@ export const createTestimonialAction = withActor(
       },
     ) => {
       await db.testimonial.create({
-        data: { ...data, studentClass: data.studentClass as any },
+        data,
       });
       createAuditLog(db, actor, {
         action: "TESTIMONIAL_CREATE",
@@ -240,13 +241,13 @@ export const createTestimonialAction = withActor(
 );
 
 export const updateTestimonialAction = withActor(
-  withAuthorization("ADMIN", async (actor, id: string, data: Record<string, unknown>) => {
+  withAuthorization("ADMIN", async (actor, id: string, data: Prisma.TestimonialUpdateInput) => {
     const clean: Record<string, unknown> = {};
     for (const [k, v] of Object.entries(data)) {
       if (v === null) clean[k] = null;
       else if (v !== undefined) clean[k] = v;
     }
-    await db.testimonial.update({ where: { id }, data: clean as any });
+    await db.testimonial.update({ where: { id }, data: clean as Prisma.TestimonialUpdateInput });
     revalidatePath("/admin/website");
     revalidatePath("/");
     return { success: true as const, data: undefined };

@@ -1,6 +1,6 @@
 import { useState, useTransition } from "react";
 
-export type ActionResponse<T = any> = 
+export type ActionResponse<T = unknown> = 
   | { success: true; data?: T } 
   | { success: false; error: string };
 
@@ -9,6 +9,7 @@ interface UseServerActionOptions<TResult> {
   onError?: (error: string) => void;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any -- Justified: any[] is the only sound generic bound for function arguments in TypeScript (unknown[] breaks contravariant inference).
 export function useServerAction<TArgs extends any[], TResult>(
   action: (...args: TArgs) => Promise<ActionResponse<TResult>>
 ) {

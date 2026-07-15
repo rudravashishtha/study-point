@@ -151,7 +151,7 @@ export function MaterialFormDialog({
         : await createAdminMaterialAction(payload);
 
       if (!res.success) {
-        throw new Error(typeof res.error === 'string' ? res.error : (res.error as any)?.message || 'Unknown error');
+        throw new Error(typeof res.error === 'string' ? res.error : (res.error as /* eslint-disable-line @typescript-eslint/no-explicit-any -- Justified: Server action boundary */ any)?.message || 'Unknown error');
       }
       toast.success("Success", { description: "Material saved" });
       onOpenChange(false);

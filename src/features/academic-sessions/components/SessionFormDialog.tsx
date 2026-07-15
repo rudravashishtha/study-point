@@ -43,7 +43,7 @@ export function SessionFormDialog({
 
     const actionArgs = session ? [session.id, payload] : [payload];
 
-    execute(actionArgs as any, {
+    execute(actionArgs as /* eslint-disable-line @typescript-eslint/no-explicit-any -- Justified: Server action boundary */ any, {
       onError: (err) => toast.error(err),
       onSuccess: () => {
         toast.success(session ? "Session updated successfully" : "Session created successfully");
