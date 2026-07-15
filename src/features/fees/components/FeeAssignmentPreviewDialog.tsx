@@ -9,12 +9,7 @@ import type {
   PreviewFeeAssignmentResult,
 } from "@/server/services/fee-assignments";
 import type { Prisma } from "@prisma/client";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import {
   Table,
@@ -156,8 +151,10 @@ export function FeeAssignmentPreviewDialog({
           <div className="flex-1 overflow-y-auto px-4 py-4 sm:px-6 flex flex-col md:flex-row gap-6">
             <div className="w-full md:w-1/3 flex flex-col gap-6">
               <section className="space-y-4">
-                <h3 className="text-sm font-medium text-muted-foreground border-b pb-2">Configuration</h3>
-                
+                <h3 className="text-sm font-medium text-muted-foreground border-b pb-2">
+                  Configuration
+                </h3>
+
                 <div className="space-y-2">
                   <label className="text-sm font-medium">Fee Plan *</label>
                   <select
@@ -241,7 +238,9 @@ export function FeeAssignmentPreviewDialog({
               {selectedFeePlan && (
                 <section className="space-y-4 flex-1 flex flex-col min-h-[300px]">
                   <div className="flex items-center justify-between border-b pb-2">
-                    <h3 className="text-sm font-medium text-muted-foreground">Target Enrolments</h3>
+                    <h3 className="text-sm font-medium text-muted-foreground">
+                      Target Enrolments
+                    </h3>
                     {matchingEnrolments.length > 0 && (
                       <button
                         type="button"
@@ -254,7 +253,7 @@ export function FeeAssignmentPreviewDialog({
                       </button>
                     )}
                   </div>
-                  
+
                   <div className="flex-1 overflow-y-auto rounded-md border divide-y min-h-[200px]">
                     {matchingEnrolments.length === 0 ? (
                       <p className="p-3 text-sm text-muted-foreground">
@@ -281,7 +280,8 @@ export function FeeAssignmentPreviewDialog({
                                 {e.student?.fullName ?? "Unknown"}
                               </span>
                               <span className="text-muted-foreground text-xs">
-                                {e.student?.studentCode ?? ""} {e.batch && `• ${e.batch.name}`}
+                                {e.student?.studentCode ?? ""}{" "}
+                                {e.batch && `• ${e.batch.name}`}
                               </span>
                             </div>
                           </label>
@@ -295,11 +295,15 @@ export function FeeAssignmentPreviewDialog({
 
             <div className="w-full md:w-2/3 flex flex-col">
               <section className="space-y-4 h-full flex flex-col">
-                <h3 className="text-sm font-medium text-muted-foreground border-b pb-2">Preview</h3>
-                
+                <h3 className="text-sm font-medium text-muted-foreground border-b pb-2">
+                  Preview
+                </h3>
+
                 {!previewResult ? (
                   <div className="flex-1 flex flex-col items-center justify-center border rounded-md border-dashed text-center p-8 text-muted-foreground">
-                    <p className="mb-2">Select a fee plan and enrolments to generate a preview.</p>
+                    <p className="mb-2">
+                      Select a fee plan and enrolments to generate a preview.
+                    </p>
                     {selectedFeePlan && (
                       <Button
                         type="button"
@@ -357,7 +361,9 @@ export function FeeAssignmentPreviewDialog({
                             <TableHead className="whitespace-nowrap">Student</TableHead>
                             <TableHead className="whitespace-nowrap">Status</TableHead>
                             <TableHead className="whitespace-nowrap">Dues</TableHead>
-                            <TableHead className="text-right whitespace-nowrap">Total</TableHead>
+                            <TableHead className="text-right whitespace-nowrap">
+                              Total
+                            </TableHead>
                           </TableRow>
                         </TableHeader>
                         <TableBody>
@@ -417,16 +423,20 @@ export function FeeAssignmentPreviewDialog({
           </div>
 
           <div className="m-0 p-4 sm:p-6 border-t bg-muted/40 flex justify-end gap-2">
-            <Button type="button" variant="outline" onClick={() => {
-              if (previewResult) {
-                handleReset();
-              } else {
-                onOpenChange(false);
-              }
-            }}>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => {
+                if (previewResult) {
+                  handleReset();
+                } else {
+                  onOpenChange(false);
+                }
+              }}
+            >
               {previewResult ? "Reset" : "Cancel"}
             </Button>
-            
+
             {previewResult && (
               <Button
                 type="button"

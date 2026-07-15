@@ -82,7 +82,10 @@ export function SessionList({ sessions }: { sessions: AcademicSession[] }) {
                     : "-"}
                 </TableCell>
                 <TableCell className="text-right">
-                  <SessionRowActions session={session} onEdit={() => handleEdit(session)} />
+                  <SessionRowActions
+                    session={session}
+                    onEdit={() => handleEdit(session)}
+                  />
                 </TableCell>
               </TableRow>
             ))}
@@ -104,11 +107,7 @@ export function SessionList({ sessions }: { sessions: AcademicSession[] }) {
                   Active
                 </Badge>
               )}
-              {session.archivedAt && (
-                <Badge variant="secondary">
-                  Archived
-                </Badge>
-              )}
+              {session.archivedAt && <Badge variant="secondary">Archived</Badge>}
             </div>
             <div className="text-sm text-muted-foreground mb-4 space-y-1">
               <div>

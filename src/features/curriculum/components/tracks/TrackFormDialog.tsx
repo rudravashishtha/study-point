@@ -13,12 +13,7 @@ import {
   updateTrackAction,
 } from "@/app/admin/curriculum/curriculum-tracks/actions";
 import { z } from "zod";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { SubmitButton } from "@/components/ui/submit-button";
 
@@ -133,7 +128,9 @@ export function TrackFormDialog({
         <div className="flex-1 overflow-y-auto px-4 py-4 sm:px-6">
           <form id="track-form" onSubmit={handleSubmit(onSubmit)} className="space-y-8">
             <section className="space-y-4">
-              <h3 className="text-sm font-medium text-muted-foreground border-b pb-2">Track Details</h3>
+              <h3 className="text-sm font-medium text-muted-foreground border-b pb-2">
+                Track Details
+              </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <label className="text-sm font-medium">
@@ -265,7 +262,7 @@ export function TrackFormDialog({
             </section>
           </form>
         </div>
-        
+
         <div className="m-0 p-4 sm:p-6 border-t bg-muted/40 flex justify-end gap-2">
           <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
             Cancel

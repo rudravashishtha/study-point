@@ -12,7 +12,7 @@ export const SubmitButton = React.forwardRef<HTMLButtonElement, SubmitButtonProp
   ({ children, pending, loadingText, disabled, className, ...props }, ref) => {
     // If inside a <form action={...}> without explicit pending prop, fallback to useFormStatus
     const { pending: statusPending } = useFormStatus();
-    
+
     const isPending = pending !== undefined ? pending : statusPending;
 
     return (
@@ -35,6 +35,6 @@ export const SubmitButton = React.forwardRef<HTMLButtonElement, SubmitButtonProp
         )}
       </Button>
     );
-  }
+  },
 );
 SubmitButton.displayName = "SubmitButton";

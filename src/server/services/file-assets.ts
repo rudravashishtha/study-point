@@ -43,7 +43,11 @@ const PUBLIC_ASSETS_BUCKET = "public-assets";
 export const publicAssetUploadSchema = z.object({
   originalFilename: z.string().min(1),
   mimeType: z.string().min(1),
-  sizeBytes: z.number().int().positive().max(50 * 1024 * 1024),
+  sizeBytes: z
+    .number()
+    .int()
+    .positive()
+    .max(50 * 1024 * 1024),
 });
 
 export type PublicAssetUploadInput = z.infer<typeof publicAssetUploadSchema>;
@@ -83,7 +87,11 @@ export async function createPublicAssetUploadIntent(
         entityId: newAsset.id,
         actorUserId,
         summary: "Public asset upload intent created",
-        metadata: { storageKey, sizeBytes: data.sizeBytes, originalFilename: data.originalFilename },
+        metadata: {
+          storageKey,
+          sizeBytes: data.sizeBytes,
+          originalFilename: data.originalFilename,
+        },
       },
     });
 

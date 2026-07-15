@@ -22,9 +22,9 @@ export const createAnnouncementAction = withActor(
         const parsed = AnnouncementCreateSchema.parse(data);
         await createAnnouncement(actor, parsed);
         return { success: true, data: undefined };
-      }
-    )
-  )
+      },
+    ),
+  ),
 );
 
 export const updateAnnouncementAction = withActor(
@@ -36,9 +36,9 @@ export const updateAnnouncementAction = withActor(
         const parsed = AnnouncementUpdateSchema.parse(data);
         await updateAnnouncement(actor, id, parsed);
         return { success: true, data: undefined };
-      }
-    )
-  )
+      },
+    ),
+  ),
 );
 
 export const publishAnnouncementAction = withActor(
@@ -49,9 +49,9 @@ export const publishAnnouncementAction = withActor(
       async (actor, id: string) => {
         await publishAnnouncement(actor, id);
         return { success: true, data: undefined };
-      }
-    )
-  )
+      },
+    ),
+  ),
 );
 
 export const archiveAnnouncementAction = withActor(
@@ -62,9 +62,9 @@ export const archiveAnnouncementAction = withActor(
       async (actor, id: string) => {
         await archiveAnnouncement(actor, id);
         return { success: true, data: undefined };
-      }
-    )
-  )
+      },
+    ),
+  ),
 );
 
 export const restoreAnnouncementAction = withActor(
@@ -75,7 +75,7 @@ export const restoreAnnouncementAction = withActor(
       async (actor, id: string) => {
         await restoreAnnouncement(actor, id);
         return { success: true, data: undefined };
-      }
-    )
-  )
+      },
+    ),
+  ),
 );

@@ -13,35 +13,30 @@ import {
 } from "lucide-react";
 
 async function getDashboardMetrics() {
-  const [
-    activeStudents,
-    pendingEnrolments,
-    todayBatches,
-    pendingFees,
-    requiresAction,
-  ] = await Promise.all([
-    db.enrolment.count({ where: { status: "ACTIVE" } }),
-    db.enrolment.count({ where: { status: "PENDING" } }),
-    db.batch.count({
-      where: {
-        archivedAt: null,
-        isActive: true,
-        schedules: {
-          some: {
-            dayOfWeek: new Date().getDay(),
+  const [activeStudents, pendingEnrolments, todayBatches, pendingFees, requiresAction] =
+    await Promise.all([
+      db.enrolment.count({ where: { status: "ACTIVE" } }),
+      db.enrolment.count({ where: { status: "PENDING" } }),
+      db.batch.count({
+        where: {
+          archivedAt: null,
+          isActive: true,
+          schedules: {
+            some: {
+              dayOfWeek: new Date().getDay(),
+            },
           },
         },
-      },
-    }),
-    db.studentFeeAssignment.count({
-      where: {
-        status: "ACTIVE",
-      },
-    }),
-    db.enrolment.count({
-      where: { status: "PENDING" },
-    }),
-  ]);
+      }),
+      db.studentFeeAssignment.count({
+        where: {
+          status: "ACTIVE",
+        },
+      }),
+      db.enrolment.count({
+        where: { status: "PENDING" },
+      }),
+    ]);
 
   return { activeStudents, pendingEnrolments, todayBatches, pendingFees, requiresAction };
 }
@@ -54,11 +49,7 @@ export default async function AdminDashboard() {
     <div className="flex flex-col gap-6 pb-12">
       {/* 1. & 2. Search and Primary Actions */}
       <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between mb-2 order-1 lg:order-none">
-        <form
-          action="/admin/students"
-          method="GET"
-          className="relative w-full sm:w-96"
-        >
+        <form action="/admin/students" method="GET" className="relative w-full sm:w-96">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground pointer-events-none" />
           <input
             type="text"
@@ -90,7 +81,11 @@ export default async function AdminDashboard() {
           <section className="order-3 lg:order-none grid grid-cols-2 sm:grid-cols-4 gap-4">
             {[
               { label: "Active Students", value: metrics.activeStudents, icon: Users },
-              { label: "Pending Enrolments", value: metrics.pendingEnrolments, icon: AlertCircle },
+              {
+                label: "Pending Enrolments",
+                value: metrics.pendingEnrolments,
+                icon: AlertCircle,
+              },
               { label: "Today's Batches", value: metrics.todayBatches, icon: Calendar },
               { label: "Pending Fees", value: metrics.pendingFees, icon: CreditCard },
             ].map((metric, i) => (
@@ -154,7 +149,9 @@ export default async function AdminDashboard() {
           {/* 4. Action Required */}
           <section className="order-4 lg:order-none bg-surface-elevated border border-border/40 rounded-xl overflow-hidden flex flex-col">
             <div className="px-5 py-4 border-b border-border/40 bg-surface/50 flex items-center gap-2">
-              <div className={`size-2 rounded-full ${metrics.requiresAction > 0 ? "bg-amber-500 shadow-[0_0_8px_rgba(245,158,11,0.5)]" : "bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]"}`} />
+              <div
+                className={`size-2 rounded-full ${metrics.requiresAction > 0 ? "bg-amber-500 shadow-[0_0_8px_rgba(245,158,11,0.5)]" : "bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]"}`}
+              />
               <h3 className="font-bold text-sm">Action Required</h3>
             </div>
 
@@ -167,7 +164,8 @@ export default async function AdminDashboard() {
                   <AlertCircle className="size-6 text-amber-500/80 shrink-0" />
                   <div>
                     <h4 className="text-sm font-semibold mb-1">
-                      {metrics.requiresAction} pending enrolment{metrics.requiresAction > 1 ? "s" : ""}
+                      {metrics.requiresAction} pending enrolment
+                      {metrics.requiresAction > 1 ? "s" : ""}
                     </h4>
                     <p className="text-xs text-muted-foreground">
                       Review and process pending student enrolments.

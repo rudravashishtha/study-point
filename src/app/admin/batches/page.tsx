@@ -79,10 +79,15 @@ export default async function AdminBatchesPage({
       <PageHeader>
         <div>
           <PageHeaderHeading>Batches</PageHeaderHeading>
-          <PageHeaderDescription>Manage class batches and schedules.</PageHeaderDescription>
+          <PageHeaderDescription>
+            Manage class batches and schedules.
+          </PageHeaderDescription>
         </div>
         <PageHeaderActions>
-          <CreateBatchButton sessions={sessions} tracks={tracks as TrackWithRelations[]} />
+          <CreateBatchButton
+            sessions={sessions}
+            tracks={tracks as TrackWithRelations[]}
+          />
         </PageHeaderActions>
       </PageHeader>
 

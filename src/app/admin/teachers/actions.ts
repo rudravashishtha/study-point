@@ -25,9 +25,9 @@ export const createTeacherAction = withActor(
           throw new DomainError("INTERNAL_ERROR", "Failed to create teacher");
         }
         return { success: true, data: { teacherId: result.data.id } };
-      }
-    )
-  )
+      },
+    ),
+  ),
 );
 
 export const updateTeacherAction = withActor(
@@ -44,13 +44,16 @@ export const updateTeacherAction = withActor(
         }
 
         if (result.type === "INVALID_LIFECYCLE") {
-          throw new DomainError("INVALID_LIFECYCLE", result.reason || "Invalid lifecycle state");
+          throw new DomainError(
+            "INVALID_LIFECYCLE",
+            result.reason || "Invalid lifecycle state",
+          );
         }
 
         return { success: true, data: undefined };
-      }
-    )
-  )
+      },
+    ),
+  ),
 );
 
 export const archiveTeacherAction = withActor(
@@ -63,16 +66,16 @@ export const archiveTeacherAction = withActor(
         if (result.type === "ARCHIVE_BLOCKED") {
           throw new DomainError(
             "ARCHIVE_BLOCKED",
-            "Cannot deactivate teacher with active batch assignments. Remove them from active batches first."
+            "Cannot deactivate teacher with active batch assignments. Remove them from active batches first.",
           );
         }
         if (result.type === "INVALID_LIFECYCLE") {
           throw new DomainError("INVALID_LIFECYCLE", "Cannot deactivate this teacher");
         }
         return { success: true, data: undefined };
-      }
-    )
-  )
+      },
+    ),
+  ),
 );
 
 export const restoreTeacherAction = withActor(
@@ -86,9 +89,9 @@ export const restoreTeacherAction = withActor(
           throw new DomainError("INVALID_LIFECYCLE", "Cannot reactivate this teacher");
         }
         return { success: true, data: undefined };
-      }
-    )
-  )
+      },
+    ),
+  ),
 );
 
 export const inviteTeacherAction = withActor(
@@ -99,7 +102,7 @@ export const inviteTeacherAction = withActor(
       async (actor, id: string) => {
         await inviteTeacher(actor, id);
         return { success: true, data: undefined };
-      }
-    )
-  )
+      },
+    ),
+  ),
 );

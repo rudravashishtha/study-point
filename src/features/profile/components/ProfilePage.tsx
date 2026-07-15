@@ -3,7 +3,15 @@
 import { useState, useActionState, useEffect } from "react";
 
 import { parsePhoneNumberFromString } from "libphonenumber-js";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogClose } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+  DialogClose,
+} from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -21,8 +29,14 @@ interface ProfileUser {
 export function ProfilePage({ user }: { user: ProfileUser }) {
   const [editPhoneOpen, setEditPhoneOpen] = useState(false);
   const [editNameOpen, setEditNameOpen] = useState(false);
-  const [phoneState, phoneAction, phoneIsPending] = useActionState(updatePhone, { error: null, success: false });
-  const [nameState, nameAction, nameIsPending] = useActionState(updateName, { error: null, success: false });
+  const [phoneState, phoneAction, phoneIsPending] = useActionState(updatePhone, {
+    error: null,
+    success: false,
+  });
+  const [nameState, nameAction, nameIsPending] = useActionState(updateName, {
+    error: null,
+    success: false,
+  });
 
   // Close phone dialog on success
   useEffect(() => {
@@ -38,7 +52,9 @@ export function ProfilePage({ user }: { user: ProfileUser }) {
     }
   }, [nameState.success]);
 
-  const formattedPhone = user.phone ? (parsePhoneNumberFromString(user.phone)?.formatInternational() ?? user.phone) : "Not set";
+  const formattedPhone = user.phone
+    ? (parsePhoneNumberFromString(user.phone)?.formatInternational() ?? user.phone)
+    : "Not set";
 
   return (
     <div className="max-w-4xl space-y-12 pb-12">
@@ -54,50 +70,80 @@ export function ProfilePage({ user }: { user: ProfileUser }) {
           </div>
           <div>
             <h2 className="text-xl font-bold">{user.fullName || "User"}</h2>
-            <p className="text-sm text-muted-foreground">Profile picture support coming soon</p>
+            <p className="text-sm text-muted-foreground">
+              Profile picture support coming soon
+            </p>
           </div>
         </div>
       </section>
 
       {/* Account Information Section */}
       <section className="space-y-6">
-        <h3 className="text-lg font-bold font-heading pb-2 border-b border-border/40">Account Information</h3>
-        
+        <h3 className="text-lg font-bold font-heading pb-2 border-b border-border/40">
+          Account Information
+        </h3>
+
         <div className="grid gap-6 sm:grid-cols-2">
           <div className="space-y-1">
-            <Label className="text-muted-foreground text-xs uppercase tracking-wider">Name</Label>
+            <Label className="text-muted-foreground text-xs uppercase tracking-wider">
+              Name
+            </Label>
             <div className="flex items-center gap-3">
               <p className="font-medium text-foreground">{user.fullName || "Not set"}</p>
-              <Button variant="outline" size="sm" onClick={() => setEditNameOpen(true)} className="h-7 text-xs px-3">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setEditNameOpen(true)}
+                className="h-7 text-xs px-3"
+              >
                 Edit
               </Button>
             </div>
           </div>
-          
+
           <div className="space-y-1">
-            <Label className="text-muted-foreground text-xs uppercase tracking-wider">Email</Label>
+            <Label className="text-muted-foreground text-xs uppercase tracking-wider">
+              Email
+            </Label>
             <p className="font-medium text-foreground">{user.email || "Not set"}</p>
           </div>
 
           <div className="space-y-1">
-            <Label className="text-muted-foreground text-xs uppercase tracking-wider">Phone Number</Label>
+            <Label className="text-muted-foreground text-xs uppercase tracking-wider">
+              Phone Number
+            </Label>
             <div className="flex items-center gap-3">
               <p className="font-medium text-foreground">{formattedPhone}</p>
-              <Button variant="outline" size="sm" onClick={() => setEditPhoneOpen(true)} className="h-7 text-xs px-3">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setEditPhoneOpen(true)}
+                className="h-7 text-xs px-3"
+              >
                 Edit
               </Button>
             </div>
           </div>
 
           <div className="space-y-1">
-            <Label className="text-muted-foreground text-xs uppercase tracking-wider">Account Type</Label>
-            <p className="font-medium text-foreground capitalize">{user.role.toLowerCase()}</p>
+            <Label className="text-muted-foreground text-xs uppercase tracking-wider">
+              Account Type
+            </Label>
+            <p className="font-medium text-foreground capitalize">
+              {user.role.toLowerCase()}
+            </p>
           </div>
 
           <div className="space-y-1">
-            <Label className="text-muted-foreground text-xs uppercase tracking-wider">Joined On</Label>
+            <Label className="text-muted-foreground text-xs uppercase tracking-wider">
+              Joined On
+            </Label>
             <p className="font-medium text-foreground">
-              {new Date(user.createdAt).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}
+              {new Date(user.createdAt).toLocaleDateString("en-US", {
+                month: "long",
+                day: "numeric",
+                year: "numeric",
+              })}
             </p>
           </div>
         </div>
@@ -111,7 +157,7 @@ export function ProfilePage({ user }: { user: ProfileUser }) {
             Coming Soon
           </span>
         </h3>
-        
+
         <div className="grid gap-4 sm:grid-cols-2">
           <div className="p-4 rounded-xl border border-border/40 bg-surface">
             <h4 className="font-medium mb-1">Change Password</h4>
@@ -119,15 +165,21 @@ export function ProfilePage({ user }: { user: ProfileUser }) {
           </div>
           <div className="p-4 rounded-xl border border-border/40 bg-surface">
             <h4 className="font-medium mb-1">Notifications</h4>
-            <p className="text-sm text-muted-foreground">Manage email and WhatsApp alerts.</p>
+            <p className="text-sm text-muted-foreground">
+              Manage email and WhatsApp alerts.
+            </p>
           </div>
           <div className="p-4 rounded-xl border border-border/40 bg-surface">
             <h4 className="font-medium mb-1">Security</h4>
-            <p className="text-sm text-muted-foreground">Manage active sessions and 2FA.</p>
+            <p className="text-sm text-muted-foreground">
+              Manage active sessions and 2FA.
+            </p>
           </div>
           <div className="p-4 rounded-xl border border-border/40 bg-surface">
             <h4 className="font-medium mb-1">Preferences</h4>
-            <p className="text-sm text-muted-foreground">Theme, language, and display settings.</p>
+            <p className="text-sm text-muted-foreground">
+              Theme, language, and display settings.
+            </p>
           </div>
         </div>
       </section>
@@ -138,7 +190,8 @@ export function ProfilePage({ user }: { user: ProfileUser }) {
           <DialogHeader>
             <DialogTitle>Update Phone Number</DialogTitle>
             <DialogDescription>
-              Please provide your full phone number including the country code (e.g., +91).
+              Please provide your full phone number including the country code (e.g.,
+              +91).
             </DialogDescription>
           </DialogHeader>
           <form action={phoneAction} className="space-y-4">
@@ -146,7 +199,9 @@ export function ProfilePage({ user }: { user: ProfileUser }) {
               <Label htmlFor="phone">Phone Number</Label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                  <span className="text-muted-foreground sm:text-sm font-medium">+91</span>
+                  <span className="text-muted-foreground sm:text-sm font-medium">
+                    +91
+                  </span>
                 </div>
                 <Input
                   id="phone"
@@ -156,7 +211,9 @@ export function ProfilePage({ user }: { user: ProfileUser }) {
                   defaultValue={user.phone ? user.phone.replace(/^\+91\s*/, "") : ""}
                 />
               </div>
-              {phoneState?.error && <p className="text-sm text-destructive font-medium">{phoneState.error}</p>}
+              {phoneState?.error && (
+                <p className="text-sm text-destructive font-medium">{phoneState.error}</p>
+              )}
             </div>
             <DialogFooter className="gap-2 sm:gap-0">
               <DialogClose render={<Button type="button" variant="outline" />}>
@@ -188,7 +245,9 @@ export function ProfilePage({ user }: { user: ProfileUser }) {
                 placeholder="e.g. John Doe"
                 defaultValue={user.fullName || ""}
               />
-              {nameState?.error && <p className="text-sm text-destructive font-medium">{nameState.error}</p>}
+              {nameState?.error && (
+                <p className="text-sm text-destructive font-medium">{nameState.error}</p>
+              )}
             </div>
             <DialogFooter className="gap-2 sm:gap-0">
               <DialogClose render={<Button type="button" variant="outline" />}>

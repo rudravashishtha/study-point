@@ -72,7 +72,9 @@ export default async function StudentsPage({
       <PageHeader>
         <div>
           <PageHeaderHeading>Students</PageHeaderHeading>
-          <PageHeaderDescription>Manage student enrolment and access.</PageHeaderDescription>
+          <PageHeaderDescription>
+            Manage student enrolment and access.
+          </PageHeaderDescription>
         </div>
         <PageHeaderActions>
           <CreateStudentButton />

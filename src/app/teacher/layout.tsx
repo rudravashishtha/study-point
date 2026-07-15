@@ -5,11 +5,7 @@ import { db } from "@/lib/db";
 import { TeacherShell } from "@/components/layout/teacher-shell";
 import { getSiteSettings } from "@/server/services/site-settings";
 
-export default async function TeacherLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default async function TeacherLayout({ children }: { children: React.ReactNode }) {
   const appUser = await requireRole(Role.TEACHER);
 
   if (!appUser.teacherId) {
@@ -53,5 +49,9 @@ export default async function TeacherLayout({
     classLevel: a.batch.curriculumTrack.classLevel,
   }));
 
-  return <TeacherShell batches={batches} instituteName={instituteName}>{children}</TeacherShell>;
+  return (
+    <TeacherShell batches={batches} instituteName={instituteName}>
+      {children}
+    </TeacherShell>
+  );
 }

@@ -5,12 +5,7 @@ import { toast } from "sonner";
 import { Programme, Board } from "@prisma/client";
 import { createProgrammeAction, updateProgrammeAction } from "../../actions/programmes";
 import { useRouter } from "next/navigation";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { SubmitButton } from "@/components/ui/submit-button";
 
@@ -129,7 +124,7 @@ export function ProgrammeFormDialog({
             </div>
           </form>
         </div>
-        
+
         <div className="m-0 p-4 sm:p-6 border-t bg-muted/40 flex justify-end gap-2">
           <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
             Cancel

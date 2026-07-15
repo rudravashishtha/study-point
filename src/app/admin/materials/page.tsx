@@ -26,7 +26,9 @@ export default async function AdminMaterialsPage() {
       <PageHeader>
         <div>
           <PageHeaderHeading>Study Materials</PageHeaderHeading>
-          <PageHeaderDescription>Manage course resources and materials.</PageHeaderDescription>
+          <PageHeaderDescription>
+            Manage course resources and materials.
+          </PageHeaderDescription>
         </div>
       </PageHeader>
 

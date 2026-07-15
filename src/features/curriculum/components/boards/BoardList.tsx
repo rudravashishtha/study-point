@@ -59,7 +59,9 @@ export function BoardList({ boards }: { boards: Board[] }) {
                   {board.archivedAt ? (
                     <Badge variant="secondary">Archived</Badge>
                   ) : (
-                    <Badge variant="default" className="bg-green-600 hover:bg-green-700">Active</Badge>
+                    <Badge variant="default" className="bg-green-600 hover:bg-green-700">
+                      Active
+                    </Badge>
                   )}
                 </TableCell>
                 <TableCell className="text-right">
@@ -83,7 +85,9 @@ export function BoardList({ boards }: { boards: Board[] }) {
               {board.archivedAt ? (
                 <Badge variant="secondary">Archived</Badge>
               ) : (
-                <Badge variant="default" className="bg-green-600 hover:bg-green-700">Active</Badge>
+                <Badge variant="default" className="bg-green-600 hover:bg-green-700">
+                  Active
+                </Badge>
               )}
             </div>
             <div className="text-sm text-muted-foreground mb-4 space-y-1">

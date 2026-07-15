@@ -59,11 +59,16 @@ export function SubjectList({ subjects }: { subjects: Subject[] }) {
                   {subject.archivedAt ? (
                     <Badge variant="secondary">Archived</Badge>
                   ) : (
-                    <Badge variant="default" className="bg-green-600 hover:bg-green-700">Active</Badge>
+                    <Badge variant="default" className="bg-green-600 hover:bg-green-700">
+                      Active
+                    </Badge>
                   )}
                 </TableCell>
                 <TableCell className="text-right">
-                  <SubjectRowActions subject={subject} onEdit={() => handleEdit(subject)} />
+                  <SubjectRowActions
+                    subject={subject}
+                    onEdit={() => handleEdit(subject)}
+                  />
                 </TableCell>
               </TableRow>
             ))}
@@ -83,7 +88,9 @@ export function SubjectList({ subjects }: { subjects: Subject[] }) {
               {subject.archivedAt ? (
                 <Badge variant="secondary">Archived</Badge>
               ) : (
-                <Badge variant="default" className="bg-green-600 hover:bg-green-700">Active</Badge>
+                <Badge variant="default" className="bg-green-600 hover:bg-green-700">
+                  Active
+                </Badge>
               )}
             </div>
             <div className="text-sm text-muted-foreground mb-4 space-y-1">

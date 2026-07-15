@@ -241,17 +241,23 @@ export const createTestimonialAction = withActor(
 );
 
 export const updateTestimonialAction = withActor(
-  withAuthorization("ADMIN", async (actor, id: string, data: Prisma.TestimonialUpdateInput) => {
-    const clean: Record<string, unknown> = {};
-    for (const [k, v] of Object.entries(data)) {
-      if (v === null) clean[k] = null;
-      else if (v !== undefined) clean[k] = v;
-    }
-    await db.testimonial.update({ where: { id }, data: clean as Prisma.TestimonialUpdateInput });
-    revalidatePath("/admin/website");
-    revalidatePath("/");
-    return { success: true as const, data: undefined };
-  }),
+  withAuthorization(
+    "ADMIN",
+    async (actor, id: string, data: Prisma.TestimonialUpdateInput) => {
+      const clean: Record<string, unknown> = {};
+      for (const [k, v] of Object.entries(data)) {
+        if (v === null) clean[k] = null;
+        else if (v !== undefined) clean[k] = v;
+      }
+      await db.testimonial.update({
+        where: { id },
+        data: clean as Prisma.TestimonialUpdateInput,
+      });
+      revalidatePath("/admin/website");
+      revalidatePath("/");
+      return { success: true as const, data: undefined };
+    },
+  ),
 );
 
 export const deleteTestimonialAction = withActor(

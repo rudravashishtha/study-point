@@ -117,7 +117,11 @@ export function WebsiteContentClient(props: Props) {
   );
 }
 
-function HomepageSectionsTab({ sections }: { sections: /* eslint-disable-line @typescript-eslint/no-explicit-any -- Justified: Prisma payload type is complex */ /* eslint-disable-line @typescript-eslint/no-explicit-any -- Justified: Prisma payload */ any[] }) {
+function HomepageSectionsTab({
+  sections,
+}: {
+  sections: /* eslint-disable-line @typescript-eslint/no-explicit-any -- Justified: Prisma payload type is complex */ /* eslint-disable-line @typescript-eslint/no-explicit-any -- Justified: Prisma payload */ any[];
+}) {
   const router = useRouter();
   const defaultSections = [
     { key: "hero", label: "Hero Section", locked: true },
@@ -149,7 +153,11 @@ function HomepageSectionsTab({ sections }: { sections: /* eslint-disable-line @t
         Toggle visibility of each homepage section.
       </p>
       {defaultSections.map((def) => {
-        const dbSection = sections.find((s: /* eslint-disable-line @typescript-eslint/no-explicit-any -- Justified: Prisma payload */ any) => s.sectionKey === def.key);
+        const dbSection = sections.find(
+          (
+            s: /* eslint-disable-line @typescript-eslint/no-explicit-any -- Justified: Prisma payload */ any,
+          ) => s.sectionKey === def.key,
+        );
         const isVisible = dbSection === undefined ? false : dbSection.isVisible;
         return (
           <div
@@ -187,13 +195,22 @@ const whyChooseUsSchema = z.object({
   isPublished: z.coerce.boolean().optional(),
 });
 
-function WhyChooseUsTab({ items }: { items: /* eslint-disable-line @typescript-eslint/no-explicit-any -- Justified: Prisma payload type is complex */ /* eslint-disable-line @typescript-eslint/no-explicit-any -- Justified: Prisma payload */ any[] }) {
+function WhyChooseUsTab({
+  items,
+}: {
+  items: /* eslint-disable-line @typescript-eslint/no-explicit-any -- Justified: Prisma payload type is complex */ /* eslint-disable-line @typescript-eslint/no-explicit-any -- Justified: Prisma payload */ any[];
+}) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
-  const [editing, setEditing] = useState</* eslint-disable-line @typescript-eslint/no-explicit-any -- Justified: editing payload */ any>(null);
+  const [editing, setEditing] =
+    useState</* eslint-disable-line @typescript-eslint/no-explicit-any -- Justified: editing payload */ any>(
+      null,
+    );
 
   const form = useForm({
-    resolver: zodResolver(whyChooseUsSchema) as /* eslint-disable-line @typescript-eslint/no-explicit-any -- Justified: RHF Zod default transforms */ any,
+    resolver: zodResolver(
+      whyChooseUsSchema,
+    ) as /* eslint-disable-line @typescript-eslint/no-explicit-any -- Justified: RHF Zod default transforms */ any,
     defaultValues: {
       title: "",
       description: "",
@@ -203,7 +220,9 @@ function WhyChooseUsTab({ items }: { items: /* eslint-disable-line @typescript-e
     },
   });
 
-  const handleEdit = (item: /* eslint-disable-line @typescript-eslint/no-explicit-any -- Justified: Prisma payload */ any) => {
+  const handleEdit = (
+    item: /* eslint-disable-line @typescript-eslint/no-explicit-any -- Justified: Prisma payload */ any,
+  ) => {
     setEditing(item);
     form.reset({
       title: item.title,
@@ -262,31 +281,39 @@ function WhyChooseUsTab({ items }: { items: /* eslint-disable-line @typescript-e
         <Plus className="size-4" /> Add Item
       </Button>
       <div className="grid gap-3 sm:grid-cols-2">
-        {items.map((item: /* eslint-disable-line @typescript-eslint/no-explicit-any -- Justified: Prisma payload */ any) => (
-          <div key={item.id} className="rounded-lg border p-4">
-            <div className="flex items-start justify-between">
-              <div>
-                <p className="font-medium">{item.title}</p>
-                <p className="text-sm text-muted-foreground line-clamp-2">
-                  {item.description}
-                </p>
-              </div>
-              <div className="flex items-center gap-1">
-                {item.isPublished ? (
-                  <Eye className="size-4 text-green-600" />
-                ) : (
-                  <EyeOff className="size-4 text-muted-foreground" />
-                )}
-                <Button variant="ghost" size="icon" onClick={() => handleEdit(item)}>
-                  <Pencil className="size-4" />
-                </Button>
-                <Button variant="ghost" size="icon" onClick={() => handleDelete(item.id)}>
-                  <Trash2 className="size-4 text-destructive" />
-                </Button>
+        {items.map(
+          (
+            item: /* eslint-disable-line @typescript-eslint/no-explicit-any -- Justified: Prisma payload */ any,
+          ) => (
+            <div key={item.id} className="rounded-lg border p-4">
+              <div className="flex items-start justify-between">
+                <div>
+                  <p className="font-medium">{item.title}</p>
+                  <p className="text-sm text-muted-foreground line-clamp-2">
+                    {item.description}
+                  </p>
+                </div>
+                <div className="flex items-center gap-1">
+                  {item.isPublished ? (
+                    <Eye className="size-4 text-green-600" />
+                  ) : (
+                    <EyeOff className="size-4 text-muted-foreground" />
+                  )}
+                  <Button variant="ghost" size="icon" onClick={() => handleEdit(item)}>
+                    <Pencil className="size-4" />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => handleDelete(item.id)}
+                  >
+                    <Trash2 className="size-4 text-destructive" />
+                  </Button>
+                </div>
               </div>
             </div>
-          </div>
-        ))}
+          ),
+        )}
       </div>
       <FormDialog
         open={open}
@@ -384,12 +411,21 @@ const methodologySchema = z.object({
   isPublished: z.boolean().default(false),
 });
 
-function MethodologyTab({ steps }: { steps: /* eslint-disable-line @typescript-eslint/no-explicit-any -- Justified: Prisma payload type is complex */ /* eslint-disable-line @typescript-eslint/no-explicit-any -- Justified: Prisma payload */ any[] }) {
+function MethodologyTab({
+  steps,
+}: {
+  steps: /* eslint-disable-line @typescript-eslint/no-explicit-any -- Justified: Prisma payload type is complex */ /* eslint-disable-line @typescript-eslint/no-explicit-any -- Justified: Prisma payload */ any[];
+}) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
-  const [editing, setEditing] = useState</* eslint-disable-line @typescript-eslint/no-explicit-any -- Justified: editing payload */ any>(null);
+  const [editing, setEditing] =
+    useState</* eslint-disable-line @typescript-eslint/no-explicit-any -- Justified: editing payload */ any>(
+      null,
+    );
   const form = useForm<z.infer<typeof methodologySchema>>({
-    resolver: zodResolver(methodologySchema) as /* eslint-disable-line @typescript-eslint/no-explicit-any -- Justified: RHF Zod default transforms */ any,
+    resolver: zodResolver(
+      methodologySchema,
+    ) as /* eslint-disable-line @typescript-eslint/no-explicit-any -- Justified: RHF Zod default transforms */ any,
     defaultValues: {
       title: "",
       description: "",
@@ -399,7 +435,9 @@ function MethodologyTab({ steps }: { steps: /* eslint-disable-line @typescript-e
     },
   });
 
-  const handleEdit = (item: /* eslint-disable-line @typescript-eslint/no-explicit-any -- Justified: Prisma payload */ any) => {
+  const handleEdit = (
+    item: /* eslint-disable-line @typescript-eslint/no-explicit-any -- Justified: Prisma payload */ any,
+  ) => {
     setEditing(item);
     form.reset({
       title: item.title,
@@ -457,36 +495,40 @@ function MethodologyTab({ steps }: { steps: /* eslint-disable-line @typescript-e
       <Button onClick={handleCreate}>
         <Plus className="size-4" /> Add Step
       </Button>
-      {steps.map((step: /* eslint-disable-line @typescript-eslint/no-explicit-any -- Justified: Prisma payload */ any) => (
-        <div key={step.id} className="rounded-lg border p-4">
-          <div className="flex items-start justify-between">
-            <div className="flex items-start gap-3">
-              <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-primary/10 text-sm font-bold text-primary">
-                {step.stepNumber}
-              </span>
-              <div>
-                <p className="font-medium">{step.title}</p>
-                <p className="text-sm text-muted-foreground line-clamp-2">
-                  {step.description}
-                </p>
+      {steps.map(
+        (
+          step: /* eslint-disable-line @typescript-eslint/no-explicit-any -- Justified: Prisma payload */ any,
+        ) => (
+          <div key={step.id} className="rounded-lg border p-4">
+            <div className="flex items-start justify-between">
+              <div className="flex items-start gap-3">
+                <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-primary/10 text-sm font-bold text-primary">
+                  {step.stepNumber}
+                </span>
+                <div>
+                  <p className="font-medium">{step.title}</p>
+                  <p className="text-sm text-muted-foreground line-clamp-2">
+                    {step.description}
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-center gap-1">
+                {step.isPublished ? (
+                  <Eye className="size-4 text-green-600" />
+                ) : (
+                  <EyeOff className="size-4 text-muted-foreground" />
+                )}
+                <Button variant="ghost" size="icon" onClick={() => handleEdit(step)}>
+                  <Pencil className="size-4" />
+                </Button>
+                <Button variant="ghost" size="icon" onClick={() => handleDelete(step.id)}>
+                  <Trash2 className="size-4 text-destructive" />
+                </Button>
               </div>
             </div>
-            <div className="flex items-center gap-1">
-              {step.isPublished ? (
-                <Eye className="size-4 text-green-600" />
-              ) : (
-                <EyeOff className="size-4 text-muted-foreground" />
-              )}
-              <Button variant="ghost" size="icon" onClick={() => handleEdit(step)}>
-                <Pencil className="size-4" />
-              </Button>
-              <Button variant="ghost" size="icon" onClick={() => handleDelete(step.id)}>
-                <Trash2 className="size-4 text-destructive" />
-              </Button>
-            </div>
           </div>
-        </div>
-      ))}
+        ),
+      )}
       <FormDialog
         open={open}
         onOpenChange={setOpen}
@@ -585,12 +627,21 @@ const testimonialSchema = z.object({
   isPublished: z.boolean().default(false),
 });
 
-function TestimonialsTab({ items }: { items: /* eslint-disable-line @typescript-eslint/no-explicit-any -- Justified: Prisma payload type is complex */ /* eslint-disable-line @typescript-eslint/no-explicit-any -- Justified: Prisma payload */ any[] }) {
+function TestimonialsTab({
+  items,
+}: {
+  items: /* eslint-disable-line @typescript-eslint/no-explicit-any -- Justified: Prisma payload type is complex */ /* eslint-disable-line @typescript-eslint/no-explicit-any -- Justified: Prisma payload */ any[];
+}) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
-  const [editing, setEditing] = useState</* eslint-disable-line @typescript-eslint/no-explicit-any -- Justified: editing payload */ any>(null);
+  const [editing, setEditing] =
+    useState</* eslint-disable-line @typescript-eslint/no-explicit-any -- Justified: editing payload */ any>(
+      null,
+    );
   const form = useForm<z.infer<typeof testimonialSchema>>({
-    resolver: zodResolver(testimonialSchema) as /* eslint-disable-line @typescript-eslint/no-explicit-any -- Justified: RHF Zod default transforms */ any,
+    resolver: zodResolver(
+      testimonialSchema,
+    ) as /* eslint-disable-line @typescript-eslint/no-explicit-any -- Justified: RHF Zod default transforms */ any,
     defaultValues: {
       studentName: "",
       message: "",
@@ -604,7 +655,9 @@ function TestimonialsTab({ items }: { items: /* eslint-disable-line @typescript-
     },
   });
 
-  const handleEdit = (item: /* eslint-disable-line @typescript-eslint/no-explicit-any -- Justified: Prisma payload */ any) => {
+  const handleEdit = (
+    item: /* eslint-disable-line @typescript-eslint/no-explicit-any -- Justified: Prisma payload */ any,
+  ) => {
     setEditing(item);
     form.reset({
       studentName: item.studentName,
@@ -638,13 +691,19 @@ function TestimonialsTab({ items }: { items: /* eslint-disable-line @typescript-
 
   const onSubmit = async (data: z.infer<typeof testimonialSchema>) => {
     if (editing) {
-      const r = await updateTestimonialAction(editing.id, { ...data, studentClass: data.studentClass as ClassLevel | undefined });
+      const r = await updateTestimonialAction(editing.id, {
+        ...data,
+        studentClass: data.studentClass as ClassLevel | undefined,
+      });
       if (!r.success) {
         toast.error(r.error);
         return;
       }
     } else {
-      const r = await createTestimonialAction({ ...data, studentClass: data.studentClass as ClassLevel | undefined });
+      const r = await createTestimonialAction({
+        ...data,
+        studentClass: data.studentClass as ClassLevel | undefined,
+      });
       if (!r.success) {
         toast.error(r.error);
         return;
@@ -671,40 +730,48 @@ function TestimonialsTab({ items }: { items: /* eslint-disable-line @typescript-
         <Plus className="size-4" /> Add Testimonial
       </Button>
       <div className="grid gap-3 sm:grid-cols-2">
-        {items.map((item: /* eslint-disable-line @typescript-eslint/no-explicit-any -- Justified: Prisma payload */ any) => (
-          <div key={item.id} className="rounded-lg border p-4">
-            <div className="flex items-start justify-between">
-              <div>
-                <div className="flex items-center gap-2">
-                  <p className="font-medium">{item.studentName}</p>
-                  {item.featured && (
-                    <Star className="size-3 fill-amber-400 text-amber-400" />
-                  )}
+        {items.map(
+          (
+            item: /* eslint-disable-line @typescript-eslint/no-explicit-any -- Justified: Prisma payload */ any,
+          ) => (
+            <div key={item.id} className="rounded-lg border p-4">
+              <div className="flex items-start justify-between">
+                <div>
+                  <div className="flex items-center gap-2">
+                    <p className="font-medium">{item.studentName}</p>
+                    {item.featured && (
+                      <Star className="size-3 fill-amber-400 text-amber-400" />
+                    )}
+                  </div>
+                  <p className="text-xs text-muted-foreground">
+                    {item.studentClass}
+                    {item.batch ? ` · ${item.batch}` : ""}
+                  </p>
+                  <p className="mt-1 text-sm text-muted-foreground line-clamp-2">
+                    &ldquo;{item.message}&rdquo;
+                  </p>
                 </div>
-                <p className="text-xs text-muted-foreground">
-                  {item.studentClass}
-                  {item.batch ? ` · ${item.batch}` : ""}
-                </p>
-                <p className="mt-1 text-sm text-muted-foreground line-clamp-2">
-                  &ldquo;{item.message}&rdquo;
-                </p>
-              </div>
-              <div className="flex items-center gap-1 shrink-0">
-                {item.isPublished ? (
-                  <Eye className="size-4 text-green-600" />
-                ) : (
-                  <EyeOff className="size-4 text-muted-foreground" />
-                )}
-                <Button variant="ghost" size="icon" onClick={() => handleEdit(item)}>
-                  <Pencil className="size-4" />
-                </Button>
-                <Button variant="ghost" size="icon" onClick={() => handleDelete(item.id)}>
-                  <Trash2 className="size-4 text-destructive" />
-                </Button>
+                <div className="flex items-center gap-1 shrink-0">
+                  {item.isPublished ? (
+                    <Eye className="size-4 text-green-600" />
+                  ) : (
+                    <EyeOff className="size-4 text-muted-foreground" />
+                  )}
+                  <Button variant="ghost" size="icon" onClick={() => handleEdit(item)}>
+                    <Pencil className="size-4" />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => handleDelete(item.id)}
+                  >
+                    <Trash2 className="size-4 text-destructive" />
+                  </Button>
+                </div>
               </div>
             </div>
-          </div>
-        ))}
+          ),
+        )}
       </div>
       <FormDialog
         open={open}
@@ -856,10 +923,17 @@ function TestimonialsTab({ items }: { items: /* eslint-disable-line @typescript-
 
 // ── Gallery ──
 
-function GalleryTab({ items }: { items: /* eslint-disable-line @typescript-eslint/no-explicit-any -- Justified: Prisma payload type is complex */ /* eslint-disable-line @typescript-eslint/no-explicit-any -- Justified: Prisma payload */ any[] }) {
+function GalleryTab({
+  items,
+}: {
+  items: /* eslint-disable-line @typescript-eslint/no-explicit-any -- Justified: Prisma payload type is complex */ /* eslint-disable-line @typescript-eslint/no-explicit-any -- Justified: Prisma payload */ any[];
+}) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
-  const [editing, setEditing] = useState</* eslint-disable-line @typescript-eslint/no-explicit-any -- Justified: editing payload */ any>(null);
+  const [editing, setEditing] =
+    useState</* eslint-disable-line @typescript-eslint/no-explicit-any -- Justified: editing payload */ any>(
+      null,
+    );
 
   const handleDelete = async (id: string) => {
     const r = await deleteGalleryItemAction(id);
@@ -882,40 +956,47 @@ function GalleryTab({ items }: { items: /* eslint-disable-line @typescript-eslin
         <Plus className="size-4" /> Add Image
       </Button>
       <div className="grid gap-3 sm:grid-cols-3">
-        {items.map((item: /* eslint-disable-line @typescript-eslint/no-explicit-any -- Justified: Prisma payload */ any) => (
-          <div key={item.id} className="group relative overflow-hidden rounded-lg border">
-            <div className="aspect-video bg-muted flex items-center justify-center text-muted-foreground text-xs">
-              {item.fileAsset?.mimeType || "Image"}
-            </div>
-            {item.caption && <p className="p-2 text-xs truncate">{item.caption}</p>}
-            <div className="absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-              <Button
-                variant="secondary"
-                size="icon"
-                className="size-7"
-                onClick={() => {
-                  setEditing(item);
-                  setOpen(true);
-                }}
-              >
-                <Pencil className="size-3" />
-              </Button>
-              <Button
-                variant="destructive"
-                size="icon"
-                className="size-7"
-                onClick={() => handleDelete(item.id)}
-              >
-                <Trash2 className="size-3" />
-              </Button>
-            </div>
-            {!item.isPublished && (
-              <div className="absolute top-2 left-2 bg-muted-foreground text-background text-[10px] px-1.5 py-0.5 rounded">
-                Draft
+        {items.map(
+          (
+            item: /* eslint-disable-line @typescript-eslint/no-explicit-any -- Justified: Prisma payload */ any,
+          ) => (
+            <div
+              key={item.id}
+              className="group relative overflow-hidden rounded-lg border"
+            >
+              <div className="aspect-video bg-muted flex items-center justify-center text-muted-foreground text-xs">
+                {item.fileAsset?.mimeType || "Image"}
               </div>
-            )}
-          </div>
-        ))}
+              {item.caption && <p className="p-2 text-xs truncate">{item.caption}</p>}
+              <div className="absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                <Button
+                  variant="secondary"
+                  size="icon"
+                  className="size-7"
+                  onClick={() => {
+                    setEditing(item);
+                    setOpen(true);
+                  }}
+                >
+                  <Pencil className="size-3" />
+                </Button>
+                <Button
+                  variant="destructive"
+                  size="icon"
+                  className="size-7"
+                  onClick={() => handleDelete(item.id)}
+                >
+                  <Trash2 className="size-3" />
+                </Button>
+              </div>
+              {!item.isPublished && (
+                <div className="absolute top-2 left-2 bg-muted-foreground text-background text-[10px] px-1.5 py-0.5 rounded">
+                  Draft
+                </div>
+              )}
+            </div>
+          ),
+        )}
       </div>
       <FormDialog open={open} onOpenChange={setOpen} title="Gallery Item">
         {editing ? (
@@ -937,7 +1018,13 @@ function GalleryTab({ items }: { items: /* eslint-disable-line @typescript-eslin
   );
 }
 
-function GalleryEditForm({ item, onDone }: { item: /* eslint-disable-line @typescript-eslint/no-explicit-any -- Justified: Prisma payload */ any; onDone: () => void }) {
+function GalleryEditForm({
+  item,
+  onDone,
+}: {
+  item: /* eslint-disable-line @typescript-eslint/no-explicit-any -- Justified: Prisma payload */ any;
+  onDone: () => void;
+}) {
   const [caption, setCaption] = useState(item.caption || "");
   const [category, setCategory] = useState(item.category || "");
   const [isPublished, setIsPublished] = useState(item.isPublished);
@@ -979,12 +1066,21 @@ const faqSchema = z.object({
   isPublished: z.boolean().default(false),
 });
 
-function FAQTab({ items }: { items: /* eslint-disable-line @typescript-eslint/no-explicit-any -- Justified: Prisma payload type is complex */ /* eslint-disable-line @typescript-eslint/no-explicit-any -- Justified: Prisma payload */ any[] }) {
+function FAQTab({
+  items,
+}: {
+  items: /* eslint-disable-line @typescript-eslint/no-explicit-any -- Justified: Prisma payload type is complex */ /* eslint-disable-line @typescript-eslint/no-explicit-any -- Justified: Prisma payload */ any[];
+}) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
-  const [editing, setEditing] = useState</* eslint-disable-line @typescript-eslint/no-explicit-any -- Justified: editing payload */ any>(null);
+  const [editing, setEditing] =
+    useState</* eslint-disable-line @typescript-eslint/no-explicit-any -- Justified: editing payload */ any>(
+      null,
+    );
   const form = useForm<z.infer<typeof faqSchema>>({
-    resolver: zodResolver(faqSchema) as /* eslint-disable-line @typescript-eslint/no-explicit-any -- Justified: RHF Zod default transforms */ any,
+    resolver: zodResolver(
+      faqSchema,
+    ) as /* eslint-disable-line @typescript-eslint/no-explicit-any -- Justified: RHF Zod default transforms */ any,
     defaultValues: {
       question: "",
       answer: "",
@@ -994,7 +1090,9 @@ function FAQTab({ items }: { items: /* eslint-disable-line @typescript-eslint/no
     },
   });
 
-  const handleEdit = (item: /* eslint-disable-line @typescript-eslint/no-explicit-any -- Justified: Prisma payload */ any) => {
+  const handleEdit = (
+    item: /* eslint-disable-line @typescript-eslint/no-explicit-any -- Justified: Prisma payload */ any,
+  ) => {
     setEditing(item);
     form.reset({
       question: item.question,
@@ -1052,29 +1150,35 @@ function FAQTab({ items }: { items: /* eslint-disable-line @typescript-eslint/no
       <Button onClick={handleCreate}>
         <Plus className="size-4" /> Add FAQ
       </Button>
-      {items.map((item: /* eslint-disable-line @typescript-eslint/no-explicit-any -- Justified: Prisma payload */ any) => (
-        <div key={item.id} className="rounded-lg border p-4">
-          <div className="flex items-start justify-between">
-            <div>
-              <p className="font-medium">{item.question}</p>
-              <p className="text-sm text-muted-foreground line-clamp-2">{item.answer}</p>
-            </div>
-            <div className="flex items-center gap-1 shrink-0">
-              {item.isPublished ? (
-                <Eye className="size-4 text-green-600" />
-              ) : (
-                <EyeOff className="size-4 text-muted-foreground" />
-              )}
-              <Button variant="ghost" size="icon" onClick={() => handleEdit(item)}>
-                <Pencil className="size-4" />
-              </Button>
-              <Button variant="ghost" size="icon" onClick={() => handleDelete(item.id)}>
-                <Trash2 className="size-4 text-destructive" />
-              </Button>
+      {items.map(
+        (
+          item: /* eslint-disable-line @typescript-eslint/no-explicit-any -- Justified: Prisma payload */ any,
+        ) => (
+          <div key={item.id} className="rounded-lg border p-4">
+            <div className="flex items-start justify-between">
+              <div>
+                <p className="font-medium">{item.question}</p>
+                <p className="text-sm text-muted-foreground line-clamp-2">
+                  {item.answer}
+                </p>
+              </div>
+              <div className="flex items-center gap-1 shrink-0">
+                {item.isPublished ? (
+                  <Eye className="size-4 text-green-600" />
+                ) : (
+                  <EyeOff className="size-4 text-muted-foreground" />
+                )}
+                <Button variant="ghost" size="icon" onClick={() => handleEdit(item)}>
+                  <Pencil className="size-4" />
+                </Button>
+                <Button variant="ghost" size="icon" onClick={() => handleDelete(item.id)}>
+                  <Trash2 className="size-4 text-destructive" />
+                </Button>
+              </div>
             </div>
           </div>
-        </div>
-      ))}
+        ),
+      )}
       <FormDialog
         open={open}
         onOpenChange={setOpen}
@@ -1169,16 +1273,27 @@ const metricSchema = z.object({
   isPublished: z.boolean().default(false),
 });
 
-function MetricsTab({ items }: { items: /* eslint-disable-line @typescript-eslint/no-explicit-any -- Justified: Prisma payload type is complex */ /* eslint-disable-line @typescript-eslint/no-explicit-any -- Justified: Prisma payload */ any[] }) {
+function MetricsTab({
+  items,
+}: {
+  items: /* eslint-disable-line @typescript-eslint/no-explicit-any -- Justified: Prisma payload type is complex */ /* eslint-disable-line @typescript-eslint/no-explicit-any -- Justified: Prisma payload */ any[];
+}) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
-  const [editing, setEditing] = useState</* eslint-disable-line @typescript-eslint/no-explicit-any -- Justified: editing payload */ any>(null);
+  const [editing, setEditing] =
+    useState</* eslint-disable-line @typescript-eslint/no-explicit-any -- Justified: editing payload */ any>(
+      null,
+    );
   const form = useForm<z.infer<typeof metricSchema>>({
-    resolver: zodResolver(metricSchema) as /* eslint-disable-line @typescript-eslint/no-explicit-any -- Justified: RHF Zod default transforms */ any,
+    resolver: zodResolver(
+      metricSchema,
+    ) as /* eslint-disable-line @typescript-eslint/no-explicit-any -- Justified: RHF Zod default transforms */ any,
     defaultValues: { label: "", value: "", displayOrder: 0, isPublished: false },
   });
 
-  const handleEdit = (item: /* eslint-disable-line @typescript-eslint/no-explicit-any -- Justified: Prisma payload */ any) => {
+  const handleEdit = (
+    item: /* eslint-disable-line @typescript-eslint/no-explicit-any -- Justified: Prisma payload */ any,
+  ) => {
     setEditing(item);
     form.reset({
       label: item.label,
@@ -1230,25 +1345,29 @@ function MetricsTab({ items }: { items: /* eslint-disable-line @typescript-eslin
         <Plus className="size-4" /> Add Metric
       </Button>
       <div className="grid gap-3 sm:grid-cols-3">
-        {items.map((item: /* eslint-disable-line @typescript-eslint/no-explicit-any -- Justified: Prisma payload */ any) => (
-          <div key={item.id} className="rounded-lg border p-4 text-center">
-            <p className="text-2xl font-bold text-primary">{item.value}</p>
-            <p className="text-sm text-muted-foreground">{item.label}</p>
-            <div className="mt-2 flex justify-center gap-1">
-              {item.isPublished ? (
-                <Eye className="size-4 text-green-600" />
-              ) : (
-                <EyeOff className="size-4 text-muted-foreground" />
-              )}
-              <Button variant="ghost" size="icon" onClick={() => handleEdit(item)}>
-                <Pencil className="size-4" />
-              </Button>
-              <Button variant="ghost" size="icon" onClick={() => handleDelete(item.id)}>
-                <Trash2 className="size-4 text-destructive" />
-              </Button>
+        {items.map(
+          (
+            item: /* eslint-disable-line @typescript-eslint/no-explicit-any -- Justified: Prisma payload */ any,
+          ) => (
+            <div key={item.id} className="rounded-lg border p-4 text-center">
+              <p className="text-2xl font-bold text-primary">{item.value}</p>
+              <p className="text-sm text-muted-foreground">{item.label}</p>
+              <div className="mt-2 flex justify-center gap-1">
+                {item.isPublished ? (
+                  <Eye className="size-4 text-green-600" />
+                ) : (
+                  <EyeOff className="size-4 text-muted-foreground" />
+                )}
+                <Button variant="ghost" size="icon" onClick={() => handleEdit(item)}>
+                  <Pencil className="size-4" />
+                </Button>
+                <Button variant="ghost" size="icon" onClick={() => handleDelete(item.id)}>
+                  <Trash2 className="size-4 text-destructive" />
+                </Button>
+              </div>
             </div>
-          </div>
-        ))}
+          ),
+        )}
       </div>
       <FormDialog
         open={open}

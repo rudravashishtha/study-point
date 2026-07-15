@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 
-export type AuthTheme = "default" | "student" | "teacher" | "admin" | "admin-signup" | "forgot";
+export type AuthTheme =
+  "default" | "student" | "teacher" | "admin" | "admin-signup" | "forgot";
 
 const THEMES: Record<
   AuthTheme,

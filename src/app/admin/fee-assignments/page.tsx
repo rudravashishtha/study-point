@@ -50,7 +50,9 @@ export default async function AdminFeeAssignmentsPage() {
       <PageHeader>
         <div>
           <PageHeaderHeading>Fee Assignments</PageHeaderHeading>
-          <PageHeaderDescription>Manage student fee plan assignments.</PageHeaderDescription>
+          <PageHeaderDescription>
+            Manage student fee plan assignments.
+          </PageHeaderDescription>
         </div>
       </PageHeader>
       <FeeAssignmentList

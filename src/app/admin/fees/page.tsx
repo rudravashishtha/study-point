@@ -31,7 +31,9 @@ export default async function AdminFeesPage() {
       <PageHeader>
         <div>
           <PageHeaderHeading>Fee Plans</PageHeaderHeading>
-          <PageHeaderDescription>Manage institute fee structures and plans.</PageHeaderDescription>
+          <PageHeaderDescription>
+            Manage institute fee structures and plans.
+          </PageHeaderDescription>
         </div>
       </PageHeader>
 

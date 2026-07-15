@@ -5,8 +5,9 @@ test.describe.configure({ mode: "serial" });
 const ADMIN = { email: "admin@example.com", password: "TestAdmin@123" };
 
 test.describe("CUJ-2-9: Admin Workflows", () => {
-
-  test("Admin login + dashboard + all sections + student/teacher/curriculum/fees/imports", async ({ page }) => {
+  test("Admin login + dashboard + all sections + student/teacher/curriculum/fees/imports", async ({
+    page,
+  }) => {
     // --- Login once ---
     await page.goto("/login");
     await page.getByPlaceholder("you@example.com").fill(ADMIN.email);
@@ -17,7 +18,9 @@ test.describe("CUJ-2-9: Admin Workflows", () => {
 
     // --- CUJ-2: Dashboard has live metrics ---
     await expect(page.getByText("Active Students")).toBeVisible();
-    const metricTexts = await page.locator(".text-2xl.font-bold.font-heading").allTextContents();
+    const metricTexts = await page
+      .locator(".text-2xl.font-bold.font-heading")
+      .allTextContents();
     for (const t of metricTexts) {
       expect(t.trim()).not.toBe("--");
     }
@@ -63,11 +66,21 @@ test.describe("CUJ-2-9: Admin Workflows", () => {
 
     // --- All admin pages return 200 ---
     const adminPages = [
-      "/admin", "/admin/students", "/admin/teachers", "/admin/batches",
-      "/admin/curriculum", "/admin/academic-sessions", "/admin/homework",
-      "/admin/materials", "/admin/tests", "/admin/fees",
-      "/admin/fee-assignments", "/admin/announcements", "/admin/imports",
-      "/admin/questions", "/admin/settings",
+      "/admin",
+      "/admin/students",
+      "/admin/teachers",
+      "/admin/batches",
+      "/admin/curriculum",
+      "/admin/academic-sessions",
+      "/admin/homework",
+      "/admin/materials",
+      "/admin/tests",
+      "/admin/fees",
+      "/admin/fee-assignments",
+      "/admin/announcements",
+      "/admin/imports",
+      "/admin/questions",
+      "/admin/settings",
     ];
     for (const path of adminPages) {
       const resp = await page.request.get(path);

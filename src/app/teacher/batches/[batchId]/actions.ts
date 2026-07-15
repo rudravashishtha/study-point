@@ -36,9 +36,9 @@ export const createTeacherHomeworkAction = withActor(
 
         await createHomework(actor.userId, payload);
         return { success: true, data: undefined };
-      }
-    )
-  )
+      },
+    ),
+  ),
 );
 
 export const updateTeacherHomeworkAction = withActor(
@@ -50,9 +50,9 @@ export const updateTeacherHomeworkAction = withActor(
         await requireTeacherPermission(batchId, "HOMEWORK_MANAGE");
         await updateHomework(actor.userId, id, input);
         return { success: true, data: undefined };
-      }
-    )
-  )
+      },
+    ),
+  ),
 );
 
 export const publishTeacherHomeworkAction = withActor(
@@ -64,9 +64,9 @@ export const publishTeacherHomeworkAction = withActor(
         await requireTeacherPermission(batchId, "HOMEWORK_MANAGE");
         await publishHomework(actor.userId, id);
         return { success: true, data: undefined };
-      }
-    )
-  )
+      },
+    ),
+  ),
 );
 
 export const archiveTeacherHomeworkAction = withActor(
@@ -78,9 +78,9 @@ export const archiveTeacherHomeworkAction = withActor(
         await requireTeacherPermission(batchId, "HOMEWORK_MANAGE");
         await archiveHomework(actor.userId, id);
         return { success: true, data: undefined };
-      }
-    )
-  )
+      },
+    ),
+  ),
 );
 
 export const createTeacherMaterialAction = withActor(
@@ -94,7 +94,7 @@ export const createTeacherMaterialAction = withActor(
         input: Omit<
           CreateStudyMaterialInput,
           "visibility" | "batchId" | "academicSessionId" | "curriculumTrackId"
-        >
+        >,
       ) => {
         await requireTeacherPermission(batchId, "MATERIALS_MANAGE");
 
@@ -116,9 +116,9 @@ export const createTeacherMaterialAction = withActor(
 
         await createStudyMaterial(actor.userId, payload);
         return { success: true, data: undefined };
-      }
-    )
-  )
+      },
+    ),
+  ),
 );
 
 export const updateTeacherMaterialAction = withActor(
@@ -133,15 +133,15 @@ export const updateTeacherMaterialAction = withActor(
         input: Omit<
           UpdateStudyMaterialInput,
           "visibility" | "batchId" | "academicSessionId" | "curriculumTrackId"
-        >
+        >,
       ) => {
         await requireTeacherPermission(batchId, "MATERIALS_MANAGE");
 
         await updateStudyMaterial(actor.userId, id, input);
         return { success: true, data: undefined };
-      }
-    )
-  )
+      },
+    ),
+  ),
 );
 
 export const publishTeacherMaterialAction = withActor(
@@ -153,9 +153,9 @@ export const publishTeacherMaterialAction = withActor(
         await requireTeacherPermission(batchId, "MATERIALS_MANAGE");
         await publishStudyMaterial(actor.userId, id);
         return { success: true, data: undefined };
-      }
-    )
-  )
+      },
+    ),
+  ),
 );
 
 export const archiveTeacherMaterialAction = withActor(
@@ -167,7 +167,7 @@ export const archiveTeacherMaterialAction = withActor(
         await requireTeacherPermission(batchId, "MATERIALS_MANAGE");
         await archiveStudyMaterial(actor.userId, id);
         return { success: true, data: undefined };
-      }
-    )
-  )
+      },
+    ),
+  ),
 );

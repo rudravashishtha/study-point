@@ -9,12 +9,7 @@ import {
 } from "@/app/admin/academic-sessions/actions";
 import { useServerAction } from "@/hooks/use-server-action";
 import { useRouter } from "next/navigation";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { SubmitButton } from "@/components/ui/submit-button";
 
@@ -29,7 +24,7 @@ export function SessionFormDialog({
 }) {
   const router = useRouter();
   const { isPending, error, execute } = useServerAction(
-    session ? updateSessionAction : createSessionAction
+    session ? updateSessionAction : createSessionAction,
   );
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -43,14 +38,19 @@ export function SessionFormDialog({
 
     const actionArgs = session ? [session.id, payload] : [payload];
 
-    execute(actionArgs as /* eslint-disable-line @typescript-eslint/no-explicit-any -- Justified: Server action boundary */ any, {
-      onError: (err) => toast.error(err),
-      onSuccess: () => {
-        toast.success(session ? "Session updated successfully" : "Session created successfully");
-        onOpenChange(false);
-        router.refresh();
-      }
-    });
+    execute(
+      actionArgs as /* eslint-disable-line @typescript-eslint/no-explicit-any -- Justified: Server action boundary */ any,
+      {
+        onError: (err) => toast.error(err),
+        onSuccess: () => {
+          toast.success(
+            session ? "Session updated successfully" : "Session created successfully",
+          );
+          onOpenChange(false);
+          router.refresh();
+        },
+      },
+    );
   };
 
   const startsOnValue = session?.startsOn
@@ -114,7 +114,7 @@ export function SessionFormDialog({
             </div>
           </form>
         </div>
-        
+
         <div className="m-0 p-4 sm:p-6 border-t bg-muted/40 flex justify-end gap-2">
           <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
             Cancel

@@ -26,7 +26,10 @@ async function main() {
       email_confirm: true,
     });
     if (error) {
-      if (error.message?.includes("already exists") || error.message?.includes("already registered")) {
+      if (
+        error.message?.includes("already exists") ||
+        error.message?.includes("already registered")
+      ) {
         console.log(`  Already exists: ${u.email}`);
       } else {
         console.error(`  Error creating ${u.email}:`, error.message);

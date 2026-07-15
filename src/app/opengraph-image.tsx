@@ -8,45 +8,44 @@ export const contentType = "image/png";
 
 export default async function OpenGraphImage() {
   const settingsResult = await getSiteSettings();
-  const name = settingsResult.success ? settingsResult.data.instituteName : siteConfig.name;
-  const description = settingsResult.success && settingsResult.data.defaultDescription
-    ? settingsResult.data.defaultDescription
-    : siteConfig.description;
+  const name = settingsResult.success
+    ? settingsResult.data.instituteName
+    : siteConfig.name;
+  const description =
+    settingsResult.success && settingsResult.data.defaultDescription
+      ? settingsResult.data.defaultDescription
+      : siteConfig.description;
 
   return new ImageResponse(
-    (
+    <div
+      style={{
+        width: "100%",
+        height: "100%",
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center",
+        background: "linear-gradient(135deg, #0f172a 0%, #1e293b 100%)",
+        color: "#e2e8f0",
+        fontFamily: "system-ui, sans-serif",
+      }}
+    >
+      <div style={{ fontSize: 80, fontWeight: 700, marginBottom: 8 }}>{name}</div>
+      <div style={{ fontSize: 28, color: "#94a3b8", textAlign: "center", maxWidth: 600 }}>
+        {description}
+      </div>
       <div
         style={{
-          width: "100%",
-          height: "100%",
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          justifyContent: "center",
-          background: "linear-gradient(135deg, #0f172a 0%, #1e293b 100%)",
-          color: "#e2e8f0",
-          fontFamily: "system-ui, sans-serif",
+          marginTop: 24,
+          fontSize: 18,
+          color: "#64748b",
+          borderTop: "1px solid #334155",
+          paddingTop: 24,
         }}
       >
-        <div style={{ fontSize: 80, fontWeight: 700, marginBottom: 8 }}>
-          {name}
-        </div>
-        <div style={{ fontSize: 28, color: "#94a3b8", textAlign: "center", maxWidth: 600 }}>
-          {description}
-        </div>
-        <div
-          style={{
-            marginTop: 24,
-            fontSize: 18,
-            color: "#64748b",
-            borderTop: "1px solid #334155",
-            paddingTop: 24,
-          }}
-        >
-          Classes IX — XII
-        </div>
+        Classes IX — XII
       </div>
-    ),
+    </div>,
     size,
   );
 }

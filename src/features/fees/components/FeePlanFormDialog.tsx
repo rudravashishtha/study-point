@@ -155,7 +155,7 @@ export function FeePlanFormDialog({
         <DialogHeader className="px-4 pt-4 pb-2 sm:px-6 sm:pt-6">
           <DialogTitle>{plan ? "Edit Fee Plan" : "Create Fee Plan"}</DialogTitle>
         </DialogHeader>
-        
+
         {error && (
           <div className="mx-4 sm:mx-6 mt-4 rounded-md bg-destructive/10 p-3 text-sm text-destructive">
             {error}
@@ -164,10 +164,11 @@ export function FeePlanFormDialog({
 
         <div className="flex-1 overflow-y-auto px-4 py-4 sm:px-6">
           <form id="fee-plan-form" onSubmit={handleSubmit} className="space-y-8">
-            
             {/* General Information */}
             <section className="space-y-4">
-              <h3 className="text-sm font-medium text-muted-foreground border-b pb-2">General Information</h3>
+              <h3 className="text-sm font-medium text-muted-foreground border-b pb-2">
+                General Information
+              </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2 col-span-1 md:col-span-2">
                   <label htmlFor="name" className="text-sm font-medium">
@@ -200,7 +201,9 @@ export function FeePlanFormDialog({
 
             {/* Scope & Pricing */}
             <section className="space-y-4">
-              <h3 className="text-sm font-medium text-muted-foreground border-b pb-2">Scope & Pricing</h3>
+              <h3 className="text-sm font-medium text-muted-foreground border-b pb-2">
+                Scope & Pricing
+              </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <label htmlFor="academicSessionId" className="text-sm font-medium">
@@ -311,7 +314,9 @@ export function FeePlanFormDialog({
             {/* Installments */}
             <section className="space-y-4">
               <div className="flex items-center justify-between border-b pb-2">
-                <h3 className="text-sm font-medium text-muted-foreground">Installments</h3>
+                <h3 className="text-sm font-medium text-muted-foreground">
+                  Installments
+                </h3>
                 <button
                   type="button"
                   onClick={addInstallment}
@@ -337,7 +342,10 @@ export function FeePlanFormDialog({
 
               <div className="space-y-3">
                 {instalments.map((inst, index) => (
-                  <div key={index} className="rounded-md border p-4 space-y-3 bg-muted/20">
+                  <div
+                    key={index}
+                    className="rounded-md border p-4 space-y-3 bg-muted/20"
+                  >
                     <div className="flex items-center justify-between border-b pb-2">
                       <span className="text-xs font-medium text-muted-foreground">
                         Installment #{index + 1}
@@ -355,43 +363,59 @@ export function FeePlanFormDialog({
 
                     <div className="grid grid-cols-1 gap-4 md:grid-cols-4">
                       <div className="space-y-1.5">
-                        <label className="text-xs font-medium text-muted-foreground">Label *</label>
+                        <label className="text-xs font-medium text-muted-foreground">
+                          Label *
+                        </label>
                         <input
                           type="text"
                           value={inst.label}
-                          onChange={(e) => updateInstallment(index, "label", e.target.value)}
+                          onChange={(e) =>
+                            updateInstallment(index, "label", e.target.value)
+                          }
                           placeholder="e.g. Term 1"
                           className="flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                         />
                       </div>
                       <div className="space-y-1.5">
-                        <label className="text-xs font-medium text-muted-foreground">Amount *</label>
+                        <label className="text-xs font-medium text-muted-foreground">
+                          Amount *
+                        </label>
                         <input
                           type="number"
                           step="0.01"
                           min="0"
                           value={inst.amount}
-                          onChange={(e) => updateInstallment(index, "amount", e.target.value)}
+                          onChange={(e) =>
+                            updateInstallment(index, "amount", e.target.value)
+                          }
                           placeholder="0.00"
                           className="flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                         />
                       </div>
                       <div className="space-y-1.5">
-                        <label className="text-xs font-medium text-muted-foreground">Due Date</label>
+                        <label className="text-xs font-medium text-muted-foreground">
+                          Due Date
+                        </label>
                         <input
                           type="date"
                           value={inst.dueDate}
-                          onChange={(e) => updateInstallment(index, "dueDate", e.target.value)}
+                          onChange={(e) =>
+                            updateInstallment(index, "dueDate", e.target.value)
+                          }
                           className="flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                         />
                       </div>
                       <div className="space-y-1.5">
-                        <label className="text-xs font-medium text-muted-foreground">Offset (days)</label>
+                        <label className="text-xs font-medium text-muted-foreground">
+                          Offset (days)
+                        </label>
                         <input
                           type="number"
                           min="0"
                           value={inst.dueOffsetDays}
-                          onChange={(e) => updateInstallment(index, "dueOffsetDays", e.target.value)}
+                          onChange={(e) =>
+                            updateInstallment(index, "dueOffsetDays", e.target.value)
+                          }
                           placeholder="e.g. 30"
                           className="flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                         />
@@ -401,10 +425,9 @@ export function FeePlanFormDialog({
                 ))}
               </div>
             </section>
-
           </form>
         </div>
-        
+
         <DialogFooter className="m-0 p-4 sm:p-6 border-t bg-muted/40">
           <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
             Cancel

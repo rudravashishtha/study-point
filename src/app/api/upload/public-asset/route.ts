@@ -12,7 +12,8 @@ export async function POST(req: NextRequest) {
     const origin = req.headers.get("origin");
     const referer = req.headers.get("referer");
     const hasValidOrigin =
-      !origin || !referer ||
+      !origin ||
+      !referer ||
       allowedOrigins.some(
         (allowed) =>
           (origin && origin.startsWith(allowed)) ||

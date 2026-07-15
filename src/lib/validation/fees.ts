@@ -50,7 +50,6 @@ export const FeePlanCreateSchema = z
     },
   );
 
-
 export const FeePlanUpdateSchema = z
   .object({
     batchId: UuidOptional,
@@ -75,10 +74,8 @@ export const FeePlanUpdateSchema = z
     },
   );
 
-
 export const FeePlanListParamsSchema = z.object({
   query: z.string().optional().default(""),
   archiveState: z.enum(["active", "archived", "all"]).optional().default("active"),
   frequency: z.enum(["MONTHLY", "QUARTERLY", "YEARLY", "CUSTOM"]).optional(),
 });
-

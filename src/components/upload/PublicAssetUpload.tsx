@@ -18,7 +18,7 @@ export function PublicAssetUpload({
   title = "Upload Image",
   helperText = "PNG, JPG, or WebP up to 10 MB.",
   className,
-}: Omit<PublicAssetUploadProps, 'maxSizeMB'>) {
+}: Omit<PublicAssetUploadProps, "maxSizeMB">) {
   const [file, setFile] = useState<File | null>(null);
   const [status, setStatus] = useState<
     "idle" | "intent" | "uploading" | "finalizing" | "success" | "error"

@@ -41,9 +41,14 @@ export function MethodologySection({
                     <span className="flex size-7 items-center justify-center rounded-full bg-primary/10 text-xs font-bold text-primary md:hidden">
                       {step.stepNumber}
                     </span>
-                    <h3 className="font-bold font-heading text-foreground">{step.title}</h3>
+                    <h3 className="font-bold font-heading text-foreground">
+                      {step.title}
+                    </h3>
                   </div>
-                  <RichText html={step.description} className="leading-relaxed text-muted-foreground" />
+                  <RichText
+                    html={step.description}
+                    className="leading-relaxed text-muted-foreground"
+                  />
                 </div>
               </div>
             ))}

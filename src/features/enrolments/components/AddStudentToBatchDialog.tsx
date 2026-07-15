@@ -206,7 +206,7 @@ export function AddStudentToBatchDialog({
             </div>
           )}
         </div>
-        
+
         <div className="m-0 p-4 sm:p-6 border-t bg-muted/40 flex justify-end gap-2">
           <Button variant="outline" onClick={resetAndClose} disabled={isPending}>
             Cancel

@@ -36,7 +36,9 @@ export default async function AdminTestsPage() {
       <PageHeader>
         <div>
           <PageHeaderHeading>Tests</PageHeaderHeading>
-          <PageHeaderDescription>Manage student tests and evaluations.</PageHeaderDescription>
+          <PageHeaderDescription>
+            Manage student tests and evaluations.
+          </PageHeaderDescription>
         </div>
       </PageHeader>
 

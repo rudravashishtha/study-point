@@ -24,7 +24,7 @@ export async function getActor(): Promise<ActorContext> {
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Justified: any[] is the only sound generic bound for function arguments in TypeScript (unknown[] breaks contravariant inference).
 export function withActor<Args extends any[], Return>(
-  action: (actor: ActorContext, ...args: Args) => Promise<ActionResult<Return>>
+  action: (actor: ActorContext, ...args: Args) => Promise<ActionResult<Return>>,
 ): (...args: Args) => Promise<ActionResult<Return>> {
   return async (...args: Args) => {
     try {
@@ -43,7 +43,7 @@ export function withActor<Args extends any[], Return>(
 // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Justified: any[] is required to preserve argument inference for HOFs.
 export function withAuthorization<Args extends any[], Return>(
   role: "ADMIN" | "TEACHER" | "STUDENT",
-  action: (actor: ActorContext, ...args: Args) => Promise<ActionResult<Return>>
+  action: (actor: ActorContext, ...args: Args) => Promise<ActionResult<Return>>,
 ): (actor: ActorContext, ...args: Args) => Promise<ActionResult<Return>> {
   return async (actor, ...args) => {
     if (actor.role !== role) {
@@ -60,7 +60,7 @@ export function withAuthorization<Args extends any[], Return>(
 export function withRevalidation<Args extends any[], Return>(
   // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Justified: needed to prevent inference collision with Args.
   pathsOrGetPaths: string[] | ((actor: ActorContext, ...args: any[]) => string[]),
-  action: (actor: ActorContext, ...args: Args) => Promise<ActionResult<Return>>
+  action: (actor: ActorContext, ...args: Args) => Promise<ActionResult<Return>>,
 ): (actor: ActorContext, ...args: Args) => Promise<ActionResult<Return>> {
   return async (actor, ...args) => {
     const result = await action(actor, ...args);

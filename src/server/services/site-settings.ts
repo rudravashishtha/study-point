@@ -37,8 +37,6 @@ export interface SiteSettingsData {
   updatedBy: string | null;
 }
 
-
-
 const DEFAULT_SETTINGS: Omit<
   SiteSettingsData,
   "id" | "createdAt" | "updatedAt" | "createdBy" | "updatedBy"

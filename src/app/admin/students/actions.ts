@@ -13,15 +13,12 @@ import { withActor, withAuthorization, withRevalidation } from "@/lib/actions/wr
 export const createStudentAction = withActor(
   withAuthorization(
     "ADMIN",
-    withRevalidation(
-      ["/admin/students"],
-      async (actor, data: unknown) => {
-        const parsed = createStudentSchema.parse(data);
-        await createStudent(parsed, actor.userId);
-        return { success: true, data: undefined };
-      }
-    )
-  )
+    withRevalidation(["/admin/students"], async (actor, data: unknown) => {
+      const parsed = createStudentSchema.parse(data);
+      await createStudent(parsed, actor.userId);
+      return { success: true, data: undefined };
+    }),
+  ),
 );
 
 export const updateStudentAction = withActor(
@@ -36,9 +33,9 @@ export const updateStudentAction = withActor(
         });
         await updateStudent(parsed, actor.userId);
         return { success: true, data: undefined };
-      }
-    )
-  )
+      },
+    ),
+  ),
 );
 
 export const archiveStudentAction = withActor(
@@ -49,9 +46,9 @@ export const archiveStudentAction = withActor(
       async (actor, id: string) => {
         await archiveStudent(id, actor.userId);
         return { success: true, data: undefined };
-      }
-    )
-  )
+      },
+    ),
+  ),
 );
 
 export const restoreStudentAction = withActor(
@@ -62,7 +59,7 @@ export const restoreStudentAction = withActor(
       async (actor, id: string) => {
         await restoreStudent(id, actor.userId);
         return { success: true, data: undefined };
-      }
-    )
-  )
+      },
+    ),
+  ),
 );

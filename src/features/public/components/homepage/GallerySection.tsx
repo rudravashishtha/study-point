@@ -31,7 +31,10 @@ export function GallerySection({
         </header>
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {items.slice(0, 9).map((item) => (
-            <div key={item.id} className="group relative overflow-hidden rounded-xl bg-muted">
+            <div
+              key={item.id}
+              className="group relative overflow-hidden rounded-xl bg-muted"
+            >
               <div className="aspect-[4/3] flex items-center justify-center bg-muted text-muted-foreground">
                 {item.fileUrl ? (
                   <span className="text-xs">Image</span>

@@ -110,7 +110,12 @@ export function FileUploadDropzone({
 
   if (status === "success") {
     return (
-      <div className={cn("border-2 border-dashed border-green-500 bg-green-50/50 rounded-lg p-6 flex flex-col items-center justify-center space-y-3", className)}>
+      <div
+        className={cn(
+          "border-2 border-dashed border-green-500 bg-green-50/50 rounded-lg p-6 flex flex-col items-center justify-center space-y-3",
+          className,
+        )}
+      >
         <CheckCircle2 className="w-10 h-10 text-green-500" />
         <div className="text-center">
           <p className="text-sm font-medium text-foreground">{file?.name}</p>
@@ -122,8 +127,11 @@ export function FileUploadDropzone({
 
   if (status === "error" || errorMsg) {
     return (
-      <div 
-        className={cn("border-2 border-dashed border-red-300 bg-red-50/50 rounded-lg p-6 flex flex-col items-center justify-center space-y-4 cursor-pointer hover:border-red-400 transition-colors", className)}
+      <div
+        className={cn(
+          "border-2 border-dashed border-red-300 bg-red-50/50 rounded-lg p-6 flex flex-col items-center justify-center space-y-4 cursor-pointer hover:border-red-400 transition-colors",
+          className,
+        )}
         onClick={handleContainerClick}
         onKeyDown={handleKeyDown}
         role="button"
@@ -135,12 +143,12 @@ export function FileUploadDropzone({
           <p className="text-xs text-red-600 mt-1">{errorMsg || "Please try again."}</p>
         </div>
         <div className="flex gap-2 mt-2">
-           <Button variant="outline" size="sm" onClick={handleReplace}>
-             Try Again
-           </Button>
-           <Button variant="ghost" size="sm" onClick={handleRemove}>
-             Cancel
-           </Button>
+          <Button variant="outline" size="sm" onClick={handleReplace}>
+            Try Again
+          </Button>
+          <Button variant="ghost" size="sm" onClick={handleRemove}>
+            Cancel
+          </Button>
         </div>
         <input
           ref={fileInputRef}
@@ -157,11 +165,18 @@ export function FileUploadDropzone({
 
   if (uploading || ["intent", "finalizing"].includes(status)) {
     return (
-      <div className={cn("border-2 border-dashed border-primary/50 bg-primary/5 rounded-lg p-8 flex flex-col items-center justify-center space-y-4", className)}>
+      <div
+        className={cn(
+          "border-2 border-dashed border-primary/50 bg-primary/5 rounded-lg p-8 flex flex-col items-center justify-center space-y-4",
+          className,
+        )}
+      >
         <Loader2 className="w-10 h-10 text-primary animate-spin" />
         <div className="text-center">
           <p className="text-sm font-medium">Uploading...</p>
-          <p className="text-xs text-muted-foreground mt-1">Please wait while your file is being processed.</p>
+          <p className="text-xs text-muted-foreground mt-1">
+            Please wait while your file is being processed.
+          </p>
         </div>
       </div>
     );
@@ -178,11 +193,13 @@ export function FileUploadDropzone({
       onKeyDown={handleKeyDown}
       className={cn(
         "relative flex flex-col items-center justify-center w-full p-6 border-2 border-dashed rounded-lg transition-colors duration-200 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
-        dragOver ? "border-primary bg-primary/5" : "border-border hover:border-muted-foreground/40",
+        dragOver
+          ? "border-primary bg-primary/5"
+          : "border-border hover:border-muted-foreground/40",
         file ? "bg-muted/30" : "bg-card",
         disabled && "opacity-60 cursor-not-allowed hover:border-border",
         !disabled && "cursor-pointer",
-        className
+        className,
       )}
     >
       <input
@@ -203,7 +220,9 @@ export function FileUploadDropzone({
           <div className="text-center pointer-events-none space-y-1">
             <p className="text-sm font-medium text-foreground">{title}</p>
             {helperText && (
-              <p className="text-xs text-muted-foreground whitespace-pre-wrap">{helperText}</p>
+              <p className="text-xs text-muted-foreground whitespace-pre-wrap">
+                {helperText}
+              </p>
             )}
           </div>
         </>
@@ -211,12 +230,14 @@ export function FileUploadDropzone({
         <div className="w-full flex flex-col items-center space-y-4">
           <div className="flex flex-col items-center text-center space-y-1 pointer-events-none">
             <File className="w-8 h-8 text-primary mb-2" />
-            <p className="text-sm font-medium text-foreground line-clamp-1 break-all px-4">{file.name}</p>
+            <p className="text-sm font-medium text-foreground line-clamp-1 break-all px-4">
+              {file.name}
+            </p>
             <p className="text-xs text-muted-foreground">
               {formatFileSize(file.size)} selected.
             </p>
           </div>
-          
+
           <div className="flex flex-wrap items-center justify-center gap-2 w-full mt-2">
             <Button
               variant="outline"

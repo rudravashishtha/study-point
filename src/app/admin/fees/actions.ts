@@ -12,15 +12,12 @@ import { withActor, withAuthorization, withRevalidation } from "@/lib/actions/wr
 export const createFeePlanAction = withActor(
   withAuthorization(
     "ADMIN",
-    withRevalidation(
-      ["/admin/fees"],
-      async (actor, data: unknown) => {
-        const parsed = FeePlanCreateSchema.parse(data);
-        await createFeePlan(actor, parsed);
-        return { success: true, data: undefined };
-      }
-    )
-  )
+    withRevalidation(["/admin/fees"], async (actor, data: unknown) => {
+      const parsed = FeePlanCreateSchema.parse(data);
+      await createFeePlan(actor, parsed);
+      return { success: true, data: undefined };
+    }),
+  ),
 );
 
 export const updateFeePlanAction = withActor(
@@ -32,9 +29,9 @@ export const updateFeePlanAction = withActor(
         const parsed = FeePlanUpdateSchema.parse(data);
         await updateFeePlan(actor, id, parsed);
         return { success: true, data: undefined };
-      }
-    )
-  )
+      },
+    ),
+  ),
 );
 
 export const archiveFeePlanAction = withActor(
@@ -45,9 +42,9 @@ export const archiveFeePlanAction = withActor(
       async (actor, id: string) => {
         await archiveFeePlan(actor, id);
         return { success: true, data: undefined };
-      }
-    )
-  )
+      },
+    ),
+  ),
 );
 
 export const restoreFeePlanAction = withActor(
@@ -58,7 +55,7 @@ export const restoreFeePlanAction = withActor(
       async (actor, id: string) => {
         await restoreFeePlan(actor, id);
         return { success: true, data: undefined };
-      }
-    )
-  )
+      },
+    ),
+  ),
 );

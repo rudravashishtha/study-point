@@ -65,7 +65,10 @@ export function ResourcesSearchClient({
       {searchEnabled && (
         <div className="mx-auto mb-8 max-w-2xl space-y-4">
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" aria-hidden="true" />
+            <Search
+              className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground"
+              aria-hidden="true"
+            />
             <Input
               placeholder="Search resources..."
               value={searchQuery}
@@ -97,7 +100,10 @@ export function ResourcesSearchClient({
 
       {grouped.length === 0 ? (
         <div className="mx-auto max-w-md py-12 text-center">
-          <FileText className="mx-auto size-12 text-muted-foreground/50" aria-hidden="true" />
+          <FileText
+            className="mx-auto size-12 text-muted-foreground/50"
+            aria-hidden="true"
+          />
           <p className="mt-4 text-muted-foreground">
             {searchQuery || selectedTypes.size > 0
               ? "No resources match your search. Try different keywords or filters."

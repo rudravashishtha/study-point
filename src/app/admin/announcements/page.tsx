@@ -36,7 +36,9 @@ export default async function AdminAnnouncementsPage() {
       <PageHeader>
         <div>
           <PageHeaderHeading>Notices</PageHeaderHeading>
-          <PageHeaderDescription>Manage institute announcements and notices.</PageHeaderDescription>
+          <PageHeaderDescription>
+            Manage institute announcements and notices.
+          </PageHeaderDescription>
         </div>
       </PageHeader>
 

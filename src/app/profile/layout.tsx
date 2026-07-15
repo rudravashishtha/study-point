@@ -11,7 +11,9 @@ import { getStudentAnnouncementUnreadCount } from "@/server/services/announcemen
 export default async function ProfileLayout({ children }: { children: React.ReactNode }) {
   const appUser = await requireAppUser();
   const settingsResult = await getSiteSettings();
-  const instituteName = settingsResult.success ? settingsResult.data.instituteName : "Study Point";
+  const instituteName = settingsResult.success
+    ? settingsResult.data.instituteName
+    : "Study Point";
 
   if (appUser.role === Role.ADMIN) {
     return <AdminShell instituteName={instituteName}>{children}</AdminShell>;
@@ -46,12 +48,16 @@ export default async function ProfileLayout({ children }: { children: React.Reac
       classLevel: a.batch.curriculumTrack.classLevel,
     }));
 
-    return <TeacherShell batches={batches} instituteName={instituteName}>{children}</TeacherShell>;
+    return (
+      <TeacherShell batches={batches} instituteName={instituteName}>
+        {children}
+      </TeacherShell>
+    );
   }
 
   if (appUser.role === Role.STUDENT) {
     if (!appUser.studentId) redirect("/unauthorized");
-    
+
     const student = await db.student.findUnique({
       where: { id: appUser.studentId },
       select: { id: true, fullName: true, studentCode: true },
@@ -62,7 +68,9 @@ export default async function ProfileLayout({ children }: { children: React.Reac
       select: {
         id: true,
         batch: { select: { id: true, name: true } },
-        curriculumTrack: { select: { classLevel: true, subject: { select: { name: true } } } },
+        curriculumTrack: {
+          select: { classLevel: true, subject: { select: { name: true } } },
+        },
         academicSession: { select: { name: true } },
       },
     });

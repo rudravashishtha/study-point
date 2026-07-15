@@ -128,7 +128,12 @@ export function HomeworkList({
     try {
       const res = await action();
       if (!res.success) {
-        toast.error("Error", { description: typeof res.error === 'string' ? res.error : res.error?.message || "Unknown error" });
+        toast.error("Error", {
+          description:
+            typeof res.error === "string"
+              ? res.error
+              : res.error?.message || "Unknown error",
+        });
         return;
       }
       toast.success("Success", { description: successMsg });
@@ -168,7 +173,10 @@ export function HomeworkList({
               </Select>
             </FilterField>
             <FilterField label="Session">
-              <Select value={filterSession} onValueChange={(v) => v && setFilterSession(v)}>
+              <Select
+                value={filterSession}
+                onValueChange={(v) => v && setFilterSession(v)}
+              >
                 <SelectTrigger className="w-[180px]">
                   <SelectValue placeholder="Session" />
                 </SelectTrigger>
@@ -284,7 +292,8 @@ export function HomeworkList({
                               : "secondary"
                         }
                       >
-                        {h.lifecycleState.charAt(0) + h.lifecycleState.slice(1).toLowerCase()}
+                        {h.lifecycleState.charAt(0) +
+                          h.lifecycleState.slice(1).toLowerCase()}
                       </Badge>
                     </TableCell>
                     <TableCell className="text-right">

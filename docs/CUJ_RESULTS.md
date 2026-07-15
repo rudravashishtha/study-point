@@ -7,11 +7,11 @@
 
 ## Test Accounts
 
-| Role | Email | Password | Expected Landing |
-|---|---|---|---|
-| Admin | admin@example.com | TestAdmin@123 | /admin |
-| Teacher | teacher@example.com | TestTeacher@123 | /teacher |
-| Student | student@example.com | TestStudent@123 | /student |
+| Role    | Email               | Password        | Expected Landing |
+| ------- | ------------------- | --------------- | ---------------- |
+| Admin   | admin@example.com   | TestAdmin@123   | /admin           |
+| Teacher | teacher@example.com | TestTeacher@123 | /teacher         |
+| Student | student@example.com | TestStudent@123 | /student         |
 
 ---
 
@@ -22,11 +22,13 @@
 **Result: ✅ PASS** (12 automated tests)
 
 **Bugs found and fixed during CUJ:**
+
 - Password input had no `placeholder` attribute — added "Enter your password"
 - Forgot password page showed "Welcome back" heading instead of "Reset your password" — added `forgot` theme to AuthScreen
 - `/forgot-password` heading now correctly reads "Reset your password"
 
 **Coverage:**
+
 - Login page renders ✅
 - Invalid credentials → error message ✅
 - Empty form → field validation ✅
@@ -49,6 +51,7 @@
 **Result: ✅ PASS** (1 automated test — serial covering CUJ-2 through CUJ-9)
 
 **Coverage:**
+
 - Admin login → dashboard with metrics ✅
 - Dashboard shows active students, pending enrolments, today's batches, pending fees ✅
 - Dashboard search form navigates to /admin/students ✅
@@ -77,6 +80,7 @@
 **Result: ✅ PASS** (8 automated tests)
 
 **Coverage:**
+
 - Home page: hero section, teacher intro, "Enquire Now" CTA, contact info ✅
 - About page loads ✅
 - Courses page: class IX/X/XI/XII offerings ✅
@@ -92,17 +96,16 @@
 
 ## Summary
 
-| CUJ | Description | Result | Tests |
-|-----|-------------|--------|-------|
-| CUJ-1 | Authentication Lifecycle | ✅ PASS | 11 |
-| CUJ-2 | Admin Onboarding | ✅ PASS | 1 (serial) |
-| CUJ-3 | Create Student | ✅ PASS | (covered in serial) |
-| CUJ-4 | Create Batch | ✅ PASS | (covered in serial) |
-| CUJ-5 | Create Academic Session | ✅ PASS | (covered in serial) |
-| CUJ-6 | Manage Timetable | ✅ PASS | (covered in serial) |
-| CUJ-7 | Upload Study Material | ✅ PASS | (covered in serial) |
-| CUJ-8 | Assign Homework | ✅ PASS | (covered in serial) |
-| CUJ-9 | Schedule a Test | ✅ PASS | (covered in serial) |
-| CUJ-10 | Public Enquiry Flow | ✅ PASS | 8 |
-| **Total** | | **10/10 PASS** | **22** |
-
+| CUJ       | Description              | Result         | Tests               |
+| --------- | ------------------------ | -------------- | ------------------- |
+| CUJ-1     | Authentication Lifecycle | ✅ PASS        | 11                  |
+| CUJ-2     | Admin Onboarding         | ✅ PASS        | 1 (serial)          |
+| CUJ-3     | Create Student           | ✅ PASS        | (covered in serial) |
+| CUJ-4     | Create Batch             | ✅ PASS        | (covered in serial) |
+| CUJ-5     | Create Academic Session  | ✅ PASS        | (covered in serial) |
+| CUJ-6     | Manage Timetable         | ✅ PASS        | (covered in serial) |
+| CUJ-7     | Upload Study Material    | ✅ PASS        | (covered in serial) |
+| CUJ-8     | Assign Homework          | ✅ PASS        | (covered in serial) |
+| CUJ-9     | Schedule a Test          | ✅ PASS        | (covered in serial) |
+| CUJ-10    | Public Enquiry Flow      | ✅ PASS        | 8                   |
+| **Total** |                          | **10/10 PASS** | **22**              |

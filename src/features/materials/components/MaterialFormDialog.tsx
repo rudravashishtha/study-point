@@ -151,7 +151,13 @@ export function MaterialFormDialog({
         : await createAdminMaterialAction(payload);
 
       if (!res.success) {
-        throw new Error(typeof res.error === 'string' ? res.error : (res.error as /* eslint-disable-line @typescript-eslint/no-explicit-any -- Justified: Server action boundary */ any)?.message || 'Unknown error');
+        throw new Error(
+          typeof res.error === "string"
+            ? res.error
+            : (
+                res.error as /* eslint-disable-line @typescript-eslint/no-explicit-any -- Justified: Server action boundary */ any
+              )?.message || "Unknown error",
+        );
       }
       toast.success("Success", { description: "Material saved" });
       onOpenChange(false);
@@ -173,13 +179,14 @@ export function MaterialFormDialog({
         <DialogHeader className="px-4 pt-4 pb-2 sm:px-6 sm:pt-6">
           <DialogTitle>{material ? "Edit Material" : "Create Material"}</DialogTitle>
         </DialogHeader>
-        
+
         <div className="flex-1 overflow-y-auto px-4 py-4 sm:px-6">
           <form id="material-form" onSubmit={handleSubmit} className="space-y-8">
-            
             {/* Scope & Targeting */}
             <section className="space-y-4">
-              <h3 className="text-sm font-medium text-muted-foreground border-b pb-2">Scope & Targeting</h3>
+              <h3 className="text-sm font-medium text-muted-foreground border-b pb-2">
+                Scope & Targeting
+              </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2 col-span-1 md:col-span-2">
                   <Label>Visibility Scope</Label>
@@ -272,7 +279,9 @@ export function MaterialFormDialog({
 
             {/* Material Details */}
             <section className="space-y-4">
-              <h3 className="text-sm font-medium text-muted-foreground border-b pb-2">Material Details</h3>
+              <h3 className="text-sm font-medium text-muted-foreground border-b pb-2">
+                Material Details
+              </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2 col-span-1 md:col-span-2">
                   <Label htmlFor="title">Title</Label>
@@ -329,7 +338,9 @@ export function MaterialFormDialog({
                         visibility === "CURRICULUM_TRACK" ? curriculumTrackId : null
                       }
                       onUploadSuccess={setFileAssetId}
-                      onUploadError={(e) => toast.error("Upload Failed", { description: e })}
+                      onUploadError={(e) =>
+                        toast.error("Upload Failed", { description: e })
+                      }
                     />
                   </div>
                 )}
@@ -347,10 +358,9 @@ export function MaterialFormDialog({
                 )}
               </div>
             </section>
-
           </form>
         </div>
-        
+
         <div className="m-0 p-4 sm:p-6 border-t bg-muted/40 flex justify-end gap-2">
           <Button
             type="button"

@@ -1,12 +1,28 @@
 import { test, expect } from "@playwright/test";
 
 const USERS = {
-  admin: { email: "admin@example.com", password: "TestAdmin@123", expectedLanding: "/admin" },
-  teacher: { email: "teacher@example.com", password: "TestTeacher@123", expectedLanding: "/teacher" },
-  student: { email: "student@example.com", password: "TestStudent@123", expectedLanding: "/student" },
+  admin: {
+    email: "admin@example.com",
+    password: "TestAdmin@123",
+    expectedLanding: "/admin",
+  },
+  teacher: {
+    email: "teacher@example.com",
+    password: "TestTeacher@123",
+    expectedLanding: "/teacher",
+  },
+  student: {
+    email: "student@example.com",
+    password: "TestStudent@123",
+    expectedLanding: "/student",
+  },
 };
 
-async function login(page: import("@playwright/test").Page, email: string, password: string) {
+async function login(
+  page: import("@playwright/test").Page,
+  email: string,
+  password: string,
+) {
   await page.goto("/login");
   await page.getByPlaceholder("you@example.com").fill(email);
   await page.getByLabel("Password", { exact: true }).fill(password);
@@ -14,7 +30,6 @@ async function login(page: import("@playwright/test").Page, email: string, passw
 }
 
 test.describe("CUJ-1: Authentication Lifecycle", () => {
-
   test("Login page renders with correct structure", async ({ page }) => {
     await page.goto("/login");
     await expect(page.getByRole("heading", { name: /welcome back/i })).toBeVisible();
@@ -39,7 +54,6 @@ test.describe("CUJ-1: Authentication Lifecycle", () => {
   });
 
   test.describe("Role-based routing", () => {
-
     for (const [role, creds] of Object.entries(USERS)) {
       test(`${role} logs in and lands on ${creds.expectedLanding}`, async ({ page }) => {
         const errors: string[] = [];
@@ -94,7 +108,9 @@ test.describe("CUJ-1: Authentication Lifecycle", () => {
 
   test("Password reset page is accessible", async ({ page }) => {
     await page.goto("/forgot-password");
-    await expect(page.getByRole("heading", { name: /reset your password/i })).toBeVisible();
+    await expect(
+      page.getByRole("heading", { name: /reset your password/i }),
+    ).toBeVisible();
     await expect(page.getByPlaceholder("you@example.com")).toBeVisible();
   });
 

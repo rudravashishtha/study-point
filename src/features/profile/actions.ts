@@ -6,19 +6,25 @@ import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { parsePhoneNumberFromString } from "libphonenumber-js";
 
-const updatePhoneSchema = z.object({
-  phone: z.string().min(1, "Phone number is required."),
-}).refine((data) => {
-  let phoneStr = data.phone.trim();
-  if (!phoneStr.startsWith("+")) {
-    phoneStr = `+91${phoneStr}`;
-  }
-  const phoneNumber = parsePhoneNumberFromString(phoneStr);
-  return phoneNumber?.isValid() ?? false;
-}, {
-  message: "Invalid phone number format. Please provide a valid 10-digit Indian mobile number.",
-  path: ["phone"],
-});
+const updatePhoneSchema = z
+  .object({
+    phone: z.string().min(1, "Phone number is required."),
+  })
+  .refine(
+    (data) => {
+      let phoneStr = data.phone.trim();
+      if (!phoneStr.startsWith("+")) {
+        phoneStr = `+91${phoneStr}`;
+      }
+      const phoneNumber = parsePhoneNumberFromString(phoneStr);
+      return phoneNumber?.isValid() ?? false;
+    },
+    {
+      message:
+        "Invalid phone number format. Please provide a valid 10-digit Indian mobile number.",
+      path: ["phone"],
+    },
+  );
 
 export async function updatePhone(
   _prev: { error: string | null; success: boolean },
@@ -62,7 +68,10 @@ export async function updatePhone(
 }
 
 const updateNameSchema = z.object({
-  fullName: z.string().min(2, "Name must be at least 2 characters.").max(100, "Name is too long."),
+  fullName: z
+    .string()
+    .min(2, "Name must be at least 2 characters.")
+    .max(100, "Name is too long."),
 });
 
 export async function updateName(

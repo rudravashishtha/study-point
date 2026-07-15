@@ -67,14 +67,18 @@ export function ProgrammeList({
                 <TableCell>
                   {programme.board.name} ({programme.board.code})
                   {programme.board.archivedAt && (
-                    <Badge variant="outline" className="ml-2">Archived Board</Badge>
+                    <Badge variant="outline" className="ml-2">
+                      Archived Board
+                    </Badge>
                   )}
                 </TableCell>
                 <TableCell>
                   {programme.archivedAt ? (
                     <Badge variant="secondary">Archived</Badge>
                   ) : (
-                    <Badge variant="default" className="bg-green-600 hover:bg-green-700">Active</Badge>
+                    <Badge variant="default" className="bg-green-600 hover:bg-green-700">
+                      Active
+                    </Badge>
                   )}
                 </TableCell>
                 <TableCell className="text-right">
@@ -101,7 +105,9 @@ export function ProgrammeList({
               {programme.archivedAt ? (
                 <Badge variant="secondary">Archived</Badge>
               ) : (
-                <Badge variant="default" className="bg-green-600 hover:bg-green-700">Active</Badge>
+                <Badge variant="default" className="bg-green-600 hover:bg-green-700">
+                  Active
+                </Badge>
               )}
             </div>
             <div className="text-sm text-muted-foreground mb-4 space-y-1">

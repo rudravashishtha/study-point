@@ -76,10 +76,7 @@ export function TrackList({
               </TableRow>
             ) : (
               tracks.map((track) => (
-                <TableRow
-                  key={track.id}
-                  className="transition-colors hover:bg-muted/50"
-                >
+                <TableRow key={track.id} className="transition-colors hover:bg-muted/50">
                   <TableCell className="font-medium">{track.displayName}</TableCell>
                   <TableCell className="text-muted-foreground">
                     {track.board.code}

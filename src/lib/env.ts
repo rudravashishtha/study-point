@@ -15,7 +15,10 @@ const serverEnvSchema = z.object({
   SUPABASE_SECRET_KEY: z.string().min(1, "SUPABASE_SECRET_KEY is required"),
   SENTRY_AUTH_TOKEN: z.string().optional(),
   ADMIN_SIGNUP_KEY: z.string().optional(),
-  ENABLE_ADMIN_SIGNUP: z.string().default("false").transform((s) => s === "true"),
+  ENABLE_ADMIN_SIGNUP: z
+    .string()
+    .default("false")
+    .transform((s) => s === "true"),
 });
 
 export const publicEnv = publicEnvSchema.parse({

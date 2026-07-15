@@ -185,16 +185,15 @@ export function FeePlanList({
                     <TableCell className="font-medium">
                       <div className="flex items-center space-x-2">
                         <span>{plan.name}</span>
-                        {plan.archivedAt && (
-                          <Badge variant="secondary">Archived</Badge>
-                        )}
+                        {plan.archivedAt && <Badge variant="secondary">Archived</Badge>}
                       </div>
                     </TableCell>
+                    <TableCell>{formatAmount(plan.totalAmount.toString())}</TableCell>
                     <TableCell>
-                      {formatAmount(plan.totalAmount.toString())}
-                    </TableCell>
-                    <TableCell>
-                      <Badge variant="outline" className="bg-blue-100 text-blue-800 hover:bg-blue-100">
+                      <Badge
+                        variant="outline"
+                        className="bg-blue-100 text-blue-800 hover:bg-blue-100"
+                      >
                         {frequencyLabel(plan.frequency)}
                       </Badge>
                     </TableCell>
@@ -229,7 +228,10 @@ export function FeePlanList({
               >
                 <div className="flex items-center justify-between mb-2">
                   <span className="font-semibold">{plan.name}</span>
-                  <Badge variant="outline" className="bg-blue-100 text-blue-800 hover:bg-blue-100">
+                  <Badge
+                    variant="outline"
+                    className="bg-blue-100 text-blue-800 hover:bg-blue-100"
+                  >
                     {frequencyLabel(plan.frequency)}
                   </Badge>
                 </div>

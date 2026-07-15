@@ -55,8 +55,8 @@ export default async function TeacherPage() {
         </div>
         <h2 className="text-xl font-bold mb-2">No batches assigned</h2>
         <p className="text-sm text-muted-foreground max-w-md">
-          You have not been assigned to any active batches yet. Contact an
-          administrator to get started.
+          You have not been assigned to any active batches yet. Contact an administrator
+          to get started.
         </p>
         <Link
           href="/teacher"
@@ -88,8 +88,7 @@ export default async function TeacherPage() {
               <div>
                 <h3 className="font-bold text-base">{batch.name}</h3>
                 <p className="text-xs text-muted-foreground mt-0.5">
-                  {batch.subjectName} &middot; Class{" "}
-                  {batch.classLevel} &middot;{" "}
+                  {batch.subjectName} &middot; Class {batch.classLevel} &middot;{" "}
                   {batch.academicSessionName}
                 </p>
               </div>

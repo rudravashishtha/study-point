@@ -17,7 +17,9 @@ export default async function AdminCurriculumPage() {
           <BookMarked className="h-8 w-8 text-primary" />
           <div>
             <PageHeaderHeading>Curriculum</PageHeaderHeading>
-            <PageHeaderDescription>Manage boards, programmes, subjects, and curriculum tracks.</PageHeaderDescription>
+            <PageHeaderDescription>
+              Manage boards, programmes, subjects, and curriculum tracks.
+            </PageHeaderDescription>
           </div>
         </div>
       </PageHeader>

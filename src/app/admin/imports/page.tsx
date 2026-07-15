@@ -22,7 +22,9 @@ export default async function AdminImportsPage() {
       <PageHeader>
         <div>
           <PageHeaderHeading>Data Imports</PageHeaderHeading>
-          <PageHeaderDescription>Import students, questions, and other data.</PageHeaderDescription>
+          <PageHeaderDescription>
+            Import students, questions, and other data.
+          </PageHeaderDescription>
         </div>
       </PageHeader>
 

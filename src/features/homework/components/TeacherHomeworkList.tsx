@@ -96,7 +96,12 @@ export function TeacherHomeworkList({
     try {
       const res = await action();
       if (!res.success) {
-        toast.error("Error", { description: typeof res.error === 'string' ? res.error : res.error?.message || "Unknown error" });
+        toast.error("Error", {
+          description:
+            typeof res.error === "string"
+              ? res.error
+              : res.error?.message || "Unknown error",
+        });
         return;
       }
       toast.success("Success", { description: successMsg });
@@ -205,7 +210,8 @@ export function TeacherHomeworkList({
                               : "secondary"
                         }
                       >
-                        {h.lifecycleState.charAt(0) + h.lifecycleState.slice(1).toLowerCase()}
+                        {h.lifecycleState.charAt(0) +
+                          h.lifecycleState.slice(1).toLowerCase()}
                       </Badge>
                     </TableCell>
                     <TableCell className="text-right">

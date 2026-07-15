@@ -156,7 +156,9 @@ export function TeacherShell({
                   <span className="text-[10px] font-bold uppercase tracking-widest text-primary mb-0.5">
                     {instituteName}
                   </span>
-                  <span className="text-sm font-bold font-heading">Teacher Workspace</span>
+                  <span className="text-sm font-bold font-heading">
+                    Teacher Workspace
+                  </span>
                 </div>
                 <button
                   onClick={closeDrawer}

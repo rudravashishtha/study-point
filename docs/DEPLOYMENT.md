@@ -272,13 +272,13 @@ Deploy to a staging environment before every production release.
 
 The application targets these browsers. Test on staging before production:
 
-| Browser       | Desktop | Mobile |
-| ------------- | ------- | ------ |
-| Chrome        | ✅      | ✅     |
-| Safari        | ✅      | ✅     |
-| Firefox       | ✅      | —      |
-| Edge          | ✅      | —      |
-| Samsung Internet | —    | ✅     |
+| Browser          | Desktop | Mobile |
+| ---------------- | ------- | ------ |
+| Chrome           | ✅      | ✅     |
+| Safari           | ✅      | ✅     |
+| Firefox          | ✅      | —      |
+| Edge             | ✅      | —      |
+| Samsung Internet | —       | ✅     |
 
 Mobile Safari is particularly important since the application is a PWA that users may install via "Add to Home Screen."
 
@@ -286,15 +286,15 @@ Mobile Safari is particularly important since the application is a PWA that user
 
 Run a Lighthouse audit on staging before production:
 
-| Check                        | Target      |
-| ---------------------------- | ----------- |
-| Performance score            | > 90        |
-| Cumulative Layout Shift      | < 0.1       |
-| Largest Contentful Paint     | < 2.5s      |
-| First Input Delay            | < 100ms     |
-| No hydration warnings        | Required    |
-| Bundle sizes (initial JS)    | < 150 KB    |
-| Images optimized             | Required    |
+| Check                     | Target   |
+| ------------------------- | -------- |
+| Performance score         | > 90     |
+| Cumulative Layout Shift   | < 0.1    |
+| Largest Contentful Paint  | < 2.5s   |
+| First Input Delay         | < 100ms  |
+| No hydration warnings     | Required |
+| Bundle sizes (initial JS) | < 150 KB |
+| Images optimized          | Required |
 
 Automated Lighthouse CI is not required for v1.0. A manual run on staging is sufficient.
 

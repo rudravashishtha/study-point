@@ -19,13 +19,17 @@ export default async function AdminWebsitePage() {
     db.testimonial.findMany({
       orderBy: { displayOrder: "asc" },
       include: {
-        studentPhoto: { select: { id: true, storageKey: true, bucket: true, mimeType: true } },
+        studentPhoto: {
+          select: { id: true, storageKey: true, bucket: true, mimeType: true },
+        },
       },
     }),
     db.galleryItem.findMany({
       orderBy: { displayOrder: "asc" },
       include: {
-        fileAsset: { select: { id: true, storageKey: true, bucket: true, mimeType: true } },
+        fileAsset: {
+          select: { id: true, storageKey: true, bucket: true, mimeType: true },
+        },
       },
     }),
     db.fAQ.findMany({ orderBy: { displayOrder: "asc" } }),

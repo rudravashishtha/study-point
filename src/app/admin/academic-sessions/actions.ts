@@ -1,6 +1,5 @@
 "use server";
 
-
 import {
   activateSession,
   archiveSession,
@@ -12,11 +11,7 @@ import {
   SessionCreateSchema,
   SessionUpdateSchema,
 } from "@/lib/validation/academic-sessions";
-import {
-  withActor,
-  withAuthorization,
-  withRevalidation,
-} from "@/lib/actions/wrappers";
+import { withActor, withAuthorization, withRevalidation } from "@/lib/actions/wrappers";
 
 export const createSessionAction = withActor(
   withAuthorization(
@@ -27,9 +22,9 @@ export const createSessionAction = withActor(
         const parsed = SessionCreateSchema.parse(data);
         await createSession(actor, parsed);
         return { success: true, data: undefined };
-      }
-    )
-  )
+      },
+    ),
+  ),
 );
 
 export const updateSessionAction = withActor(
@@ -41,9 +36,9 @@ export const updateSessionAction = withActor(
         const parsed = SessionUpdateSchema.parse(data);
         await updateSession(actor, id, parsed);
         return { success: true, data: undefined };
-      }
-    )
-  )
+      },
+    ),
+  ),
 );
 
 export const activateSessionAction = withActor(
@@ -54,9 +49,9 @@ export const activateSessionAction = withActor(
       async (actor, id: string) => {
         await activateSession(actor, id);
         return { success: true, data: undefined };
-      }
-    )
-  )
+      },
+    ),
+  ),
 );
 
 export const archiveSessionAction = withActor(
@@ -67,9 +62,9 @@ export const archiveSessionAction = withActor(
       async (actor, id: string) => {
         await archiveSession(actor, id);
         return { success: true, data: undefined };
-      }
-    )
-  )
+      },
+    ),
+  ),
 );
 
 export const restoreSessionAction = withActor(
@@ -80,7 +75,7 @@ export const restoreSessionAction = withActor(
       async (actor, id: string) => {
         await restoreSession(actor, id);
         return { success: true, data: undefined };
-      }
-    )
-  )
+      },
+    ),
+  ),
 );

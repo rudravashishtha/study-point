@@ -13,10 +13,12 @@ export const updateSiteSettingsAction = withActor(
         const parsed = SiteSettingsUpdateSchema.parse(data);
         const result = await updateSiteSettings(actor, parsed);
         if (!result.success) {
-          throw new Error(typeof result.error === 'string' ? result.error : result.error.message);
+          throw new Error(
+            typeof result.error === "string" ? result.error : result.error.message,
+          );
         }
         return { success: true, data: undefined };
-      }
-    )
-  )
+      },
+    ),
+  ),
 );

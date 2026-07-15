@@ -5,12 +5,7 @@ import { toast } from "sonner";
 import { Student } from "@prisma/client";
 import { createStudentAction, updateStudentAction } from "@/app/admin/students/actions";
 import { useRouter } from "next/navigation";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { SubmitButton } from "@/components/ui/submit-button";
 
@@ -79,7 +74,9 @@ export function StudentFormDialog({
         <div className="flex-1 overflow-y-auto px-4 py-4 sm:px-6">
           <form id="student-form" onSubmit={handleSubmit} className="space-y-8">
             <section className="space-y-4">
-              <h3 className="text-sm font-medium text-muted-foreground border-b pb-2">General Information</h3>
+              <h3 className="text-sm font-medium text-muted-foreground border-b pb-2">
+                General Information
+              </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {student && (
                   <div className="space-y-2 md:col-span-1">
@@ -102,7 +99,9 @@ export function StudentFormDialog({
                   </div>
                 )}
 
-                <div className={`space-y-2 ${student ? "md:col-span-2" : "md:col-span-2"}`}>
+                <div
+                  className={`space-y-2 ${student ? "md:col-span-2" : "md:col-span-2"}`}
+                >
                   <label htmlFor="fullName" className="text-sm font-medium">
                     Full Name *
                   </label>
@@ -119,7 +118,9 @@ export function StudentFormDialog({
             </section>
 
             <section className="space-y-4">
-              <h3 className="text-sm font-medium text-muted-foreground border-b pb-2">Contact Information</h3>
+              <h3 className="text-sm font-medium text-muted-foreground border-b pb-2">
+                Contact Information
+              </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <label htmlFor="phone" className="text-sm font-medium">
@@ -161,7 +162,9 @@ export function StudentFormDialog({
             </section>
 
             <section className="space-y-4">
-              <h3 className="text-sm font-medium text-muted-foreground border-b pb-2">Other Details</h3>
+              <h3 className="text-sm font-medium text-muted-foreground border-b pb-2">
+                Other Details
+              </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <label htmlFor="joiningDate" className="text-sm font-medium">
@@ -179,7 +182,7 @@ export function StudentFormDialog({
             </section>
           </form>
         </div>
-        
+
         <div className="m-0 p-4 sm:p-6 border-t bg-muted/40 flex justify-end gap-2">
           <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
             Cancel

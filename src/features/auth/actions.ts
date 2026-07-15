@@ -164,22 +164,25 @@ export async function requestPasswordReset(
   return { error: null, sent: true };
 }
 
-const signUpAdminSchema = z.object({
-  fullName: z.string().min(1, "Name is required."),
-  email: z.string().email("Enter a valid email address."),
-  password: z.string()
-    .min(12, "Password must be at least 12 characters.")
-    .max(128, "Password is too long.")
-    .regex(/[A-Z]/, "Password must contain at least one uppercase letter.")
-    .regex(/[a-z]/, "Password must contain at least one lowercase letter.")
-    .regex(/[0-9]/, "Password must contain at least one number.")
-    .regex(/[^A-Za-z0-9]/, "Password must contain at least one special character."),
-  confirmPassword: z.string(),
-  registrationKey: z.string().min(1, "Registration key is required."),
-}).refine((data) => data.password === data.confirmPassword, {
-  message: "Passwords do not match.",
-  path: ["confirmPassword"],
-});
+const signUpAdminSchema = z
+  .object({
+    fullName: z.string().min(1, "Name is required."),
+    email: z.string().email("Enter a valid email address."),
+    password: z
+      .string()
+      .min(12, "Password must be at least 12 characters.")
+      .max(128, "Password is too long.")
+      .regex(/[A-Z]/, "Password must contain at least one uppercase letter.")
+      .regex(/[a-z]/, "Password must contain at least one lowercase letter.")
+      .regex(/[0-9]/, "Password must contain at least one number.")
+      .regex(/[^A-Za-z0-9]/, "Password must contain at least one special character."),
+    confirmPassword: z.string(),
+    registrationKey: z.string().min(1, "Registration key is required."),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: "Passwords do not match.",
+    path: ["confirmPassword"],
+  });
 
 /**
  * Validates if the current environment allows creating an admin account with the given key.
@@ -205,11 +208,7 @@ async function canCreateAdminAccount(providedKey: string): Promise<boolean> {
  * Abstracted to easily swap memory map for Redis/Supabase in the future.
  */
 async function assertSignupRateLimit(email: string): Promise<boolean> {
-  const { success } = rateLimit(
-    `admin_signup:${email.toLowerCase()}`,
-    5,
-    15 * 60_000,
-  );
+  const { success } = rateLimit(`admin_signup:${email.toLowerCase()}`, 5, 15 * 60_000);
   return success;
 }
 
@@ -279,7 +278,10 @@ export async function signUpAdmin(
   });
 
   if (signInError) {
-    return { error: "Account created, but failed to log in automatically. Please log in manually." };
+    return {
+      error:
+        "Account created, but failed to log in automatically. Please log in manually.",
+    };
   }
 
   // 9. Redirect to /admin

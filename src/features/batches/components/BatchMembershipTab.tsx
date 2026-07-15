@@ -19,7 +19,6 @@ import {
 import { AddStudentToBatchDialog } from "@/features/enrolments/components/AddStudentToBatchDialog";
 import { removeEnrolmentFromBatchAction } from "@/features/batches/actions/batch-actions";
 
-
 type EnrolmentWithStudent = Enrolment & { student: Student };
 
 export function BatchMembershipTab({

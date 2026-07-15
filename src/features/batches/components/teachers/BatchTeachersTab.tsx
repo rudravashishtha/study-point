@@ -84,11 +84,7 @@ export async function BatchTeachersTab({
                       {effective
                         .filter((p) => !assignment.permissions.includes(p))
                         .map((p) => (
-                          <Badge
-                            key={p}
-                            variant="outline"
-                            className="text-[10px]"
-                          >
+                          <Badge key={p} variant="outline" className="text-[10px]">
                             {p}
                           </Badge>
                         ))}

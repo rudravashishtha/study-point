@@ -348,7 +348,11 @@ export function BatchScheduleEditor({
           >
             Discard Changes
           </Button>
-          <SubmitButton type="submit" pending={isPending} disabled={!form.formState.isDirty}>
+          <SubmitButton
+            type="submit"
+            pending={isPending}
+            disabled={!form.formState.isDirty}
+          >
             {isPending ? "Saving..." : "Save Schedules"}
           </SubmitButton>
         </div>

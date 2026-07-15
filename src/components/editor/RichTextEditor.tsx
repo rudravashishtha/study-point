@@ -147,10 +147,7 @@ export function RichTextEditor({
   return (
     <div className="rounded-md border border-input">
       <Toolbar editor={editor} onLink={setLink} onImage={addImage} />
-      <div
-        className="border-t border-input"
-        style={{ minHeight }}
-      >
+      <div className="border-t border-input" style={{ minHeight }}>
         <EditorContent editor={editor} />
       </div>
 
@@ -287,7 +284,6 @@ function Toolbar({
       >
         <Quote className="size-4" />
       </ToolbarButton>
-
 
       <div className="mx-1 h-6 w-px bg-border" />
 

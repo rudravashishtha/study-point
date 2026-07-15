@@ -44,10 +44,7 @@ export default async function ResourcesPage() {
             </p>
           </header>
 
-          <ResourcesSearchClient
-            resources={resources}
-            searchEnabled={searchEnabled}
-          />
+          <ResourcesSearchClient resources={resources} searchEnabled={searchEnabled} />
         </div>
       </section>
     </div>

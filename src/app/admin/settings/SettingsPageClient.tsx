@@ -19,7 +19,11 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { SubmitButton } from "@/components/ui/submit-button";
-import { PageHeader, PageHeaderHeading, PageHeaderDescription } from "@/components/layout/page-header";
+import {
+  PageHeader,
+  PageHeaderHeading,
+  PageHeaderDescription,
+} from "@/components/layout/page-header";
 import { updateSiteSettingsAction } from "./actions";
 
 const TABS = [
@@ -56,7 +60,11 @@ const settingsSchema = z.object({
 
 type SettingsValues = z.infer<typeof settingsSchema>;
 
-export function SettingsPageClient(/* eslint-disable-line @typescript-eslint/no-explicit-any -- Justified: settings payload */ { settings }: { settings: any }) {
+export function SettingsPageClient(
+  /* eslint-disable-line @typescript-eslint/no-explicit-any -- Justified: settings payload */ {
+    settings,
+  }: { settings: any },
+) {
   const router = useRouter();
   const [activeTab, setActiveTab] = useState<TabId>("institute");
   const [isPending, startTransition] = useTransition();
@@ -107,9 +115,7 @@ export function SettingsPageClient(/* eslint-disable-line @typescript-eslint/no-
       <PageHeader>
         <div>
           <PageHeaderHeading>Settings</PageHeaderHeading>
-          <PageHeaderDescription>
-            Manage site-wide configuration.
-          </PageHeaderDescription>
+          <PageHeaderDescription>Manage site-wide configuration.</PageHeaderDescription>
         </div>
       </PageHeader>
 
@@ -143,161 +149,409 @@ export function SettingsPageClient(/* eslint-disable-line @typescript-eslint/no-
   );
 }
 
-function InstituteTab(/* eslint-disable-line @typescript-eslint/no-explicit-any -- Justified: prop drilling complex RHF types */ { form }: { form: any }) {
+function InstituteTab(
+  /* eslint-disable-line @typescript-eslint/no-explicit-any -- Justified: prop drilling complex RHF types */ {
+    form,
+  }: { form: any },
+) {
   return (
     <div className="grid gap-6 sm:grid-cols-2">
-      <FormField control={form.control} name="instituteName" render={(/* eslint-disable-line @typescript-eslint/no-explicit-any -- Justified: react-hook-form render props are complex */ { field }: any) => (
-        <FormItem className="sm:col-span-2">
-          <FormLabel>Institute Name</FormLabel>
-          <FormControl><Input {...field} /></FormControl>
-          <FormMessage />
-        </FormItem>
-      )} />
-      <FormField control={form.control} name="tagline" render={(/* eslint-disable-line @typescript-eslint/no-explicit-any -- Justified: react-hook-form render props are complex */ { field }: any) => (
-        <FormItem className="sm:col-span-2">
-          <FormLabel>Tagline</FormLabel>
-          <FormControl><Input {...field} value={field.value || ""} /></FormControl>
-          <FormMessage />
-        </FormItem>
-      )} />
-      <FormField control={form.control} name="phone" render={(/* eslint-disable-line @typescript-eslint/no-explicit-any -- Justified: react-hook-form render props are complex */ { field }: any) => (
-        <FormItem><FormLabel>Phone</FormLabel><FormControl><Input {...field} value={field.value || ""} /></FormControl><FormMessage /></FormItem>
-      )} />
-      <FormField control={form.control} name="whatsappNumber" render={(/* eslint-disable-line @typescript-eslint/no-explicit-any -- Justified: react-hook-form render props are complex */ { field }: any) => (
-        <FormItem><FormLabel>WhatsApp Number</FormLabel><FormControl><Input {...field} value={field.value || ""} /></FormControl><FormMessage /></FormItem>
-      )} />
-      <FormField control={form.control} name="email" render={(/* eslint-disable-line @typescript-eslint/no-explicit-any -- Justified: react-hook-form render props are complex */ { field }: any) => (
-        <FormItem><FormLabel>Email</FormLabel><FormControl><Input type="email" {...field} value={field.value || ""} /></FormControl><FormMessage /></FormItem>
-      )} />
-      <FormField control={form.control} name="openingHours" render={(/* eslint-disable-line @typescript-eslint/no-explicit-any -- Justified: react-hook-form render props are complex */ { field }: any) => (
-        <FormItem><FormLabel>Opening Hours</FormLabel><FormControl><Input {...field} value={field.value || ""} /></FormControl><FormMessage /></FormItem>
-      )} />
-      <FormField control={form.control} name="address" render={(/* eslint-disable-line @typescript-eslint/no-explicit-any -- Justified: react-hook-form render props are complex */ { field }: any) => (
-        <FormItem className="sm:col-span-2">
-          <FormLabel>Address</FormLabel>
-          <FormControl><Textarea rows={2} {...field} value={field.value || ""} /></FormControl>
-          <FormMessage />
-        </FormItem>
-      )} />
-      <FormField control={form.control} name="landmark" render={(/* eslint-disable-line @typescript-eslint/no-explicit-any -- Justified: react-hook-form render props are complex */ { field }: any) => (
-        <FormItem className="sm:col-span-2">
-          <FormLabel>Landmark</FormLabel>
-          <FormControl><Input {...field} value={field.value || ""} /></FormControl>
-          <FormMessage />
-        </FormItem>
-      )} />
-      <FormField control={form.control} name="mapUrl" render={(/* eslint-disable-line @typescript-eslint/no-explicit-any -- Justified: react-hook-form render props are complex */ { field }: any) => (
-        <FormItem className="sm:col-span-2">
-          <FormLabel>Map URL</FormLabel>
-          <FormControl><Input {...field} value={field.value || ""} /></FormControl>
-          <FormDescription>Google Maps embed URL</FormDescription>
-          <FormMessage />
-        </FormItem>
-      )} />
+      <FormField
+        control={form.control}
+        name="instituteName"
+        render={(
+          /* eslint-disable-line @typescript-eslint/no-explicit-any -- Justified: react-hook-form render props are complex */ {
+            field,
+          }: any,
+        ) => (
+          <FormItem className="sm:col-span-2">
+            <FormLabel>Institute Name</FormLabel>
+            <FormControl>
+              <Input {...field} />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+      <FormField
+        control={form.control}
+        name="tagline"
+        render={(
+          /* eslint-disable-line @typescript-eslint/no-explicit-any -- Justified: react-hook-form render props are complex */ {
+            field,
+          }: any,
+        ) => (
+          <FormItem className="sm:col-span-2">
+            <FormLabel>Tagline</FormLabel>
+            <FormControl>
+              <Input {...field} value={field.value || ""} />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+      <FormField
+        control={form.control}
+        name="phone"
+        render={(
+          /* eslint-disable-line @typescript-eslint/no-explicit-any -- Justified: react-hook-form render props are complex */ {
+            field,
+          }: any,
+        ) => (
+          <FormItem>
+            <FormLabel>Phone</FormLabel>
+            <FormControl>
+              <Input {...field} value={field.value || ""} />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+      <FormField
+        control={form.control}
+        name="whatsappNumber"
+        render={(
+          /* eslint-disable-line @typescript-eslint/no-explicit-any -- Justified: react-hook-form render props are complex */ {
+            field,
+          }: any,
+        ) => (
+          <FormItem>
+            <FormLabel>WhatsApp Number</FormLabel>
+            <FormControl>
+              <Input {...field} value={field.value || ""} />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+      <FormField
+        control={form.control}
+        name="email"
+        render={(
+          /* eslint-disable-line @typescript-eslint/no-explicit-any -- Justified: react-hook-form render props are complex */ {
+            field,
+          }: any,
+        ) => (
+          <FormItem>
+            <FormLabel>Email</FormLabel>
+            <FormControl>
+              <Input type="email" {...field} value={field.value || ""} />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+      <FormField
+        control={form.control}
+        name="openingHours"
+        render={(
+          /* eslint-disable-line @typescript-eslint/no-explicit-any -- Justified: react-hook-form render props are complex */ {
+            field,
+          }: any,
+        ) => (
+          <FormItem>
+            <FormLabel>Opening Hours</FormLabel>
+            <FormControl>
+              <Input {...field} value={field.value || ""} />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+      <FormField
+        control={form.control}
+        name="address"
+        render={(
+          /* eslint-disable-line @typescript-eslint/no-explicit-any -- Justified: react-hook-form render props are complex */ {
+            field,
+          }: any,
+        ) => (
+          <FormItem className="sm:col-span-2">
+            <FormLabel>Address</FormLabel>
+            <FormControl>
+              <Textarea rows={2} {...field} value={field.value || ""} />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+      <FormField
+        control={form.control}
+        name="landmark"
+        render={(
+          /* eslint-disable-line @typescript-eslint/no-explicit-any -- Justified: react-hook-form render props are complex */ {
+            field,
+          }: any,
+        ) => (
+          <FormItem className="sm:col-span-2">
+            <FormLabel>Landmark</FormLabel>
+            <FormControl>
+              <Input {...field} value={field.value || ""} />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+      <FormField
+        control={form.control}
+        name="mapUrl"
+        render={(
+          /* eslint-disable-line @typescript-eslint/no-explicit-any -- Justified: react-hook-form render props are complex */ {
+            field,
+          }: any,
+        ) => (
+          <FormItem className="sm:col-span-2">
+            <FormLabel>Map URL</FormLabel>
+            <FormControl>
+              <Input {...field} value={field.value || ""} />
+            </FormControl>
+            <FormDescription>Google Maps embed URL</FormDescription>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
       <div className="sm:col-span-2 rounded-lg border p-4">
         <p className="text-sm font-medium mb-1">Logo</p>
-        <p className="text-xs text-muted-foreground">Logo upload will use the shared file uploader in Phase 7.</p>
+        <p className="text-xs text-muted-foreground">
+          Logo upload will use the shared file uploader in Phase 7.
+        </p>
       </div>
     </div>
   );
 }
 
-function HomepageTab(/* eslint-disable-line @typescript-eslint/no-explicit-any -- Justified: prop drilling complex RHF types */ { form }: { form: any }) {
+function HomepageTab(
+  /* eslint-disable-line @typescript-eslint/no-explicit-any -- Justified: prop drilling complex RHF types */ {
+    form,
+  }: { form: any },
+) {
   return (
     <div className="grid gap-6 sm:grid-cols-2">
-      <FormField control={form.control} name="heroHeadline" render={(/* eslint-disable-line @typescript-eslint/no-explicit-any -- Justified: react-hook-form render props are complex */ { field }: any) => (
-        <FormItem className="sm:col-span-2">
-          <FormLabel>Hero Headline</FormLabel>
-          <FormControl><Input {...field} value={field.value || ""} /></FormControl>
-          <FormMessage />
-        </FormItem>
-      )} />
-      <FormField control={form.control} name="heroSubheadline" render={(/* eslint-disable-line @typescript-eslint/no-explicit-any -- Justified: react-hook-form render props are complex */ { field }: any) => (
-        <FormItem className="sm:col-span-2">
-          <FormLabel>Hero Subheadline</FormLabel>
-          <FormControl><Textarea rows={2} {...field} value={field.value || ""} /></FormControl>
-          <FormMessage />
-        </FormItem>
-      )} />
-      <FormField control={form.control} name="heroCtaText" render={(/* eslint-disable-line @typescript-eslint/no-explicit-any -- Justified: react-hook-form render props are complex */ { field }: any) => (
-        <FormItem><FormLabel>CTA Button Text</FormLabel><FormControl><Input {...field} value={field.value || ""} /></FormControl><FormMessage /></FormItem>
-      )} />
-      <FormField control={form.control} name="heroCtaTarget" render={(/* eslint-disable-line @typescript-eslint/no-explicit-any -- Justified: react-hook-form render props are complex */ { field }: any) => (
-        <FormItem><FormLabel>CTA Target URL</FormLabel><FormControl><Input {...field} value={field.value || ""} /></FormControl><FormMessage /></FormItem>
-      )} />
+      <FormField
+        control={form.control}
+        name="heroHeadline"
+        render={(
+          /* eslint-disable-line @typescript-eslint/no-explicit-any -- Justified: react-hook-form render props are complex */ {
+            field,
+          }: any,
+        ) => (
+          <FormItem className="sm:col-span-2">
+            <FormLabel>Hero Headline</FormLabel>
+            <FormControl>
+              <Input {...field} value={field.value || ""} />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+      <FormField
+        control={form.control}
+        name="heroSubheadline"
+        render={(
+          /* eslint-disable-line @typescript-eslint/no-explicit-any -- Justified: react-hook-form render props are complex */ {
+            field,
+          }: any,
+        ) => (
+          <FormItem className="sm:col-span-2">
+            <FormLabel>Hero Subheadline</FormLabel>
+            <FormControl>
+              <Textarea rows={2} {...field} value={field.value || ""} />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+      <FormField
+        control={form.control}
+        name="heroCtaText"
+        render={(
+          /* eslint-disable-line @typescript-eslint/no-explicit-any -- Justified: react-hook-form render props are complex */ {
+            field,
+          }: any,
+        ) => (
+          <FormItem>
+            <FormLabel>CTA Button Text</FormLabel>
+            <FormControl>
+              <Input {...field} value={field.value || ""} />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+      <FormField
+        control={form.control}
+        name="heroCtaTarget"
+        render={(
+          /* eslint-disable-line @typescript-eslint/no-explicit-any -- Justified: react-hook-form render props are complex */ {
+            field,
+          }: any,
+        ) => (
+          <FormItem>
+            <FormLabel>CTA Target URL</FormLabel>
+            <FormControl>
+              <Input {...field} value={field.value || ""} />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
     </div>
   );
 }
 
-function BrandingTab(/* eslint-disable-line @typescript-eslint/no-explicit-any -- Justified: prop drilling complex RHF types */ { form }: { form: any }) {
+function BrandingTab(
+  /* eslint-disable-line @typescript-eslint/no-explicit-any -- Justified: prop drilling complex RHF types */ {
+    form,
+  }: { form: any },
+) {
   return (
     <div className="grid gap-6 sm:grid-cols-2">
-      <FormField control={form.control} name="defaultTitle" render={(/* eslint-disable-line @typescript-eslint/no-explicit-any -- Justified: react-hook-form render props are complex */ { field }: any) => (
-        <FormItem className="sm:col-span-2">
-          <FormLabel>Default Meta Title</FormLabel>
-          <FormControl><Input {...field} value={field.value || ""} /></FormControl>
-          <FormDescription>Used as fallback for pages without specific titles</FormDescription>
-          <FormMessage />
-        </FormItem>
-      )} />
-      <FormField control={form.control} name="defaultDescription" render={(/* eslint-disable-line @typescript-eslint/no-explicit-any -- Justified: react-hook-form render props are complex */ { field }: any) => (
-        <FormItem className="sm:col-span-2">
-          <FormLabel>Default Meta Description</FormLabel>
-          <FormControl><Textarea rows={2} {...field} value={field.value || ""} /></FormControl>
-          <FormDescription>Used as fallback for pages without specific descriptions</FormDescription>
-          <FormMessage />
-        </FormItem>
-      )} />
+      <FormField
+        control={form.control}
+        name="defaultTitle"
+        render={(
+          /* eslint-disable-line @typescript-eslint/no-explicit-any -- Justified: react-hook-form render props are complex */ {
+            field,
+          }: any,
+        ) => (
+          <FormItem className="sm:col-span-2">
+            <FormLabel>Default Meta Title</FormLabel>
+            <FormControl>
+              <Input {...field} value={field.value || ""} />
+            </FormControl>
+            <FormDescription>
+              Used as fallback for pages without specific titles
+            </FormDescription>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+      <FormField
+        control={form.control}
+        name="defaultDescription"
+        render={(
+          /* eslint-disable-line @typescript-eslint/no-explicit-any -- Justified: react-hook-form render props are complex */ {
+            field,
+          }: any,
+        ) => (
+          <FormItem className="sm:col-span-2">
+            <FormLabel>Default Meta Description</FormLabel>
+            <FormControl>
+              <Textarea rows={2} {...field} value={field.value || ""} />
+            </FormControl>
+            <FormDescription>
+              Used as fallback for pages without specific descriptions
+            </FormDescription>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
     </div>
   );
 }
 
-function AdmissionsTab(/* eslint-disable-line @typescript-eslint/no-explicit-any -- Justified: prop drilling complex RHF types */ { form }: { form: any }) {
+function AdmissionsTab(
+  /* eslint-disable-line @typescript-eslint/no-explicit-any -- Justified: prop drilling complex RHF types */ {
+    form,
+  }: { form: any },
+) {
   return (
     <div className="space-y-6">
-      <FormField control={form.control} name="admissionsOpen" render={(/* eslint-disable-line @typescript-eslint/no-explicit-any -- Justified: react-hook-form render props are complex */ { field }: any) => (
-        <FormItem className="flex items-center justify-between rounded-lg border p-4">
-          <div>
-            <FormLabel className="text-base">Admissions Open</FormLabel>
-            <p className="text-sm text-muted-foreground">Show admission-related content and CTAs on the website</p>
-          </div>
-          <FormControl><Switch checked={field.value} onCheckedChange={field.onChange} /></FormControl>
-        </FormItem>
-      )} />
-      <FormField control={form.control} name="feeDisplayEnabled" render={(/* eslint-disable-line @typescript-eslint/no-explicit-any -- Justified: react-hook-form render props are complex */ { field }: any) => (
-        <FormItem className="flex items-center justify-between rounded-lg border p-4">
-          <div>
-            <FormLabel className="text-base">Fee Display</FormLabel>
-            <p className="text-sm text-muted-foreground">Show fee information on the public website</p>
-          </div>
-          <FormControl><Switch checked={field.value} onCheckedChange={field.onChange} /></FormControl>
-        </FormItem>
-      )} />
+      <FormField
+        control={form.control}
+        name="admissionsOpen"
+        render={(
+          /* eslint-disable-line @typescript-eslint/no-explicit-any -- Justified: react-hook-form render props are complex */ {
+            field,
+          }: any,
+        ) => (
+          <FormItem className="flex items-center justify-between rounded-lg border p-4">
+            <div>
+              <FormLabel className="text-base">Admissions Open</FormLabel>
+              <p className="text-sm text-muted-foreground">
+                Show admission-related content and CTAs on the website
+              </p>
+            </div>
+            <FormControl>
+              <Switch checked={field.value} onCheckedChange={field.onChange} />
+            </FormControl>
+          </FormItem>
+        )}
+      />
+      <FormField
+        control={form.control}
+        name="feeDisplayEnabled"
+        render={(
+          /* eslint-disable-line @typescript-eslint/no-explicit-any -- Justified: react-hook-form render props are complex */ {
+            field,
+          }: any,
+        ) => (
+          <FormItem className="flex items-center justify-between rounded-lg border p-4">
+            <div>
+              <FormLabel className="text-base">Fee Display</FormLabel>
+              <p className="text-sm text-muted-foreground">
+                Show fee information on the public website
+              </p>
+            </div>
+            <FormControl>
+              <Switch checked={field.value} onCheckedChange={field.onChange} />
+            </FormControl>
+          </FormItem>
+        )}
+      />
     </div>
   );
 }
 
-function ResourcesTab(/* eslint-disable-line @typescript-eslint/no-explicit-any -- Justified: prop drilling complex RHF types */ { form }: { form: any }) {
+function ResourcesTab(
+  /* eslint-disable-line @typescript-eslint/no-explicit-any -- Justified: prop drilling complex RHF types */ {
+    form,
+  }: { form: any },
+) {
   return (
     <div className="space-y-6">
-      <FormField control={form.control} name="resourcesEnabled" render={(/* eslint-disable-line @typescript-eslint/no-explicit-any -- Justified: react-hook-form render props are complex */ { field }: any) => (
-        <FormItem className="flex items-center justify-between rounded-lg border p-4">
-          <div>
-            <FormLabel className="text-base">Public Resources</FormLabel>
-            <p className="text-sm text-muted-foreground">Enable the public study resources section</p>
-          </div>
-          <FormControl><Switch checked={field.value} onCheckedChange={field.onChange} /></FormControl>
-        </FormItem>
-      )} />
-      <FormField control={form.control} name="resourcesSearchEnabled" render={(/* eslint-disable-line @typescript-eslint/no-explicit-any -- Justified: react-hook-form render props are complex */ { field }: any) => (
-        <FormItem className="flex items-center justify-between rounded-lg border p-4">
-          <div>
-            <FormLabel className="text-base">Resources Search</FormLabel>
-            <p className="text-sm text-muted-foreground">Enable search and filtering on the resources page</p>
-          </div>
-          <FormControl><Switch checked={field.value} onCheckedChange={field.onChange} /></FormControl>
-        </FormItem>
-      )} />
+      <FormField
+        control={form.control}
+        name="resourcesEnabled"
+        render={(
+          /* eslint-disable-line @typescript-eslint/no-explicit-any -- Justified: react-hook-form render props are complex */ {
+            field,
+          }: any,
+        ) => (
+          <FormItem className="flex items-center justify-between rounded-lg border p-4">
+            <div>
+              <FormLabel className="text-base">Public Resources</FormLabel>
+              <p className="text-sm text-muted-foreground">
+                Enable the public study resources section
+              </p>
+            </div>
+            <FormControl>
+              <Switch checked={field.value} onCheckedChange={field.onChange} />
+            </FormControl>
+          </FormItem>
+        )}
+      />
+      <FormField
+        control={form.control}
+        name="resourcesSearchEnabled"
+        render={(
+          /* eslint-disable-line @typescript-eslint/no-explicit-any -- Justified: react-hook-form render props are complex */ {
+            field,
+          }: any,
+        ) => (
+          <FormItem className="flex items-center justify-between rounded-lg border p-4">
+            <div>
+              <FormLabel className="text-base">Resources Search</FormLabel>
+              <p className="text-sm text-muted-foreground">
+                Enable search and filtering on the resources page
+              </p>
+            </div>
+            <FormControl>
+              <Switch checked={field.value} onCheckedChange={field.onChange} />
+            </FormControl>
+          </FormItem>
+        )}
+      />
     </div>
   );
 }

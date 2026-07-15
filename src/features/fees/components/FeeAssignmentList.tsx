@@ -161,7 +161,10 @@ export function FeeAssignmentList({
           />
 
           <FilterField label="Fee Plan">
-            <Select value={feePlanFilter} onValueChange={(v) => setFeePlanFilter(v || "")}>
+            <Select
+              value={feePlanFilter}
+              onValueChange={(v) => setFeePlanFilter(v || "")}
+            >
               <SelectTrigger className="h-9 w-[180px]">
                 <SelectValue placeholder="All Fee Plans" />
               </SelectTrigger>

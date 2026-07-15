@@ -476,9 +476,9 @@ export const updateEntityAction = withActor(
       () => ["/admin/entities"],
       async (actor, entityId: string, data: unknown) => {
         // Business Logic
-      }
-    )
-  )
+      },
+    ),
+  ),
 );
 ```
 
@@ -486,6 +486,7 @@ export const updateEntityAction = withActor(
 
 The Next.js 15+ `unstable_rethrow` API is utilized exclusively in `src/lib/actions/types.ts` (`handleActionError`).
 It is isolated here for the following reasons:
+
 - **Centralized Handling**: It is only used in one centralized error handler.
 - **Top of Catch**: It is invoked as the very first statement inside the `catch` block.
 - **Framework Preservation**: Its sole intended purpose is to preserve framework-controlled exceptions like `redirect()` and `notFound()`.

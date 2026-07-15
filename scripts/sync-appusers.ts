@@ -8,12 +8,19 @@ import { Role, AppUserStatus } from "@prisma/client";
 import { createClient } from "@supabase/supabase-js";
 
 async function main() {
-  const supabaseAdmin = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SECRET_KEY!, {
-    auth: { autoRefreshToken: false, persistSession: false },
-  });
+  const supabaseAdmin = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SECRET_KEY!,
+    {
+      auth: { autoRefreshToken: false, persistSession: false },
+    },
+  );
 
   // Fetch all users to map their emails to their actual IDs
-  const { data: { users }, error } = await supabaseAdmin.auth.admin.listUsers();
+  const {
+    data: { users },
+    error,
+  } = await supabaseAdmin.auth.admin.listUsers();
   if (error || !users) {
     console.error("Failed to fetch users from Supabase:", error);
     return;
@@ -26,7 +33,9 @@ async function main() {
   };
 
   if (!authUsers.admin || !authUsers.teacher || !authUsers.student) {
-    console.error("Missing one or more test users in Supabase. Run scripts/create-test-users.ts first.");
+    console.error(
+      "Missing one or more test users in Supabase. Run scripts/create-test-users.ts first.",
+    );
     return;
   }
 
@@ -37,7 +46,9 @@ async function main() {
       where: { id: admin.id },
       data: { supabaseAuthUserId: authUsers.admin, status: AppUserStatus.ACTIVE },
     });
-    await supabaseAdmin.auth.admin.updateUserById(authUsers.admin, { app_metadata: { role: Role.ADMIN } });
+    await supabaseAdmin.auth.admin.updateUserById(authUsers.admin, {
+      app_metadata: { role: Role.ADMIN },
+    });
     console.log(`Admin AppUser synced: ${admin.id} → ${authUsers.admin} (Role: ADMIN)`);
   } else {
     console.error("Admin AppUser not found! Run seed first.");
@@ -45,12 +56,16 @@ async function main() {
   }
 
   // 2. Verify teacher exists in Teacher table, create AppUser
-  const teacherProfile = await db.teacher.findFirst({ where: { email: "teacher@example.com" } });
+  const teacherProfile = await db.teacher.findFirst({
+    where: { email: "teacher@example.com" },
+  });
   if (!teacherProfile) {
     console.error("Teacher profile not found! Run seed first.");
     return;
   }
-  const teacherAppUser = await db.appUser.findFirst({ where: { email: "teacher@example.com" } });
+  const teacherAppUser = await db.appUser.findFirst({
+    where: { email: "teacher@example.com" },
+  });
   if (!teacherAppUser) {
     await db.appUser.create({
       data: {
@@ -62,14 +77,22 @@ async function main() {
         createdBy: admin?.id ?? "SEED",
       },
     });
-    await supabaseAdmin.auth.admin.updateUserById(authUsers.teacher, { app_metadata: { role: Role.TEACHER } });
+    await supabaseAdmin.auth.admin.updateUserById(authUsers.teacher, {
+      app_metadata: { role: Role.TEACHER },
+    });
     console.log(`Teacher AppUser created → ${authUsers.teacher} (Role: TEACHER)`);
   } else {
     await db.appUser.update({
       where: { id: teacherAppUser.id },
-      data: { supabaseAuthUserId: authUsers.teacher, teacherId: teacherProfile.id, status: AppUserStatus.ACTIVE },
+      data: {
+        supabaseAuthUserId: authUsers.teacher,
+        teacherId: teacherProfile.id,
+        status: AppUserStatus.ACTIVE,
+      },
     });
-    await supabaseAdmin.auth.admin.updateUserById(authUsers.teacher, { app_metadata: { role: Role.TEACHER } });
+    await supabaseAdmin.auth.admin.updateUserById(authUsers.teacher, {
+      app_metadata: { role: Role.TEACHER },
+    });
     console.log(`Teacher AppUser synced → ${authUsers.teacher} (Role: TEACHER)`);
   }
 
@@ -79,7 +102,9 @@ async function main() {
     console.error("Student not found! Run seed first.");
     return;
   }
-  const studentAppUser = await db.appUser.findFirst({ where: { email: "student@example.com" } });
+  const studentAppUser = await db.appUser.findFirst({
+    where: { email: "student@example.com" },
+  });
   if (!studentAppUser) {
     await db.appUser.create({
       data: {
@@ -91,14 +116,22 @@ async function main() {
         createdBy: admin?.id ?? "SEED",
       },
     });
-    await supabaseAdmin.auth.admin.updateUserById(authUsers.student, { app_metadata: { role: Role.STUDENT } });
+    await supabaseAdmin.auth.admin.updateUserById(authUsers.student, {
+      app_metadata: { role: Role.STUDENT },
+    });
     console.log(`Student AppUser created → ${authUsers.student} (Role: STUDENT)`);
   } else {
     await db.appUser.update({
       where: { id: studentAppUser.id },
-      data: { supabaseAuthUserId: authUsers.student, studentId: studentProfile.id, status: AppUserStatus.ACTIVE },
+      data: {
+        supabaseAuthUserId: authUsers.student,
+        studentId: studentProfile.id,
+        status: AppUserStatus.ACTIVE,
+      },
     });
-    await supabaseAdmin.auth.admin.updateUserById(authUsers.student, { app_metadata: { role: Role.STUDENT } });
+    await supabaseAdmin.auth.admin.updateUserById(authUsers.student, {
+      app_metadata: { role: Role.STUDENT },
+    });
     console.log(`Student AppUser synced → ${authUsers.student} (Role: STUDENT)`);
   }
 

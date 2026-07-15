@@ -28,10 +28,14 @@ export default async function HomePage() {
   const settings = settingsResult.success ? settingsResult.data : null;
 
   const sectionMap = new Map(
-    website.sections.map((s) => [s.sectionKey, { isVisible: s.isVisible, title: s.title }]),
+    website.sections.map((s) => [
+      s.sectionKey,
+      { isVisible: s.isVisible, title: s.title },
+    ]),
   );
 
-  const getSection = (key: string) => sectionMap.get(key) ?? { isVisible: true, title: null };
+  const getSection = (key: string) =>
+    sectionMap.get(key) ?? { isVisible: true, title: null };
 
   return (
     <div className="space-y-0">

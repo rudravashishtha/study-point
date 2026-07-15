@@ -4,9 +4,10 @@ import { getSiteSettings } from "@/server/services/site-settings";
 export default async function manifest(): Promise<MetadataRoute.Manifest> {
   const settingsResult = await getSiteSettings();
   const name = settingsResult.success ? settingsResult.data.instituteName : "Study Point";
-  const description = settingsResult.success && settingsResult.data.defaultDescription
-    ? settingsResult.data.defaultDescription
-    : "A premium mathematics institute coaching students in Classes IX, X, XI, and XII.";
+  const description =
+    settingsResult.success && settingsResult.data.defaultDescription
+      ? settingsResult.data.defaultDescription
+      : "A premium mathematics institute coaching students in Classes IX, X, XI, and XII.";
 
   return {
     name,

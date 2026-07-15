@@ -13,7 +13,10 @@ const inputClass =
   "w-full rounded-md border border-input bg-background px-3 py-2 text-sm outline-none transition focus-visible:ring-2 focus-visible:ring-ring";
 
 export function SignupForm() {
-  const [state, formAction] = useActionState<FormState, FormData>(signUpAdmin, initialState);
+  const [state, formAction] = useActionState<FormState, FormData>(
+    signUpAdmin,
+    initialState,
+  );
   const [showPassword, setShowPassword] = useState(false);
 
   return (

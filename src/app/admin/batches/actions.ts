@@ -19,12 +19,15 @@ export const createBatchAction = withActor(
       async (_actor, data: CreateBatchInput) => {
         const result = await createBatch(data);
         if (!result.success) {
-          throw new DomainError((result.error?.code as DomainErrorCode) || "INTERNAL_ERROR", result.error?.message || "Failed to create batch");
+          throw new DomainError(
+            (result.error?.code as DomainErrorCode) || "INTERNAL_ERROR",
+            result.error?.message || "Failed to create batch",
+          );
         }
         return { success: true, data: result.data };
-      }
-    )
-  )
+      },
+    ),
+  ),
 );
 
 export const updateBatchDetailsAction = withActor(
@@ -37,15 +40,18 @@ export const updateBatchDetailsAction = withActor(
         // service safely preserves existing schedules.
         const detailsOnly = { ...data };
         delete detailsOnly.schedules;
-      
+
         const result = await updateBatch(id, detailsOnly);
         if (!result.success) {
-          throw new DomainError((result.error?.code as DomainErrorCode) || "INTERNAL_ERROR", result.error?.message || "Failed to update batch");
+          throw new DomainError(
+            (result.error?.code as DomainErrorCode) || "INTERNAL_ERROR",
+            result.error?.message || "Failed to update batch",
+          );
         }
         return { success: true, data: result.data };
-      }
-    )
-  )
+      },
+    ),
+  ),
 );
 
 export const archiveBatchAction = withActor(
@@ -56,12 +62,15 @@ export const archiveBatchAction = withActor(
       async (_actor, id: string) => {
         const result = await archiveBatch(id);
         if (!result.success) {
-          throw new DomainError((result.error?.code as DomainErrorCode) || "INTERNAL_ERROR", result.error?.message || "Failed to archive batch");
+          throw new DomainError(
+            (result.error?.code as DomainErrorCode) || "INTERNAL_ERROR",
+            result.error?.message || "Failed to archive batch",
+          );
         }
         return { success: true, data: result.data };
-      }
-    )
-  )
+      },
+    ),
+  ),
 );
 
 export const restoreBatchAction = withActor(
@@ -72,10 +81,13 @@ export const restoreBatchAction = withActor(
       async (_actor, id: string) => {
         const result = await restoreBatch(id);
         if (!result.success) {
-          throw new DomainError((result.error?.code as DomainErrorCode) || "INTERNAL_ERROR", result.error?.message || "Failed to restore batch");
+          throw new DomainError(
+            (result.error?.code as DomainErrorCode) || "INTERNAL_ERROR",
+            result.error?.message || "Failed to restore batch",
+          );
         }
         return { success: true, data: result.data };
-      }
-    )
-  )
+      },
+    ),
+  ),
 );

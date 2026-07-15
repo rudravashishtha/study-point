@@ -107,14 +107,19 @@ export function TeacherFormDialog({
             {mode === "create" ? "Create Teacher" : "Edit Teacher"}
           </DialogTitle>
         </DialogHeader>
-        
+
         <div className="flex-1 overflow-y-auto px-4 py-4 sm:px-6">
           <Form {...form}>
-            <form id="teacher-form" onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-              
+            <form
+              id="teacher-form"
+              onSubmit={form.handleSubmit(onSubmit)}
+              className="space-y-8"
+            >
               {/* Basic Details */}
               <section className="space-y-4">
-                <h3 className="text-sm font-medium text-muted-foreground border-b pb-2">Basic Details</h3>
+                <h3 className="text-sm font-medium text-muted-foreground border-b pb-2">
+                  Basic Details
+                </h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="col-span-1 md:col-span-2">
                     <FormField
@@ -172,7 +177,9 @@ export function TeacherFormDialog({
 
               {/* Professional Details */}
               <section className="space-y-4">
-                <h3 className="text-sm font-medium text-muted-foreground border-b pb-2">Professional Details</h3>
+                <h3 className="text-sm font-medium text-muted-foreground border-b pb-2">
+                  Professional Details
+                </h3>
                 <div className="grid grid-cols-1 gap-4">
                   <FormField
                     control={form.control}
@@ -211,13 +218,17 @@ export function TeacherFormDialog({
                   />
                 </div>
               </section>
-
             </form>
           </Form>
         </div>
-        
+
         <div className="m-0 p-4 sm:p-6 border-t bg-muted/40 flex justify-end gap-2">
-          <Button type="button" variant="outline" onClick={() => setIsOpen(false)} disabled={isSubmitting}>
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => setIsOpen(false)}
+            disabled={isSubmitting}
+          >
             Cancel
           </Button>
           <SubmitButton type="submit" form="teacher-form" pending={isSubmitting}>

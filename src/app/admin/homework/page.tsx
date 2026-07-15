@@ -56,7 +56,9 @@ export default async function AdminHomeworkPage() {
       <PageHeader>
         <div>
           <PageHeaderHeading>Homework</PageHeaderHeading>
-          <PageHeaderDescription>Manage student assignments and tasks.</PageHeaderDescription>
+          <PageHeaderDescription>
+            Manage student assignments and tasks.
+          </PageHeaderDescription>
         </div>
       </PageHeader>
 

@@ -8,7 +8,10 @@ export function MetricsSection({
   if (!isVisible || metrics.length === 0) return null;
 
   return (
-    <section className="bg-primary py-16 md:py-20" aria-label="Institute performance metrics">
+    <section
+      className="bg-primary py-16 md:py-20"
+      aria-label="Institute performance metrics"
+    >
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
           {metrics.slice(0, 4).map((metric) => (
