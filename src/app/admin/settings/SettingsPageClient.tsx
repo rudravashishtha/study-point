@@ -63,7 +63,7 @@ export function SettingsPageClient({ settings }: { settings: any }) {
 
   const form = useForm<SettingsValues>({
     resolver: zodResolver(settingsSchema),
-    defaultValues: {
+    values: {
       instituteName: settings.instituteName,
       tagline: settings.tagline || "",
       phone: settings.phone || "",

@@ -37,6 +37,8 @@ model AppUser {
   status             AppUserStatus @default(ACTIVE)
   studentId          String?       @unique
   teacherId          String?       @unique
+  fullName           String?
+  phone              String?
 
   student Student? @relation(fields: [studentId], references: [id])
   teacher Teacher? @relation(fields: [teacherId], references: [id])

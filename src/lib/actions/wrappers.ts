@@ -65,7 +65,13 @@ export function withRevalidation<Args extends any[], Return>(
         typeof pathsOrGetPaths === "function"
           ? pathsOrGetPaths(actor, ...args)
           : pathsOrGetPaths;
-      paths.forEach((p) => revalidatePath(p));
+      paths.forEach((p) => {
+        if (p === "/") {
+          revalidatePath("/", "layout");
+        } else {
+          revalidatePath(p, "page");
+        }
+      });
     }
     return result;
   };

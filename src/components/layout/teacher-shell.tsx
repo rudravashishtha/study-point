@@ -1,7 +1,7 @@
 "use client";
 
 import { TeacherNavigation } from "./teacher-navigation";
-import { Menu, X, LogOut } from "lucide-react";
+import { Menu, X, LogOut, User } from "lucide-react";
 import { useState, useRef, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import Link from "next/link";
@@ -91,14 +91,21 @@ export function TeacherShell({
           <TeacherNavigation batches={batches} />
         </div>
 
-        <div className="p-4 border-t border-border/40 shrink-0">
+        <div className="p-4 border-t border-border/40 shrink-0 space-y-1">
+          <Link
+            href="/profile"
+            className="flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors w-full px-2 py-1.5 rounded-lg hover:bg-surface"
+          >
+            <User className="size-4 opacity-70" />
+            My Profile
+          </Link>
           <form action={signOut}>
             <button
               type="submit"
               className="flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors w-full px-2 py-1.5 rounded-lg hover:bg-surface"
             >
               <LogOut className="size-4 opacity-70" />
-              <span>Sign out</span>
+              Log out
             </button>
           </form>
         </div>

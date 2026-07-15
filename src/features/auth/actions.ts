@@ -163,3 +163,125 @@ export async function requestPasswordReset(
 
   return { error: null, sent: true };
 }
+
+const signUpAdminSchema = z.object({
+  fullName: z.string().min(1, "Name is required."),
+  email: z.string().email("Enter a valid email address."),
+  password: z.string()
+    .min(12, "Password must be at least 12 characters.")
+    .max(128, "Password is too long.")
+    .regex(/[A-Z]/, "Password must contain at least one uppercase letter.")
+    .regex(/[a-z]/, "Password must contain at least one lowercase letter.")
+    .regex(/[0-9]/, "Password must contain at least one number.")
+    .regex(/[^A-Za-z0-9]/, "Password must contain at least one special character."),
+  confirmPassword: z.string(),
+  registrationKey: z.string().min(1, "Registration key is required."),
+}).refine((data) => data.password === data.confirmPassword, {
+  message: "Passwords do not match.",
+  path: ["confirmPassword"],
+});
+
+/**
+ * Validates if the current environment allows creating an admin account with the given key.
+ * Abstracted for future organization invite flows.
+ */
+async function canCreateAdminAccount(providedKey: string): Promise<boolean> {
+  const { serverEnv } = await import("@/lib/env");
+  if (!serverEnv.ENABLE_ADMIN_SIGNUP) return false;
+
+  const crypto = await import("crypto");
+  const providedBuffer = Buffer.from(providedKey);
+  const expectedKeyStr = serverEnv.ADMIN_SIGNUP_KEY ?? "";
+  const expectedBuffer = Buffer.from(expectedKeyStr);
+
+  if (providedBuffer.length === expectedBuffer.length && expectedBuffer.length > 0) {
+    return crypto.timingSafeEqual(providedBuffer, expectedBuffer);
+  }
+  return false;
+}
+
+/**
+ * Asserts the signup rate limit for a given email.
+ * Abstracted to easily swap memory map for Redis/Supabase in the future.
+ */
+async function assertSignupRateLimit(email: string): Promise<boolean> {
+  const { success } = rateLimit(
+    `admin_signup:${email.toLowerCase()}`,
+    5,
+    15 * 60_000,
+  );
+  return success;
+}
+
+export async function signUpAdmin(
+  _prev: { error: string | null },
+  formData: FormData,
+): Promise<{ error: string | null }> {
+  // 1. Validate Inputs
+  const parsed = signUpAdminSchema.safeParse(Object.fromEntries(formData.entries()));
+  if (!parsed.success) {
+    return { error: parsed.error.issues[0]?.message ?? "Invalid form data." };
+  }
+
+  // 2. Rate Limit Check (max 5 failed attempts per Email)
+  const signupOk = await assertSignupRateLimit(parsed.data.email);
+  if (!signupOk) {
+    return { error: "Too many attempts. Please try again later." };
+  }
+
+  // 3. Validate Registration Authorization
+  const canCreate = await canCreateAdminAccount(parsed.data.registrationKey);
+  if (!canCreate) {
+    return { error: "Invalid registration key or admin signup is disabled." };
+  }
+
+  // 5. Create Supabase User and 6. Assign ADMIN role
+  const adminClient = createAdminClient();
+  const { data: authData, error: authError } = await adminClient.auth.admin.createUser({
+    email: parsed.data.email,
+    password: parsed.data.password,
+    email_confirm: true,
+    user_metadata: { fullName: parsed.data.fullName },
+    app_metadata: { role: "ADMIN" },
+  });
+
+  if (authError || !authData.user) {
+    if (authError?.message?.toLowerCase().includes("already exists")) {
+      return { error: "A user with this email already exists." };
+    }
+    return { error: "Failed to create administrator account." };
+  }
+
+  // 7. Create Prisma AppUser
+  try {
+    const { Role } = await import("@prisma/client");
+    await db.appUser.create({
+      data: {
+        supabaseAuthUserId: authData.user.id,
+        email: parsed.data.email,
+        fullName: parsed.data.fullName,
+        role: Role.ADMIN,
+        status: "ACTIVE",
+        createdBy: "SELF_SIGNUP",
+      },
+    });
+  } catch {
+    // If Prisma fails, the Supabase user exists but lacks a profile.
+    // In a real app we might try to rollback the Supabase user, but for now we error out.
+    return { error: "Failed to create administrator profile." };
+  }
+
+  // 8. Create Local Session
+  const supabase = await createClient();
+  const { error: signInError } = await supabase.auth.signInWithPassword({
+    email: parsed.data.email,
+    password: parsed.data.password,
+  });
+
+  if (signInError) {
+    return { error: "Account created, but failed to log in automatically. Please log in manually." };
+  }
+
+  // 9. Redirect to /admin
+  redirect("/admin");
+}

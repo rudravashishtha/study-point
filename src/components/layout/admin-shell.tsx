@@ -7,8 +7,20 @@ import { motion, AnimatePresence } from "motion/react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { signOut } from "@/features/auth/actions";
-
-export function AdminShell({ children, instituteName = "Study Point" }: { children: React.ReactNode; instituteName?: string }) {
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+export function AdminShell({
+  children,
+  instituteName = "Study Point",
+}: {
+  children: React.ReactNode;
+  instituteName?: string;
+}) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const pathname = usePathname();
   const drawerRef = useRef<HTMLDivElement>(null);
@@ -163,9 +175,28 @@ export function AdminShell({ children, instituteName = "Study Point" }: { childr
         {/* Desktop Contextual Top Bar */}
         <header className="hidden md:flex h-16 items-center justify-between px-8 border-b border-border/40 bg-surface/50 backdrop-blur-md sticky top-0 z-30 shrink-0">
           <h1 className="text-lg font-bold font-heading">{currentPage}</h1>
-          <div className="size-8 rounded-full bg-surface-interactive border border-border/60 flex items-center justify-center font-bold text-xs">
-            AD
-          </div>
+          <DropdownMenu>
+            <DropdownMenuTrigger>
+              <button className="size-8 rounded-full bg-surface-interactive border border-border/60 flex items-center justify-center font-bold text-xs hover:bg-surface-elevated transition-colors outline-none focus-visible:ring-2 focus-visible:ring-ring">
+                AD
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-48">
+              <Link href="/profile">
+                <DropdownMenuItem className="cursor-pointer">My Profile</DropdownMenuItem>
+              </Link>
+              <Link href="/admin/settings">
+                <DropdownMenuItem className="cursor-pointer">Settings</DropdownMenuItem>
+              </Link>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem
+                onClick={() => signOut()}
+                className="cursor-pointer text-destructive focus:bg-destructive/10 focus:text-destructive"
+              >
+                Log out
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </header>
 
         {/* Workspace Content */}

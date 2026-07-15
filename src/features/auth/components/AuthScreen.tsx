@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 
-export type AuthTheme = "default" | "student" | "teacher" | "admin" | "forgot";
+export type AuthTheme = "default" | "student" | "teacher" | "admin" | "admin-signup" | "forgot";
 
 const THEMES: Record<
   AuthTheme,
@@ -35,6 +35,12 @@ const THEMES: Record<
     subtitle: "Institute management console",
     card: "border-emerald-200 bg-emerald-50/60",
     accent: "text-emerald-600",
+  },
+  "admin-signup": {
+    title: "Administrator Setup",
+    subtitle: "Create an administration account",
+    card: "border-purple-200 bg-purple-50/60",
+    accent: "text-purple-600",
   },
 };
 

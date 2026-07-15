@@ -3,6 +3,7 @@ import { LogOut, User } from "lucide-react";
 import { signOut } from "@/features/auth/actions";
 import { getSiteSettings } from "@/server/services/site-settings";
 import { ClassLevel } from "@prisma/client";
+import Link from "next/link";
 
 type EnrolmentInfo = {
   id: string;
@@ -75,13 +76,20 @@ export async function StudentShell({
             </div>
           </div>
           <div className="flex items-center gap-3">
+            <Link
+              href="/profile"
+              className="flex items-center gap-1.5 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors px-2 py-1.5 rounded-lg hover:bg-surface"
+            >
+              <User className="size-4 opacity-70" />
+              <span className="hidden sm:inline">Profile</span>
+            </Link>
             <form action={signOut}>
               <button
                 type="submit"
                 className="flex items-center gap-1.5 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors px-2 py-1.5 rounded-lg hover:bg-surface"
               >
                 <LogOut className="size-4 opacity-70" />
-                <span>Log out</span>
+                <span className="hidden sm:inline">Log out</span>
               </button>
             </form>
             <div className="hidden sm:block">

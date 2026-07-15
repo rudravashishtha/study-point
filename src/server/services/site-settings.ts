@@ -148,6 +148,7 @@ export async function updateSiteSettings(
       socialLinks: (updated.socialLinks as Record<string, string> | null) ?? null,
     });
   } catch (error) {
+    console.error("updateSiteSettings error:", error);
     if (error instanceof DomainError) return failure(error.code, error.message);
     return failure("INTERNAL_ERROR", "Failed to update site settings");
   }

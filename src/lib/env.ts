@@ -14,6 +14,8 @@ const serverEnvSchema = z.object({
   DIRECT_URL: z.string().min(1, "DIRECT_URL is required"),
   SUPABASE_SECRET_KEY: z.string().min(1, "SUPABASE_SECRET_KEY is required"),
   SENTRY_AUTH_TOKEN: z.string().optional(),
+  ADMIN_SIGNUP_KEY: z.string().optional(),
+  ENABLE_ADMIN_SIGNUP: z.string().default("false").transform((s) => s === "true"),
 });
 
 export const publicEnv = publicEnvSchema.parse({
@@ -28,4 +30,6 @@ export const serverEnv = serverEnvSchema.parse({
   DIRECT_URL: process.env.DIRECT_URL,
   SUPABASE_SECRET_KEY: process.env.SUPABASE_SECRET_KEY,
   SENTRY_AUTH_TOKEN: process.env.SENTRY_AUTH_TOKEN,
+  ADMIN_SIGNUP_KEY: process.env.ADMIN_SIGNUP_KEY,
+  ENABLE_ADMIN_SIGNUP: process.env.ENABLE_ADMIN_SIGNUP,
 });
