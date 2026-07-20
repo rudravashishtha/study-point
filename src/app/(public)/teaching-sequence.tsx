@@ -1,10 +1,10 @@
 "use client";
 
 import { motion, useScroll, useTransform, MotionValue } from "motion/react";
-import { useRef, ElementType } from "react";
-import { Brain, Layers, PenTool, CheckCircle, Trophy } from "lucide-react";
+import { useRef } from "react";
+import { Brain, Layers, PenTool, CheckCircle, Trophy, LucideIcon } from "lucide-react";
 
-type StepType = { id: string; title: string; desc: string; icon: ElementType };
+type StepType = { id: string; title: string; desc: string; icon: LucideIcon };
 
 const steps: StepType[] = [
   {

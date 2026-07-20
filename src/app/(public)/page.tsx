@@ -10,13 +10,14 @@ import { TestimonialsSection } from "@/features/public/components/homepage/Testi
 import { MetricsSection } from "@/features/public/components/homepage/MetricsSection";
 import { GallerySection } from "@/features/public/components/homepage/GallerySection";
 import { FeaturedResourcesSection } from "@/features/public/components/homepage/FeaturedResourcesSection";
+import { CurrentBatchesSection } from "@/features/public/components/homepage/CurrentBatchesSection";
 
 export const revalidate = 3600;
 
 export const metadata: Metadata = {
-  title: "Study Point — Mathematics Coaching for Classes IX–XII",
+  title: "Study Point — Coaching for Classes IX-XII",
   description:
-    "Premium mathematics coaching for Classes IX–XII (CBSE & CISCE). Concept-driven teaching, expert faculty, small batches, and proven results.",
+    "Premium coaching for Classes IX-XII (CBSE & CISCE). Concept-driven teaching, expert faculty, small batches, and proven results.",
   alternates: { canonical: "/" },
   openGraph: { url: "/" },
 };
@@ -40,7 +41,7 @@ export default async function HomePage() {
   return (
     <div className="space-y-0">
       <HeroSection settings={data.siteSettings} />
-      <TeacherIntro teacher={data.teacher} />
+      <TeacherIntro teachers={data.teachers} />
       <WhyChooseUsSection
         items={website.whyChooseUs}
         isVisible={getSection("why-choose-us").isVisible}
@@ -64,6 +65,10 @@ export default async function HomePage() {
         items={website.galleryItems}
         isVisible={getSection("gallery").isVisible}
         title={getSection("gallery").title}
+      />
+      <CurrentBatchesSection
+        batches={data.batches}
+        isVisible={settings?.admissionsOpen ?? true}
       />
       <FeaturedResourcesSection
         resources={website.featuredResources}

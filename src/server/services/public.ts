@@ -10,14 +10,14 @@ export interface PublicHomeData {
   }
     ? T | null
     : null;
-  teacher: {
+  teachers: Array<{
     id: string;
     fullName: string;
     qualifications: string | null;
     photoFileId: string | null;
     bio: string | null;
     subjects: string[];
-  } | null;
+  }>;
   batches: Array<{
     id: string;
     name: string;
@@ -56,12 +56,12 @@ export interface PublicHomeData {
 }
 
 export async function getPublicHomeData(): Promise<PublicHomeData> {
-  const [settingsResult, batches, announcementsResult, teacher, resourcesResult] =
+  const [settingsResult, batches, announcementsResult, teachers, resourcesResult] =
     await Promise.all([
       getSiteSettings(),
       getPublicBatches(),
       listPublicAnnouncements(),
-      getPublicTeacherProfile(),
+      getPublicTeachers(),
       listPublicResources(1, 6),
     ]);
 
@@ -69,7 +69,7 @@ export async function getPublicHomeData(): Promise<PublicHomeData> {
     siteSettings: settingsResult.success
       ? (settingsResult.data as unknown as PublicHomeData["siteSettings"])
       : null,
-    teacher,
+    teachers,
     batches,
     announcements: announcementsResult.success
       ? announcementsResult.data.items
@@ -93,12 +93,18 @@ async function getPublicBatches() {
 
   if (!activeSession) return [];
 
+  const settings = await db.siteSettings.findFirst();
+  const feeDisplayEnabled = settings?.feeDisplayEnabled ?? true;
+
+  if (!feeDisplayEnabled) return [];
+
   const feePlans = await db.feePlan.findMany({
     where: {
       batch: {
         academicSessionId: activeSession.id,
         archivedAt: null,
         isActive: true,
+        showFeePublicly: true,
       },
       showPublicly: true,
       feeAssignments: {
@@ -157,8 +163,8 @@ async function getPublicBatches() {
   });
 }
 
-export async function getPublicTeacherProfile() {
-  const teacher = await db.teacher.findFirst({
+export async function getPublicTeachers() {
+  const teachers = await db.teacher.findMany({
     where: { active: true },
     select: {
       id: true,
@@ -166,17 +172,17 @@ export async function getPublicTeacherProfile() {
       qualifications: true,
       photoFileId: true,
       bio: true,
+      subjects: true,
     },
+    orderBy: { displayName: "asc" },
   });
 
-  if (!teacher) return null;
-
-  return {
+  return teachers.map(teacher => ({
     id: teacher.id,
     fullName: teacher.displayName,
     qualifications: teacher.qualifications,
     photoFileId: teacher.photoFileId,
     bio: teacher.bio,
-    subjects: [],
-  };
+    subjects: teacher.subjects,
+  }));
 }

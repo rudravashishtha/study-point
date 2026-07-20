@@ -226,7 +226,7 @@ export function HeroEnvironment() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.6 }}
         >
-          A premium mathematics institute building profound intuition through structured
+          A premium institute building profound intuition through structured
           foundations and rigorous logic.
         </motion.p>
 

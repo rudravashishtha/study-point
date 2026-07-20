@@ -3,7 +3,8 @@
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { WhatsAppButton } from "@/features/public/components/WhatsAppButton";
-
+import { AmbientBackground } from "@/features/public/components/AmbientBackground";
+import { motion } from "motion/react";
 interface HeroSectionProps {
   settings: {
     instituteName: string;
@@ -16,7 +17,7 @@ interface HeroSectionProps {
 }
 
 export function HeroSection({ settings }: HeroSectionProps) {
-  const headline = settings?.heroHeadline ?? "Master Mathematics with Confidence";
+  const headline = settings?.heroHeadline ?? "Master Coaching with Confidence";
   const subheadline =
     settings?.heroSubheadline ??
     "Concept → Practice → Doubt Resolution → Test → Improvement";
@@ -25,29 +26,36 @@ export function HeroSection({ settings }: HeroSectionProps) {
 
   return (
     <section className="relative overflow-hidden py-16 md:py-24 lg:py-32">
-      <div className="absolute inset-0 pointer-events-none opacity-10">
-        <svg className="w-full h-full" viewBox="0 0 1200 600" preserveAspectRatio="none">
-          <path
-            d="M 0 300 Q 300 150 600 300 T 1200 300"
-            fill="none"
-            stroke="var(--color-brand-glow)"
-            strokeWidth="2"
-            vectorEffect="non-scaling-stroke"
-          />
-          <circle cx="600" cy="300" r="8" fill="var(--color-brand-glow)" />
-        </svg>
-        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-brand-glow/10 to-transparent" />
-      </div>
-
+      <AmbientBackground />
       <div className="relative mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
-        <div className="text-center max-w-3xl mx-auto">
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold font-heading tracking-tight text-foreground mb-6">
+        <motion.div 
+          className="text-center max-w-3xl mx-auto"
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, ease: "easeOut" }}
+        >
+          <motion.h1 
+            className="text-4xl md:text-5xl lg:text-6xl font-bold font-heading tracking-tight text-foreground mb-6"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }}
+          >
             {headline}
-          </h1>
-          <p className="text-lg md:text-xl text-muted-foreground mb-10 max-w-2xl mx-auto leading-relaxed">
+          </motion.h1>
+          <motion.p 
+            className="text-lg md:text-xl text-muted-foreground mb-10 max-w-2xl mx-auto leading-relaxed"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.8, delay: 0.4 }}
+          >
             {subheadline}
-          </p>
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+          </motion.p>
+          <motion.div 
+            className="flex flex-col sm:flex-row items-center justify-center gap-4"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.6, ease: "easeOut" }}
+          >
             <Link
               href={ctaTarget}
               className={cn(
@@ -93,8 +101,8 @@ export function HeroSection({ settings }: HeroSectionProps) {
               </svg>
               <span className="sm:inline">WhatsApp</span>
             </WhatsAppButton>
-          </div>
-        </div>
+          </motion.div>
+        </motion.div>
       </div>
     </section>
   );

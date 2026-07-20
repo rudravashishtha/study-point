@@ -5,9 +5,9 @@ import { getSiteSettings } from "@/server/services/site-settings";
 export const revalidate = 3600;
 
 export const metadata: Metadata = {
-  title: "Terms of Use | Study Point Mathematics",
+  title: "Terms of Use | Study Point",
   description:
-    "The terms that govern your use of the Study Point Mathematics website and services.",
+    "The terms that govern your use of the Study Point website and services.",
   alternates: { canonical: "/terms" },
   openGraph: { url: "/terms" },
 };
@@ -16,7 +16,7 @@ export default async function TermsPage() {
   const settingsResult = await getSiteSettings();
   const instituteName = settingsResult.success
     ? settingsResult.data.instituteName
-    : "Study Point Mathematics";
+    : "Study Point";
 
   return (
     <div className="py-16 md:py-24">
@@ -44,7 +44,7 @@ export default async function TermsPage() {
               Use of the website
             </h2>
             <p className="mt-2 leading-relaxed">
-              This website is provided for information about our mathematics coaching for
+              This website is provided for information about our coaching for
               Classes IX to XII. You agree to use it lawfully and not to misuse its
               content or attempt to disrupt its operation.
             </p>

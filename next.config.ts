@@ -21,7 +21,7 @@ const cspHeader = [
   `default-src 'self'`,
   `script-src 'self' 'unsafe-inline'${isDev ? " 'unsafe-eval'" : ""}`,
   `style-src 'self' 'unsafe-inline'`,
-  `img-src 'self' blob: data:`,
+  `img-src 'self' blob: data: https://maps.gstatic.com https://*.googleapis.com`,
   `font-src 'self'`,
   `connect-src 'self' https://*.supabase.co${sentryHosts.length > 0 ? " " + sentryHosts.join(" ") : ""}`,
   `worker-src 'self' blob:`,
@@ -29,6 +29,7 @@ const cspHeader = [
   `object-src 'none'`,
   `base-uri 'self'`,
   `form-action 'self'`,
+  `frame-src www.google.com`,
   `frame-ancestors 'none'`,
   ...(isProd && !isLocal ? ["upgrade-insecure-requests"] : []),
 ].join("; ");

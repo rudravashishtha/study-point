@@ -101,7 +101,7 @@ export function CTASection() {
           </span>
         </h2>
         <p className="text-xl md:text-2xl text-muted-foreground mb-12 max-w-2xl mx-auto font-medium drop-shadow">
-          Join us and build a mathematical foundation that lasts a lifetime.
+          Join us and build a strong foundation that lasts a lifetime.
         </p>
 
         <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">

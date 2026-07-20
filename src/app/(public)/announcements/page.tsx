@@ -7,9 +7,9 @@ import { PublicAnnouncementList } from "@/features/announcements/components/Publ
 import { EmptyState } from "@/components/feedback/empty-state";
 
 export const metadata: Metadata = {
-  title: "Announcements | Study Point Mathematics",
+  title: "Announcements | Study Point",
   description:
-    "Latest announcements, notices, and updates from Study Point Mathematics for students and parents.",
+    "Latest announcements, notices, and updates from Study Point for students and parents.",
   alternates: { canonical: "/announcements" },
   openGraph: { url: "/announcements" },
 };

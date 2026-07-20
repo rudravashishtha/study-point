@@ -3,14 +3,13 @@ import { BookOpen, ChevronRight } from "lucide-react";
 import Link from "next/link";
 import { getPublicCourses } from "@/server/services/public-courses";
 import { CourseGroup } from "@/features/public/components/CourseGroup";
-import { TeacherIntro } from "@/features/public/components/TeacherIntro";
 
 export const revalidate = 3600;
 
 export const metadata: Metadata = {
-  title: "Courses | Study Point Mathematics",
+  title: "Courses | Study Point",
   description:
-    "Mathematics coaching for Classes IX-XII across CBSE and CISCE boards. Structured curriculum, expert faculty, and proven results.",
+    "coaching for Classes IX-XII across CBSE and CISCE boards. Structured curriculum, expert faculty, and proven results.",
   alternates: { canonical: "/courses" },
   openGraph: { url: "/courses" },
 };
@@ -30,7 +29,7 @@ export default async function CoursesPage() {
               id="courses-heading"
               className="text-3xl md:text-4xl lg:text-5xl font-bold font-heading tracking-tight text-foreground mb-4"
             >
-              Mathematics Courses for Classes IX–XII
+              Courses for Classes IX-XII
             </h1>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto leading-relaxed">
               Structured curriculum aligned with CBSE and CISCE boards. Expert faculty,
@@ -55,7 +54,7 @@ export default async function CoursesPage() {
                 <CourseGroup
                   key={boardEntry.board.id}
                   board={boardEntry.board}
-                  programmes={boardEntry.programmes}
+                  tracks={boardEntry.tracks}
                 />
               ))}
 
@@ -72,8 +71,6 @@ export default async function CoursesPage() {
           )}
         </div>
       </section>
-
-      <TeacherIntro teacher={null} />
     </div>
   );
 }

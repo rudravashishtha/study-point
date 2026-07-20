@@ -18,9 +18,9 @@ import { LocationMap } from "@/features/public/components/LocationMap";
 export const revalidate = 3600;
 
 export const metadata: Metadata = {
-  title: "Admissions | Study Point Mathematics",
+  title: "Admissions | Study Point",
   description:
-    "Admissions open for Classes IX–XII (CBSE & CISCE). Enquire about mathematics coaching at Study Point. Simple admission process, free demo class, and personal counselling.",
+    "Admissions open for Classes IX–XII (CBSE & CISCE). Enquire about coaching at Study Point. Simple admission process, free demo class, and personal counselling.",
   alternates: { canonical: "/admissions" },
   openGraph: { url: "/admissions" },
 };
@@ -79,7 +79,7 @@ export default async function AdmissionsPage() {
   const mapUrl = settings?.mapUrl ?? null;
   const openingHours = settings?.openingHours ?? null;
 
-  const whatsappMessage = `Hello ${instituteName}, I want to enquire about admissions for mathematics coaching.`;
+  const whatsappMessage = `Hello ${instituteName}, I want to enquire about admissions for coaching.`;
 
   return (
     <div className="space-y-0">
@@ -93,7 +93,7 @@ export default async function AdmissionsPage() {
               Join Study Point for Classes IX-XII
             </h1>
             <p className="mx-auto mt-5 max-w-2xl text-lg text-muted-foreground">
-              Personalised mathematics coaching built on clear concepts, regular practice,
+              Personalised coaching built on clear concepts, regular practice,
               and consistent assessment. Enquire in minutes — we&apos;ll guide you from
               there.
             </p>
@@ -198,7 +198,7 @@ export default async function AdmissionsPage() {
               id="classes-heading"
               className="text-3xl font-bold font-heading tracking-tight text-foreground md:text-4xl"
             >
-              Mathematics for Classes IX–XII
+              Coaching for Classes IX–XII
             </h2>
             <p className="mt-3 text-muted-foreground">
               Coaching aligned with CBSE and CISCE boards.

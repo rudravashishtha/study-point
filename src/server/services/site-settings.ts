@@ -56,7 +56,7 @@ const DEFAULT_SETTINGS: Omit<
   defaultDescription: null,
   ogImageFileId: null,
   socialLinks: null,
-  heroHeadline: "Mathematics Coaching for Classes IX–XII",
+  heroHeadline: "Coaching for Classes IX-XII",
   heroSubheadline: "Concept → Practice → Doubt Resolution → Test → Improvement",
   heroCtaText: "Enquire Now",
   heroCtaTarget: "/admissions",

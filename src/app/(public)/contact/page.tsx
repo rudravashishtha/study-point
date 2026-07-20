@@ -7,9 +7,9 @@ import { LocationMap } from "@/features/public/components/LocationMap";
 export const revalidate = 3600;
 
 export const metadata: Metadata = {
-  title: "Contact | Study Point Mathematics",
+  title: "Contact | Study Point",
   description:
-    "Get in touch with Study Point Mathematics. Call, WhatsApp, or visit us. Find our address, map, directions, and opening hours.",
+    "Get in touch with Study Point. Call, WhatsApp, or visit us. Find our address, map, directions, and opening hours.",
   alternates: { canonical: "/contact" },
   openGraph: { url: "/contact" },
 };
@@ -39,7 +39,7 @@ export default async function ContactPage() {
   const openingHours = settings?.openingHours ?? null;
   const socialLinks = settings?.socialLinks ?? null;
 
-  const whatsappMessage = `Hello ${instituteName}, I would like to enquire about mathematics coaching admissions.`;
+  const whatsappMessage = `Hello ${instituteName}, I would like to enquire about coaching admissions.`;
 
   const hasContactDetails = Boolean(
     phone || whatsappNumber || email || address || landmark || openingHours,

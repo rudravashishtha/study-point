@@ -29,7 +29,7 @@ export function TeacherSection() {
             <p className="font-mono text-xs uppercase tracking-[0.2em] text-muted-foreground mb-2">
               Subject Matter Expert
             </p>
-            <h3 className="text-3xl font-bold font-heading">Mathematics</h3>
+            <h3 className="text-3xl font-bold font-heading">Coaching</h3>
           </div>
 
           <div className="relative z-10 space-y-6">
@@ -73,7 +73,7 @@ export function TeacherSection() {
             </h2>
             <div className="space-y-6 text-lg sm:text-xl leading-relaxed text-muted-foreground">
               <p>
-                Mathematics is not merely a tool for calculation; it is a language of
+                Coaching is not merely a tool for calculation; it is a language of
                 logic and a framework for structured thought.
               </p>
               <p>

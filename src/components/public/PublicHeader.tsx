@@ -2,8 +2,11 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Phone, MessageSquare, LogIn } from "lucide-react";
+import { Phone, MessageSquare, LogIn, LayoutDashboard } from "lucide-react";
 import { WhatsAppButton } from "@/features/public/components/WhatsAppButton";
+import { type User } from "@supabase/supabase-js";
+import { roleHome } from "@/lib/auth/route-guards";
+
 interface PublicHeaderProps {
   settings: {
     instituteName: string;
@@ -11,6 +14,7 @@ interface PublicHeaderProps {
     whatsappNumber?: string | null;
     socialLinks?: Record<string, string> | null;
   } | null;
+  user?: User | null;
 }
 
 const navLinks = [
@@ -22,7 +26,7 @@ const navLinks = [
   { href: "/admissions", label: "Admissions" },
 ];
 
-export function PublicHeader({ settings }: PublicHeaderProps) {
+export function PublicHeader({ settings, user }: PublicHeaderProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const phone = settings?.phone ?? null;
@@ -39,6 +43,11 @@ export function PublicHeader({ settings }: PublicHeaderProps) {
       <span>{phone}</span>
     </a>
   ) : null;
+
+  const isLoggedIn = !!user;
+  const dashboardHref = isLoggedIn ? roleHome(user.app_metadata?.role || "STUDENT") : "/login";
+  const loginLabel = isLoggedIn ? "Dashboard" : "Login";
+  const ActionIcon = isLoggedIn ? LayoutDashboard : LogIn;
 
   return (
     <header
@@ -77,11 +86,11 @@ export function PublicHeader({ settings }: PublicHeaderProps) {
         <div className="flex items-center gap-3">
           {phoneLink}
           <Link
-            href="/login"
+            href={dashboardHref}
             className="hidden sm:inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
           >
-            <LogIn className="size-4" aria-hidden="true" />
-            <span>Login</span>
+            <ActionIcon className="size-4" aria-hidden="true" />
+            <span>{loginLabel}</span>
           </Link>
           <WhatsAppButton
             phoneNumber={settings?.whatsappNumber}
@@ -142,7 +151,7 @@ export function PublicHeader({ settings }: PublicHeaderProps) {
         >
           <nav className="px-4 py-4" role="navigation" aria-label="Mobile navigation">
             <ul className="flex flex-col gap-2">
-              {[...navLinks, { href: "/login", label: "Login" }].map((link) => (
+              {[...navLinks, { href: dashboardHref, label: loginLabel }].map((link) => (
                 <li key={link.href}>
                   <Link
                     href={link.href}

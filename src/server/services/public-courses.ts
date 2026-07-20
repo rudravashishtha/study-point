@@ -1,36 +1,5 @@
 import { db } from "../../lib/db";
 
-interface PublicCourseTrack {
-  id: string;
-  displayName: string;
-  classLevel: string;
-  board: {
-    id: string;
-    code: string;
-    name: string;
-  };
-  programme: {
-    id: string;
-    code: string;
-    name: string;
-  } | null;
-  subject: {
-    id: string;
-    name: string;
-  };
-  batches: Array<{
-    id: string;
-    name: string;
-    isActive: boolean;
-    feePlan: {
-      id: string;
-      name: string;
-      showPublicly: boolean;
-      assignedTotalAmount: number | null;
-    } | null;
-  }>;
-}
-
 export interface PublicCoursesData {
   groups: Array<{
     board: {
@@ -38,30 +7,23 @@ export interface PublicCoursesData {
       code: string;
       name: string;
     };
-    programmes: Array<{
-      programme: {
+    tracks: Array<{
+      id: string;
+      displayName: string;
+      classLevel: string;
+      board: { id: string; code: string; name: string };
+      programme: { id: string; code: string; name: string } | null;
+      subject: { id: string; name: string };
+      batches: Array<{
         id: string;
-        code: string;
         name: string;
-      } | null;
-      tracks: Array<{
-        id: string;
-        displayName: string;
-        classLevel: string;
-        board: { id: string; code: string; name: string };
-        programme: { id: string; code: string; name: string } | null;
-        subject: { id: string; name: string };
-        batches: Array<{
+        isActive: boolean;
+        feePlan: {
           id: string;
           name: string;
-          isActive: boolean;
-          feePlan: {
-            id: string;
-            name: string;
-            showPublicly: boolean;
-            assignedTotalAmount: number | null;
-          } | null;
-        }>;
+          showPublicly: boolean;
+          assignedTotalAmount: number | null;
+        } | null;
       }>;
     }>;
   }>;
@@ -77,12 +39,17 @@ export async function getPublicCourses(): Promise<PublicCoursesData> {
     return { groups: [] };
   }
 
-  // Fetch tracks with basic includes
+  const settings = await db.siteSettings.findFirst();
+  const feeDisplayEnabled = settings?.feeDisplayEnabled ?? true;
+
   const tracks = await db.curriculumTrack.findMany({
     where: {
       archivedAt: null,
       board: { archivedAt: null },
-      programme: { archivedAt: null },
+      OR: [
+        { programme: { archivedAt: null } },
+        { programmeId: null },
+      ],
       subject: { archivedAt: null },
     },
     select: {
@@ -98,29 +65,34 @@ export async function getPublicCourses(): Promise<PublicCoursesData> {
     },
   });
 
-  // Collect all track IDs for batch query
   const trackIds = tracks.map((t) => t.id);
 
-  // Fetch active batches for these tracks in the current session
   const batches = await db.batch.findMany({
     where: {
       curriculumTrackId: { in: trackIds },
       academicSessionId: activeSession.id,
       archivedAt: null,
       isActive: true,
+      ...(feeDisplayEnabled
+        ? {}
+        : { showFeePublicly: false }),
     },
     include: {
       feePlans: {
         where: {
-          showPublicly: true,
-          isActive: true,
-          archivedAt: null,
-          feeAssignments: {
-            some: {
-              status: "ACTIVE",
-              archivedAt: null,
-            },
-          },
+          showPublicly: feeDisplayEnabled,
+          isActive: feeDisplayEnabled ? true : undefined,
+          archivedAt: feeDisplayEnabled ? null : undefined,
+          ...(feeDisplayEnabled
+            ? {
+                feeAssignments: {
+                  some: {
+                    status: "ACTIVE",
+                    archivedAt: null,
+                  },
+                },
+              }
+            : {}),
         },
         include: {
           feeAssignments: {
@@ -185,12 +157,12 @@ export async function getPublicCourses(): Promise<PublicCoursesData> {
     };
   });
 
-  // Group by board, then programme (or null)
+  // Group by board directly
   const boardMap = new Map<
     string,
     {
       board: { id: string; code: string; name: string };
-      programmeMap: Map<string | null, PublicCourseTrack[]>;
+      tracks: PublicCoursesData["groups"][0]["tracks"];
     }
   >();
 
@@ -199,43 +171,22 @@ export async function getPublicCourses(): Promise<PublicCoursesData> {
     if (!boardMap.has(boardKey)) {
       boardMap.set(boardKey, {
         board: { id: track.board.id, code: track.board.code, name: track.board.name },
-        programmeMap: new Map(),
+        tracks: [],
       });
     }
 
-    const boardData = boardMap.get(boardKey)!;
-    const programmeKey = track.programme?.id ?? null;
-    if (!boardData.programmeMap.has(programmeKey)) {
-      boardData.programmeMap.set(programmeKey, []);
-    }
-
-    boardData.programmeMap.get(programmeKey)!.push(track);
+    boardMap.get(boardKey)!.tracks.push(track);
   }
 
-  // Convert to array format
-  const groups = Array.from(boardMap.entries()).map(([, boardData]) => {
-    const programmes = Array.from(boardData.programmeMap.entries()).map(
-      ([, trackItems]) => {
-        return {
-          programme: trackItems[0]?.programme ?? null,
-          tracks: trackItems.sort(
-            (a, b) =>
-              a.classLevel.localeCompare(b.classLevel) ||
-              a.displayName.localeCompare(b.displayName),
-          ),
-        };
-      },
-    );
-
-    return {
-      board: boardData.board,
-      programmes: programmes.sort((a, b) => {
-        const aCode = a.programme?.code ?? "ZZZ";
-        const bCode = b.programme?.code ?? "ZZZ";
-        return aCode.localeCompare(bCode);
-      }),
-    };
-  });
+  // Convert to array and sort
+  const groups = Array.from(boardMap.values()).map((boardData) => ({
+    board: boardData.board,
+    tracks: boardData.tracks.sort(
+      (a, b) =>
+        a.classLevel.localeCompare(b.classLevel) ||
+        a.displayName.localeCompare(b.displayName),
+    ),
+  }));
 
   return { groups };
 }

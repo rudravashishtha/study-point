@@ -6,7 +6,7 @@ import { ResourcesSearchClient } from "@/features/public/components/ResourcesSea
 export const revalidate = 3600;
 
 export const metadata: Metadata = {
-  title: "Free Study Resources | Study Point Mathematics",
+  title: "Free Study Resources | Study Point",
   description:
     "Download free mathematics study materials, formula sheets, and practice resources for Classes IX–XII. No sign-up required.",
   alternates: { canonical: "/resources" },
@@ -39,7 +39,7 @@ export default async function ResourcesPage() {
               Free Study Resources
             </h1>
             <p className="text-lg leading-relaxed text-muted-foreground">
-              Curated mathematics notes, formula sheets, and practice material for Classes
+              Curated study notes, formula sheets, and practice material for Classes
               IX–XII. No sign-up required.
             </p>
           </header>

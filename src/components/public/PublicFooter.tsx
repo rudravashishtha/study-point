@@ -216,7 +216,7 @@ export function PublicFooter({ settings }: PublicFooterProps) {
           <div className="space-y-4">
             <div className="font-semibold text-foreground">Quick Links</div>
             <nav aria-label="Quick links">
-              <ul className="space-y-2">
+              <ul className="space-y-3">
                 {defaultQuickLinks.map((link) => (
                   <li key={link.href}>
                     <Link

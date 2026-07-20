@@ -1,5 +1,6 @@
 "use client";
 
+import { ChevronRight } from "lucide-react";
 import Link from "next/link";
 
 interface CourseCardProps {
@@ -24,132 +25,50 @@ interface CourseCardProps {
 }
 
 export function CourseCard({ track, batches, showFees }: CourseCardProps) {
-  const subjectName = track.subject?.name ?? "Mathematics";
+  const subjectName = track.subject?.name ?? "Coaching";
   const classLevel = track.classLevel ?? "Class";
   const displayName = track.displayName ?? `${classLevel} ${subjectName}`;
 
   const activeBatches = batches.filter((b) => b.feePlan?.showPublicly !== false);
+  const feeAmount = activeBatches[0]?.feePlan?.assignedTotalAmount;
 
   return (
-    <article className="rounded-2xl border border-border/60 bg-surface-elevated bg-card p-5 sm:p-6 shadow-sm transition-all hover:border-brand-glow/30 hover:shadow-md flex flex-col h-full">
-      <div className="mb-4">
-        <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground mb-2">
-          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary/10 text-primary">
-            {track.board?.code ?? "Board"} • {track.classLevel ?? "Class"}
+    <article className="group rounded-2xl border border-border/60 bg-surface-elevated p-5 sm:p-6 shadow-sm transition-all hover:border-brand-glow/30 hover:shadow-md flex flex-col h-full">
+      <div className="flex items-start justify-between gap-3 mb-3">
+        <div>
+          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary/10 text-primary mb-2">
+            {track.board?.code ?? "Board"} • {classLevel}
           </span>
+          <h3 className="text-xl font-bold font-heading text-foreground">
+            {displayName}
+          </h3>
         </div>
-        <h3 className="text-xl font-bold font-heading text-foreground mb-1">
-          {displayName}
-        </h3>
-        <p className="text-sm text-muted-foreground">
-          {track.subject?.name ?? "Mathematics"} — {displayName} Curriculum
-        </p>
       </div>
 
-      <div className="flex-1 space-y-4">
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
-          <div className="rounded-lg bg-muted/50 p-3 text-center">
-            <div className="flex items-center justify-center gap-1.5 text-muted-foreground mb-1">
-              <svg
-                className="size-4"
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                aria-hidden="true"
-              >
-                <path d="M22 10v6a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v6" />
-                <polyline points="22 6 12 12 2 6" />
-              </svg>
-              <span className="text-xs font-medium">Curriculum</span>
-            </div>
-            <p className="text-sm font-medium text-foreground">{displayName}</p>
-          </div>
+      <p className="text-sm text-muted-foreground mb-4">
+        {subjectName} — {activeBatches.length} batch{activeBatches.length !== 1 ? "es" : ""} available
+      </p>
 
-          <div className="rounded-lg bg-muted/50 p-3 text-center">
-            <div className="flex items-center justify-center gap-1.5 text-muted-foreground mb-1">
-              <svg
-                className="size-4"
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                aria-hidden="true"
-              >
-                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 1-4-4V5" />
-                <polyline points="17 11 12 6 7 11" />
-              </svg>
-              <span className="text-xs font-medium">Batches</span>
-            </div>
-            <p className="text-sm font-medium text-foreground">{activeBatches.length}</p>
-          </div>
+      <div className="flex-1" />
 
-          <div className="rounded-lg bg-muted/50 p-3 text-center">
-            <div className="flex items-center justify-center gap-1.5 text-muted-foreground mb-1">
-              <svg
-                className="size-4"
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                aria-hidden="true"
-              >
-                <circle cx="12" cy="12" r="10" />
-                <polyline points="12 6 12 12 16 14" />
-              </svg>
-              <span className="text-xs font-medium">Schedule</span>
-            </div>
-            <p className="text-sm font-medium text-foreground">See Timetable</p>
-          </div>
-        </div>
-
+      <div className="flex items-center gap-4 pt-4 border-t border-border/50">
         {showFees && (
-          <div className="border-t border-border/50 pt-4">
-            <div className="flex items-center justify-between">
-              <span className="text-sm font-medium text-muted-foreground">
-                Fee (Public)
-              </span>
-              <span className="text-sm font-semibold text-foreground">
-                {activeBatches[0]?.feePlan?.assignedTotalAmount
-                  ? `₹${activeBatches[0].feePlan.assignedTotalAmount?.toLocaleString()}`
-                  : "Contact for details"}
-              </span>
-            </div>
-            <p className="text-xs text-muted-foreground mt-1">
-              Per term • Contact for exact amount
+          <div className="min-w-0">
+            <p className="text-xs text-muted-foreground">Fee</p>
+            <p className="text-sm font-semibold text-foreground truncate">
+              {feeAmount ? `₹${feeAmount.toLocaleString()}` : "Contact for details"}
             </p>
           </div>
         )}
-
-        <Link
-          href="/admissions"
-          className="inline-flex items-center gap-2 w-full justify-center rounded-lg border border-border/60 bg-muted/50 px-4 py-2.5 text-sm font-medium text-muted-foreground transition-colors hover:border-brand-glow/30 hover:bg-muted hover:text-foreground"
-        >
-          Enquire / Admissions
-          <svg
-            className="size-4"
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            aria-hidden="true"
+        <div className="ml-auto">
+          <Link
+            href="/admissions"
+            className="inline-flex items-center gap-1.5 rounded-full bg-primary px-5 py-2 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90"
           >
-            <path d="M5 12h14" />
-            <path d="m12 5 7 7-7 7" />
-          </svg>
-        </Link>
+            Enquire
+            <ChevronRight className="size-4" />
+          </Link>
+        </div>
       </div>
     </article>
   );

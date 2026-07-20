@@ -2,15 +2,15 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowRight, GraduationCap, Target, Lightbulb, Users } from "lucide-react";
 import { getSiteSettings } from "@/server/services/site-settings";
-import { getPublicTeacherProfile } from "@/server/services/public";
+import { getPublicTeachers } from "@/server/services/public";
 import { TeacherIntro } from "@/features/public/components/TeacherIntro";
 
 export const revalidate = 3600;
 
 export const metadata: Metadata = {
-  title: "About | Study Point Mathematics",
+  title: "About | Study Point",
   description:
-    "Learn about Study Point Mathematics — the teacher, the teaching philosophy, and why students trust us for Classes IX to XII.",
+    "Learn about Study Point — the teacher, the teaching philosophy, and why students trust us for Classes IX to XII.",
   alternates: { canonical: "/about" },
   openGraph: { url: "/about" },
 };
@@ -43,12 +43,12 @@ const APPROACH = [
 ];
 
 export default async function AboutPage() {
-  const [settingsResult, teacher] = await Promise.all([
+  const [settingsResult, teachers] = await Promise.all([
     getSiteSettings(),
-    getPublicTeacherProfile(),
+    getPublicTeachers(),
   ]);
   const settings = settingsResult.success ? settingsResult.data : null;
-  const instituteName = settings?.instituteName ?? "Study Point Mathematics";
+  const instituteName = settings?.instituteName ?? "Study Point";
 
   return (
     <div className="flex-1">
@@ -62,7 +62,7 @@ export default async function AboutPage() {
               The people and principles behind {instituteName}
             </h1>
             <p className="mt-5 text-lg text-muted-foreground">
-              A focused mathematics coaching institute for Classes IX to XII, built on
+              A focused coaching institute for Classes IX to XII, built on
               clear teaching, consistent practice, and genuine care for every
               student&rsquo;s progress.
             </p>
@@ -70,7 +70,7 @@ export default async function AboutPage() {
         </div>
       </section>
 
-      <TeacherIntro teacher={teacher} />
+      <TeacherIntro teachers={teachers} />
 
       <section className="py-16 md:py-24" aria-labelledby="approach-heading">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -83,7 +83,7 @@ export default async function AboutPage() {
             </h2>
             <p className="mt-4 text-lg text-muted-foreground">
               A simple, repeatable method that has helped students gain confidence and
-              results in mathematics.
+              results .
             </p>
           </div>
 

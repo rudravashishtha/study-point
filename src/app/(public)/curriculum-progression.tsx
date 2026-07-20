@@ -29,7 +29,7 @@ const classes = [
   {
     id: 12,
     name: "Class XII",
-    focus: "Senior Board Excellence & Complex Mathematics",
+    focus: "Senior Board Excellence & Complex Coaching",
     cbse: true,
     cisce: true,
   },
@@ -45,7 +45,7 @@ export function CurriculumProgression() {
           Curriculum Tracks
         </h2>
         <p className="text-xl text-muted-foreground max-w-2xl">
-          An intentional, four-year mathematical journey designed to build compound
+          An intentional, four-year learning journey designed to build compound
           understanding from middle school to senior boards.
         </p>
       </div>

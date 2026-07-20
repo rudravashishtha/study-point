@@ -5,9 +5,9 @@ import { getSiteSettings } from "@/server/services/site-settings";
 export const revalidate = 3600;
 
 export const metadata: Metadata = {
-  title: "Privacy Policy | Study Point Mathematics",
+  title: "Privacy Policy | Study Point",
   description:
-    "How Study Point Mathematics collects, uses, and protects your information.",
+    "How Study Point collects, uses, and protects your information.",
   alternates: { canonical: "/privacy" },
   openGraph: { url: "/privacy" },
 };
@@ -16,7 +16,7 @@ export default async function PrivacyPage() {
   const settingsResult = await getSiteSettings();
   const instituteName = settingsResult.success
     ? settingsResult.data.instituteName
-    : "Study Point Mathematics";
+    : "Study Point";
 
   return (
     <div className="py-16 md:py-24">
