@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { MoreHorizontal, Edit, Power, PowerOff, RotateCcw } from "lucide-react";
+import { MoreHorizontal, Edit, Loader2, Power, PowerOff, RotateCcw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -15,30 +15,28 @@ import {
 import { TeacherFormDialog } from "./TeacherFormDialog";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 
+import type { Subject } from "@prisma/client";
 import { TeacherWithAppUser } from "./TeacherList";
 import { getTeacherInvitationEligibility } from "../domain/provisioning";
 import type { AppUserStatus } from "../domain/provisioning";
 
 interface TeacherRowActionsProps {
   teacher: TeacherWithAppUser;
+  availableSubjects: Subject[];
   onActionComplete?: () => void;
 }
 
-export function TeacherRowActions({ teacher, onActionComplete }: TeacherRowActionsProps) {
+export function TeacherRowActions({ teacher, availableSubjects, onActionComplete }: TeacherRowActionsProps) {
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
-  const [isProcessing, setIsProcessing] = useState(false);
+  const [processingAction, setProcessingAction] = useState<string | null>(null);
+  const [confirmToggleOpen, setConfirmToggleOpen] = useState(false);
   const router = useRouter();
+  const isProcessing = processingAction !== null;
 
   const handleToggleStatus = async () => {
-    if (
-      !confirm(
-        `Are you sure you want to ${teacher.active ? "deactivate" : "reactivate"} ${teacher.displayName}?`,
-      )
-    )
-      return;
-
-    setIsProcessing(true);
+    setProcessingAction("toggle");
     try {
       let result;
       if (teacher.active) {
@@ -66,12 +64,13 @@ export function TeacherRowActions({ teacher, onActionComplete }: TeacherRowActio
           error instanceof Error ? error.message : "An unexpected error occurred",
       });
     } finally {
-      setIsProcessing(false);
+      setProcessingAction(null);
+      setConfirmToggleOpen(false);
     }
   };
 
   const handleInvite = async () => {
-    setIsProcessing(true);
+    setProcessingAction("invite");
     try {
       const { inviteTeacherAction } = await import("@/app/admin/teachers/actions");
       const result = await inviteTeacherAction(teacher.id);
@@ -93,12 +92,12 @@ export function TeacherRowActions({ teacher, onActionComplete }: TeacherRowActio
           error instanceof Error ? error.message : "An unexpected error occurred",
       });
     } finally {
-      setIsProcessing(false);
+      setProcessingAction(null);
     }
   };
 
   const handleReset = async () => {
-    setIsProcessing(true);
+    setProcessingAction("reset");
     try {
       const { resetTeacherInvitationAction } =
         await import("@/app/admin/teachers/activate/actions");
@@ -109,7 +108,7 @@ export function TeacherRowActions({ teacher, onActionComplete }: TeacherRowActio
           description: "error" in result ? result.error : "Unknown error",
         });
       } else {
-        toast.success("Invitation reset. You can now re-invite this teacher.");
+        toast.success("Success", { description: "Invitation reset. You can now re-invite this teacher." });
         router.refresh();
         onActionComplete?.();
       }
@@ -119,7 +118,7 @@ export function TeacherRowActions({ teacher, onActionComplete }: TeacherRowActio
           error instanceof Error ? error.message : "An unexpected error occurred",
       });
     } finally {
-      setIsProcessing(false);
+      setProcessingAction(null);
     }
   };
 
@@ -148,14 +147,22 @@ export function TeacherRowActions({ teacher, onActionComplete }: TeacherRowActio
 
           {eligibility.canInvite && (
             <DropdownMenuItem onClick={handleInvite} disabled={isProcessing}>
-              <Power className="mr-2 h-4 w-4" />
+              {processingAction === "invite" ? (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              ) : (
+                <Power className="mr-2 h-4 w-4" />
+              )}
               Invite Teacher
             </DropdownMenuItem>
           )}
 
           {eligibility.canReset && (
             <DropdownMenuItem onClick={handleReset} disabled={isProcessing}>
-              <RotateCcw className="mr-2 h-4 w-4" />
+              {processingAction === "reset" ? (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              ) : (
+                <RotateCcw className="mr-2 h-4 w-4" />
+              )}
               Reset Invitation
             </DropdownMenuItem>
           )}
@@ -166,7 +173,7 @@ export function TeacherRowActions({ teacher, onActionComplete }: TeacherRowActio
           </DropdownMenuItem>
 
           <DropdownMenuItem
-            onClick={handleToggleStatus}
+            onClick={() => setConfirmToggleOpen(true)}
             disabled={isProcessing}
             className={
               teacher.active
@@ -174,24 +181,31 @@ export function TeacherRowActions({ teacher, onActionComplete }: TeacherRowActio
                 : "text-green-600 focus:text-green-600"
             }
           >
-            {teacher.active ? (
-              <>
-                <PowerOff className="mr-2 h-4 w-4" />
-                Deactivate
-              </>
+            {processingAction === "toggle" ? (
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            ) : teacher.active ? (
+              <PowerOff className="mr-2 h-4 w-4" />
             ) : (
-              <>
-                <Power className="mr-2 h-4 w-4" />
-                Reactivate
-              </>
+              <Power className="mr-2 h-4 w-4" />
             )}
+            {teacher.active ? "Deactivate" : "Reactivate"}
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
 
+      <ConfirmDialog
+        open={confirmToggleOpen}
+        onOpenChange={setConfirmToggleOpen}
+        title={teacher.active ? "Deactivate teacher?" : "Reactivate teacher?"}
+        description={`Are you sure you want to ${teacher.active ? "deactivate" : "reactivate"} ${teacher.displayName}?`}
+        confirmLabel={teacher.active ? "Deactivate" : "Reactivate"}
+        onConfirm={handleToggleStatus}
+      />
+
       <TeacherFormDialog
         mode="edit"
         teacher={teacher}
+        availableSubjects={availableSubjects}
         open={isEditDialogOpen}
         onOpenChange={setIsEditDialogOpen}
         onSuccess={onActionComplete}

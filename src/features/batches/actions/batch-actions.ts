@@ -11,6 +11,27 @@ import {
 import { failure, success } from "@/server/services/types";
 import { db } from "@/lib/db";
 
+export async function listActiveStudentsAction(query?: string) {
+  await requireAdmin();
+  const students = await db.student.findMany({
+    where: {
+      archivedAt: null,
+      ...(query
+        ? {
+            OR: [
+              { fullName: { contains: query, mode: "insensitive" } },
+              { studentCode: { contains: query, mode: "insensitive" } },
+            ],
+          }
+        : {}),
+    },
+    select: { id: true, studentCode: true, fullName: true },
+    orderBy: { fullName: "asc" },
+    take: 50,
+  });
+  return success(students);
+}
+
 export async function lookupStudentByCodeAction(studentCode: string) {
   await requireAdmin();
   const student = await db.student.findUnique({

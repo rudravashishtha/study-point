@@ -15,6 +15,7 @@ import { TeacherAssignment } from "@prisma/client";
 import { removeTeacherAssignmentAction } from "../../actions/batch-actions";
 import { toast } from "sonner";
 import { EditAssignmentDialog } from "./EditAssignmentDialog";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 
 export interface AssignmentRowActionsProps {
   batchId: string;
@@ -29,15 +30,9 @@ export function AssignmentRowActions({
 }: AssignmentRowActionsProps) {
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [confirmOpen, setConfirmOpen] = useState(false);
 
   const handleRemove = async () => {
-    if (
-      !confirm(
-        `Are you sure you want to remove ${assignment.teacher.displayName} from this batch?`,
-      )
-    )
-      return;
-
     setIsProcessing(true);
     try {
       const result = await removeTeacherAssignmentAction(batchId, assignment.id);
@@ -58,6 +53,7 @@ export function AssignmentRowActions({
       });
     } finally {
       setIsProcessing(false);
+      setConfirmOpen(false);
     }
   };
 
@@ -86,7 +82,7 @@ export function AssignmentRowActions({
           </DropdownMenuItem>
 
           <DropdownMenuItem
-            onClick={handleRemove}
+            onClick={() => setConfirmOpen(true)}
             className="text-red-600 focus:text-red-600"
           >
             <Trash2 className="mr-2 h-4 w-4" />
@@ -94,6 +90,15 @@ export function AssignmentRowActions({
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
+
+      <ConfirmDialog
+        open={confirmOpen}
+        onOpenChange={setConfirmOpen}
+        title="Remove teacher assignment?"
+        description={`Are you sure you want to remove ${assignment.teacher.displayName} from this batch?`}
+        confirmLabel="Remove"
+        onConfirm={handleRemove}
+      />
 
       <EditAssignmentDialog
         batchId={batchId}

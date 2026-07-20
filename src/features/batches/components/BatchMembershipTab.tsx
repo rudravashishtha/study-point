@@ -18,6 +18,7 @@ import {
 } from "@/components/ui/table";
 import { AddStudentToBatchDialog } from "@/features/enrolments/components/AddStudentToBatchDialog";
 import { removeEnrolmentFromBatchAction } from "@/features/batches/actions/batch-actions";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 
 type EnrolmentWithStudent = Enrolment & { student: Student };
 
@@ -33,29 +34,31 @@ export function BatchMembershipTab({
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [addStudentOpen, setAddStudentOpen] = useState(false);
+  const [removeTargetId, setRemoveTargetId] = useState<string | null>(null);
 
-  const handleRemove = (enrolmentId: string) => {
-    if (
-      !confirm(
-        "Are you sure you want to remove this student from the batch? They will become unassigned.",
-      )
-    )
-      return;
-
+  const handleRemove = () => {
+    if (!removeTargetId) return;
+    const enrolmentId = removeTargetId;
     startTransition(async () => {
       try {
         const result = await removeEnrolmentFromBatchAction(batch.id, enrolmentId);
         if (!result.success) {
-          toast.error(result.error.message);
+          toast.error("Error", { description: result.error.message });
           return;
         }
-        toast.success("Student removed from batch successfully");
+        toast.success("Success", { description: "Student removed from batch successfully" });
         router.refresh();
       } catch {
-        toast.error("Failed to remove student from batch");
+        toast.error("Error", { description: "Failed to remove student from batch" });
+      } finally {
+        setRemoveTargetId(null);
       }
     });
   };
+
+  const removeTarget = removeTargetId
+    ? enrolments.find((e) => e.id === removeTargetId)
+    : null;
 
   return (
     <div className="space-y-4">
@@ -122,7 +125,7 @@ export function BatchMembershipTab({
                         variant="ghost"
                         size="sm"
                         className="text-destructive hover:bg-destructive/10 hover:text-destructive h-8 gap-1"
-                        onClick={() => handleRemove(enrolment.id)}
+                        onClick={() => setRemoveTargetId(enrolment.id)}
                         disabled={isPending}
                       >
                         <UserMinus className="size-4" />
@@ -136,6 +139,19 @@ export function BatchMembershipTab({
           </TableBody>
         </Table>
       </div>
+
+      <ConfirmDialog
+        open={!!removeTargetId}
+        onOpenChange={(open) => !open && setRemoveTargetId(null)}
+        title="Remove student from batch?"
+        description={
+          removeTarget
+            ? `Are you sure you want to remove ${removeTarget.student.fullName} from this batch? They will become unassigned.`
+            : ""
+        }
+        confirmLabel="Remove"
+        onConfirm={handleRemove}
+      />
 
       <AddStudentToBatchDialog
         open={addStudentOpen}

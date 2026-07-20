@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import { Student } from "@prisma/client";
-import { Archive, ArchiveRestore, Pencil, Power } from "lucide-react";
+import { Archive, ArchiveRestore, Loader2, Pencil, Power } from "lucide-react";
 import {
   Table,
   TableBody,
@@ -15,37 +15,51 @@ import { archiveStudentAction, restoreStudentAction } from "@/app/admin/students
 import { inviteStudentAction } from "@/app/admin/students/activate/actions";
 import { toast } from "sonner";
 import { StudentFormDialog } from "./StudentFormDialog";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 
 export function StudentList({ students }: { students: Student[] }) {
   const [editingStudent, setEditingStudent] = useState<Student | null>(null);
+  const [processingId, setProcessingId] = useState<string | null>(null);
+  const [archiveConfirmId, setArchiveConfirmId] = useState<string | null>(null);
 
-  const handleArchive = async (id: string) => {
-    if (!confirm("Are you sure you want to archive this student?")) return;
-    const res = await archiveStudentAction(id);
+  const handleArchive = async () => {
+    if (!archiveConfirmId) return;
+    setProcessingId(archiveConfirmId);
+    const res = await archiveStudentAction(archiveConfirmId);
+    setProcessingId(null);
+    setArchiveConfirmId(null);
     if (!res.success) {
-      toast.error(res.error);
+      toast.error("Error", { description: res.error });
     } else {
-      toast.success("Student archived successfully.");
+      toast.success("Success", { description: "Student archived successfully." });
     }
   };
 
   const handleRestore = async (id: string) => {
+    setProcessingId(id);
     const res = await restoreStudentAction(id);
+    setProcessingId(null);
     if (!res.success) {
-      toast.error(res.error);
+      toast.error("Error", { description: res.error });
     } else {
-      toast.success("Student restored successfully.");
+      toast.success("Success", { description: "Student archived successfully." });
     }
   };
 
   const handleActivate = async (id: string) => {
+    setProcessingId(id);
     const res = await inviteStudentAction(id);
+    setProcessingId(null);
     if (!res.success) {
-      toast.error(res.error);
+      toast.error("Error", { description: res.error });
     } else {
-      toast.success("Invitation sent successfully.");
+      toast.success("Success", { description: "Invitation sent successfully." });
     }
   };
+
+  const archiveTarget = archiveConfirmId
+    ? students.find((s) => s.id === archiveConfirmId)
+    : null;
 
   return (
     <>
@@ -103,10 +117,15 @@ export function StudentList({ students }: { students: Student[] }) {
                       {student.accountStatus === "none" && (
                         <button
                           onClick={() => handleActivate(student.id)}
-                          className="flex h-8 w-8 items-center justify-center rounded-md text-emerald-600 hover:bg-emerald-100 dark:hover:bg-emerald-900/30"
+                          disabled={processingId === student.id}
+                          className="flex h-8 w-8 items-center justify-center rounded-md text-emerald-600 hover:bg-emerald-100 dark:hover:bg-emerald-900/30 disabled:opacity-50"
                           title="Activate account"
                         >
-                          <Power className="h-4 w-4" />
+                          {processingId === student.id ? (
+                            <Loader2 className="h-4 w-4 animate-spin" />
+                          ) : (
+                            <Power className="h-4 w-4" />
+                          )}
                           <span className="sr-only">Activate account</span>
                         </button>
                       )}
@@ -119,21 +138,31 @@ export function StudentList({ students }: { students: Student[] }) {
                         <span className="sr-only">Edit</span>
                       </button>
                       <button
-                        onClick={() => handleArchive(student.id)}
-                        className="flex h-8 w-8 items-center justify-center rounded-md text-destructive hover:bg-destructive/10"
+                        onClick={() => setArchiveConfirmId(student.id)}
+                        disabled={processingId === student.id}
+                        className="flex h-8 w-8 items-center justify-center rounded-md text-destructive hover:bg-destructive/10 disabled:opacity-50"
                         title="Archive"
                       >
-                        <Archive className="h-4 w-4" />
+                        {processingId === student.id ? (
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                        ) : (
+                          <Archive className="h-4 w-4" />
+                        )}
                         <span className="sr-only">Archive</span>
                       </button>
                     </>
                   ) : (
                     <button
                       onClick={() => handleRestore(student.id)}
-                      className="flex h-8 w-8 items-center justify-center rounded-md hover:bg-muted"
+                      disabled={processingId === student.id}
+                      className="flex h-8 w-8 items-center justify-center rounded-md hover:bg-muted disabled:opacity-50"
                       title="Restore"
                     >
-                      <ArchiveRestore className="h-4 w-4" />
+                      {processingId === student.id ? (
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                      ) : (
+                        <ArchiveRestore className="h-4 w-4" />
+                      )}
                       <span className="sr-only">Restore</span>
                     </button>
                   )}
@@ -143,6 +172,19 @@ export function StudentList({ students }: { students: Student[] }) {
           </TableBody>
         </Table>
       </div>
+
+      <ConfirmDialog
+        open={!!archiveConfirmId}
+        onOpenChange={(open) => !open && setArchiveConfirmId(null)}
+        title="Archive student?"
+        description={
+          archiveTarget
+            ? `Are you sure you want to archive "${archiveTarget.fullName}"? They can be restored later.`
+            : ""
+        }
+        confirmLabel="Archive"
+        onConfirm={handleArchive}
+      />
 
       <StudentFormDialog
         student={editingStudent || undefined}
