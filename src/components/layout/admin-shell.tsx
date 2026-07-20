@@ -176,10 +176,8 @@ export function AdminShell({
         <header className="hidden md:flex h-16 items-center justify-between px-8 border-b border-border/40 bg-surface/50 backdrop-blur-md sticky top-0 z-30 shrink-0">
           <h1 className="text-lg font-bold font-heading">{currentPage}</h1>
           <DropdownMenu>
-            <DropdownMenuTrigger>
-              <button className="size-8 rounded-full bg-surface-interactive border border-border/60 flex items-center justify-center font-bold text-xs hover:bg-surface-elevated transition-colors outline-none focus-visible:ring-2 focus-visible:ring-ring">
-                AD
-              </button>
+            <DropdownMenuTrigger className="size-8 rounded-full bg-surface-interactive border border-border/60 flex items-center justify-center font-bold text-xs hover:bg-surface-elevated transition-colors outline-none focus-visible:ring-2 focus-visible:ring-ring">
+              AD
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-48">
               <Link href="/profile">

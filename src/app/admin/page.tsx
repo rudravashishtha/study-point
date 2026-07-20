@@ -10,12 +10,20 @@ import {
   Upload,
   Search,
   CheckCircle2,
+  Clock,
 } from "lucide-react";
 
+function getTodayDayOfWeek(): number {
+  const jsDay = new Date().getDay();
+  return jsDay === 0 ? 7 : jsDay;
+}
+
 async function getDashboardMetrics() {
-  const [activeStudents, pendingEnrolments, todayBatches, pendingFees, requiresAction] =
+  const todayDayOfWeek = getTodayDayOfWeek();
+
+  const [activeStudents, pendingEnrolments, todayBatches, pendingFees, unactivatedStudents] =
     await Promise.all([
-      db.enrolment.count({ where: { status: "ACTIVE" } }),
+      db.enrolment.count({ where: { status: "active" } }),
       db.enrolment.count({ where: { status: "PENDING" } }),
       db.batch.count({
         where: {
@@ -23,7 +31,8 @@ async function getDashboardMetrics() {
           isActive: true,
           schedules: {
             some: {
-              dayOfWeek: new Date().getDay(),
+              dayOfWeek: todayDayOfWeek,
+              isActive: true,
             },
           },
         },
@@ -33,17 +42,63 @@ async function getDashboardMetrics() {
           status: "ACTIVE",
         },
       }),
-      db.enrolment.count({
-        where: { status: "PENDING" },
+      db.student.count({
+        where: {
+          accountStatus: "none",
+          archivedAt: null,
+        },
       }),
     ]);
 
-  return { activeStudents, pendingEnrolments, todayBatches, pendingFees, requiresAction };
+  return { activeStudents, pendingEnrolments, todayBatches, pendingFees, unactivatedStudents };
+}
+
+async function getTodaySchedules() {
+  const todayDayOfWeek = getTodayDayOfWeek();
+
+  const schedules = await db.batchSchedule.findMany({
+    where: {
+      dayOfWeek: todayDayOfWeek,
+      isActive: true,
+      batch: {
+        archivedAt: null,
+        isActive: true,
+      },
+    },
+    include: {
+      batch: {
+        select: {
+          id: true,
+          name: true,
+          curriculumTrack: {
+            select: {
+              displayName: true,
+              subject: { select: { name: true } },
+            },
+          },
+        },
+      },
+    },
+    orderBy: [{ startTime: "asc" }],
+  });
+
+  return schedules;
+}
+
+async function getRecentActivity() {
+  const logs = await db.auditLog.findMany({
+    orderBy: { createdAt: "desc" },
+    take: 8,
+  });
+
+  return logs;
 }
 
 export default async function AdminDashboard() {
   await requireAdmin();
   const metrics = await getDashboardMetrics();
+  const todaySchedules = await getTodaySchedules();
+  const recentActivity = await getRecentActivity();
 
   return (
     <div className="flex flex-col gap-6 pb-12">
@@ -118,16 +173,53 @@ export default async function AdminDashboard() {
               </Link>
             </div>
 
-            <div className="p-8 flex flex-col items-center justify-center text-center bg-surface/20 min-h-[250px]">
-              <div className="size-12 rounded-full border border-dashed border-border flex items-center justify-center mb-3 bg-surface/50">
-                <Calendar className="size-5 text-muted-foreground opacity-50" />
+            {todaySchedules.length > 0 ? (
+              <div className="divide-y divide-border/40">
+                {todaySchedules.map((schedule) => (
+                  <Link
+                    key={schedule.id}
+                    href={`/admin/batches/${schedule.batch.id}`}
+                    className="flex items-center gap-4 px-5 py-3.5 hover:bg-surface-interactive transition-colors"
+                  >
+                    <div className="flex items-center gap-2 w-28 shrink-0">
+                      <Clock className="size-4 text-muted-foreground" />
+                      <span className="text-sm font-medium">
+                        {schedule.startTime} - {schedule.endTime}
+                      </span>
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-semibold truncate">
+                        {schedule.batch.name}
+                      </p>
+                      <p className="text-xs text-muted-foreground truncate">
+                        {schedule.batch.curriculumTrack.displayName}
+                      </p>
+                    </div>
+                    {schedule.liveClassUrl && (
+                      <span className="text-xs font-medium text-brand-glow shrink-0">
+                        Live
+                      </span>
+                    )}
+                    {schedule.roomOrLocation && (
+                      <span className="text-xs text-muted-foreground shrink-0 hidden sm:inline">
+                        {schedule.roomOrLocation}
+                      </span>
+                    )}
+                  </Link>
+                ))}
               </div>
-              <h4 className="text-sm font-bold mb-1">No batches scheduled today</h4>
-              <p className="text-xs text-muted-foreground max-w-sm">
-                When academic batches are created and assigned to today&apos;s schedule,
-                they will appear here for quick access.
-              </p>
-            </div>
+            ) : (
+              <div className="p-8 flex flex-col items-center justify-center text-center bg-surface/20 min-h-[250px]">
+                <div className="size-12 rounded-full border border-dashed border-border flex items-center justify-center mb-3 bg-surface/50">
+                  <Calendar className="size-5 text-muted-foreground opacity-50" />
+                </div>
+                <h4 className="text-sm font-bold mb-1">No batches scheduled today</h4>
+                <p className="text-xs text-muted-foreground max-w-sm">
+                  When academic batches are created and assigned to today&apos;s schedule,
+                  they will appear here for quick access.
+                </p>
+              </div>
+            )}
           </section>
 
           {/* 6. Recent Operational Activity */}
@@ -135,12 +227,38 @@ export default async function AdminDashboard() {
             <div className="px-5 py-4 border-b border-border/40 flex justify-between items-center bg-surface/50">
               <h3 className="font-bold text-sm">Recent Activity</h3>
             </div>
-            <div className="p-8 flex flex-col items-center justify-center text-center bg-surface/20 opacity-60">
-              <p className="text-sm font-bold mb-1">No recent activity</p>
-              <p className="text-xs text-muted-foreground">
-                Recent administrative actions will be logged here
-              </p>
-            </div>
+
+            {recentActivity.length > 0 ? (
+              <div className="divide-y divide-border/40">
+                {recentActivity.map((log) => (
+                  <div
+                    key={log.id}
+                    className="px-5 py-3 text-sm flex items-start gap-3"
+                  >
+                    <div className="size-2 rounded-full bg-brand-glow/60 mt-1.5 shrink-0" />
+                    <div className="min-w-0 flex-1">
+                      <p className="font-medium truncate">{log.summary}</p>
+                      <p className="text-xs text-muted-foreground mt-0.5">
+                        {log.entityType} &middot;{" "}
+                        {log.createdAt.toLocaleString("en-IN", {
+                          day: "numeric",
+                          month: "short",
+                          hour: "2-digit",
+                          minute: "2-digit",
+                        })}
+                      </p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="p-8 flex flex-col items-center justify-center text-center bg-surface/20 opacity-60">
+                <p className="text-sm font-bold mb-1">No recent activity</p>
+                <p className="text-xs text-muted-foreground">
+                  Recent administrative actions will be logged here
+                </p>
+              </div>
+            )}
           </section>
         </div>
 
@@ -150,13 +268,13 @@ export default async function AdminDashboard() {
           <section className="order-4 lg:order-none bg-surface-elevated border border-border/40 rounded-xl overflow-hidden flex flex-col">
             <div className="px-5 py-4 border-b border-border/40 bg-surface/50 flex items-center gap-2">
               <div
-                className={`size-2 rounded-full ${metrics.requiresAction > 0 ? "bg-amber-500 shadow-[0_0_8px_rgba(245,158,11,0.5)]" : "bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]"}`}
+                className={`size-2 rounded-full ${metrics.unactivatedStudents > 0 || metrics.pendingEnrolments > 0 ? "bg-amber-500 shadow-[0_0_8px_rgba(245,158,11,0.5)]" : "bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]"}`}
               />
               <h3 className="font-bold text-sm">Action Required</h3>
             </div>
 
             <div className="p-5 flex flex-col gap-4">
-              {metrics.requiresAction > 0 ? (
+              {metrics.pendingEnrolments > 0 && (
                 <Link
                   href="/admin/students?status=PENDING"
                   className="p-4 rounded-lg border border-border/60 bg-surface flex items-center gap-3 hover:bg-surface-interactive transition-colors"
@@ -164,15 +282,33 @@ export default async function AdminDashboard() {
                   <AlertCircle className="size-6 text-amber-500/80 shrink-0" />
                   <div>
                     <h4 className="text-sm font-semibold mb-1">
-                      {metrics.requiresAction} pending enrolment
-                      {metrics.requiresAction > 1 ? "s" : ""}
+                      {metrics.pendingEnrolments} pending enrolment
+                      {metrics.pendingEnrolments > 1 ? "s" : ""}
                     </h4>
                     <p className="text-xs text-muted-foreground">
                       Review and process pending student enrolments.
                     </p>
                   </div>
                 </Link>
-              ) : (
+              )}
+              {metrics.unactivatedStudents > 0 && (
+                <Link
+                  href="/admin/students"
+                  className="p-4 rounded-lg border border-border/60 bg-surface flex items-center gap-3 hover:bg-surface-interactive transition-colors"
+                >
+                  <AlertCircle className="size-6 text-amber-500/80 shrink-0" />
+                  <div>
+                    <h4 className="text-sm font-semibold mb-1">
+                      {metrics.unactivatedStudents} student
+                      {metrics.unactivatedStudents > 1 ? "s" : ""} without account
+                    </h4>
+                    <p className="text-xs text-muted-foreground">
+                      Activate accounts so students can access the portal.
+                    </p>
+                  </div>
+                </Link>
+              )}
+              {metrics.pendingEnrolments === 0 && metrics.unactivatedStudents === 0 && (
                 <div className="p-6 rounded-lg border border-border/60 bg-surface flex flex-col items-center justify-center text-center gap-3">
                   <CheckCircle2 className="size-8 text-emerald-500/80 shrink-0" />
                   <div>
