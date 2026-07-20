@@ -83,6 +83,22 @@ export function FeePlanFormDialog({
       : [defaultInstallment(0)],
   );
 
+  React.useEffect(() => {
+    setFrequency(plan?.frequency || "MONTHLY");
+    setInstalments(
+      plan?.instalments?.length
+        ? plan.instalments.map((i) => ({
+            id: i.id,
+            label: i.label,
+            dueOffsetDays: i.dueOffsetDays?.toString() || "",
+            dueDate: i.dueDate ? new Date(i.dueDate).toISOString().split("T")[0] : "",
+            amount: i.amount?.toString() || "",
+            displayOrder: i.displayOrder,
+          }))
+        : [defaultInstallment(0)],
+    );
+  }, [plan]);
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError(null);
@@ -116,11 +132,9 @@ export function FeePlanFormDialog({
 
       if (!res.success) {
         setError(res.error);
-        toast.error(res.error);
+        toast.error("Error", { description: res.error });
       } else {
-        toast.success(
-          plan ? "Fee plan updated successfully" : "Fee plan created successfully",
-        );
+        toast.success("Success", { description: plan ? "Fee plan updated successfully" : "Fee plan created successfully" });
         onOpenChange(false);
         router.refresh();
       }
@@ -205,7 +219,7 @@ export function FeePlanFormDialog({
                 Scope & Pricing
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-2">
+                <div className="space-y-3">
                   <label htmlFor="academicSessionId" className="text-sm font-medium">
                     Academic Session *
                   </label>
@@ -224,7 +238,7 @@ export function FeePlanFormDialog({
                     ))}
                   </select>
                 </div>
-                <div className="space-y-2">
+                <div className="space-y-3">
                   <label htmlFor="curriculumTrackId" className="text-sm font-medium">
                     Curriculum Track *
                   </label>
@@ -244,7 +258,7 @@ export function FeePlanFormDialog({
                   </select>
                 </div>
 
-                <div className="space-y-2">
+                <div className="space-y-3">
                   <label htmlFor="batchId" className="text-sm font-medium">
                     Batch (optional)
                   </label>
@@ -264,7 +278,7 @@ export function FeePlanFormDialog({
                       ))}
                   </select>
                 </div>
-                <div className="space-y-2">
+                <div className="space-y-3">
                   <label htmlFor="frequency" className="text-sm font-medium">
                     Frequency *
                   </label>
@@ -281,7 +295,7 @@ export function FeePlanFormDialog({
                   </select>
                 </div>
 
-                <div className="space-y-2">
+                <div className="space-y-3">
                   <label htmlFor="totalAmount" className="text-sm font-medium">
                     Total Amount *
                   </label>

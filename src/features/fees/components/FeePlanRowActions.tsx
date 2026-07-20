@@ -3,7 +3,11 @@
 import React, { useTransition } from "react";
 import { FeePlan } from "@prisma/client";
 import { toast } from "sonner";
-import { archiveFeePlanAction, restoreFeePlanAction } from "@/app/admin/fees/actions";
+import {
+  archiveFeePlanAction,
+  restoreFeePlanAction,
+  duplicateFeePlanAction,
+} from "@/app/admin/fees/actions";
 import { useRouter } from "next/navigation";
 
 export function FeePlanRowActions({
@@ -23,9 +27,9 @@ export function FeePlanRowActions({
     startTransition(async () => {
       const res = await actionFn(plan.id);
       if (!res.success) {
-        toast.error(res.error);
+        toast.error("Error", { description: res.error });
       } else {
-        toast.success(successMessage);
+        toast.success("Success", { description: successMessage });
         router.refresh();
       }
     });
@@ -40,6 +44,16 @@ export function FeePlanRowActions({
           className="text-sm font-medium text-blue-600 hover:underline disabled:opacity-50"
         >
           Edit
+        </button>
+      )}
+
+      {!plan.archivedAt && (
+        <button
+          onClick={() => handleAction(duplicateFeePlanAction, "Fee plan duplicated")}
+          disabled={isPending}
+          className="text-sm font-medium text-green-600 hover:underline disabled:opacity-50"
+        >
+          Duplicate
         </button>
       )}
 
