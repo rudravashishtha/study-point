@@ -175,7 +175,7 @@ export function TestFormDialog({
                 General Information
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-2">
+                <div className="space-y-3">
                   <Label htmlFor="title">Title</Label>
                   <Input
                     id="title"
@@ -186,7 +186,7 @@ export function TestFormDialog({
                     maxLength={100}
                   />
                 </div>
-                <div className="space-y-2">
+                <div className="space-y-3">
                   <Label htmlFor="batch">Batch</Label>
                   <Select
                     value={batchId}
@@ -213,7 +213,7 @@ export function TestFormDialog({
                   </Select>
                 </div>
 
-                <div className="space-y-2">
+                <div className="space-y-3">
                   <Label htmlFor="testType">Test Type</Label>
                   <Select value={testType} onValueChange={(v) => v && setTestType(v)}>
                     <SelectTrigger>
@@ -228,7 +228,7 @@ export function TestFormDialog({
                     </SelectContent>
                   </Select>
                 </div>
-                <div className="space-y-2">
+                <div className="space-y-3">
                   <Label htmlFor="testDate">Date & Time</Label>
                   <Input
                     id="testDate"
@@ -247,7 +247,7 @@ export function TestFormDialog({
                 Evaluation Details
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-2">
+                <div className="space-y-3">
                   <Label htmlFor="maximumMarks">Maximum Marks</Label>
                   <Input
                     id="maximumMarks"
@@ -258,7 +258,7 @@ export function TestFormDialog({
                     required
                   />
                 </div>
-                <div className="space-y-2">
+                <div className="space-y-3">
                   <Label htmlFor="durationMinutes">Duration (min, Optional)</Label>
                   <Input
                     id="durationMinutes"
@@ -291,7 +291,7 @@ export function TestFormDialog({
                   />
                 </div>
 
-                <div className="space-y-2">
+                <div className="space-y-3">
                   <Label>Chapter (Optional)</Label>
                   <Select
                     value={chapterId}
@@ -308,7 +308,7 @@ export function TestFormDialog({
                     </SelectContent>
                   </Select>
                 </div>
-                <div className="space-y-2">
+                <div className="space-y-3">
                   <Label>Topic (Optional)</Label>
                   <Select
                     value={topicId}
@@ -331,7 +331,7 @@ export function TestFormDialog({
               <h3 className="text-sm font-medium text-muted-foreground border-b pb-2">
                 Attachments
               </h3>
-              <div className="space-y-2">
+              <div className="space-y-3">
                 <Label>Question Paper Upload (Optional)</Label>
                 {test?.fileAssetId && !questionPaperFileId && (
                   <div className="text-sm text-muted-foreground mb-2">
@@ -343,9 +343,9 @@ export function TestFormDialog({
                     targetBatchId={batchId}
                     onUploadSuccess={(fid) => {
                       setQuestionPaperFileId(fid);
-                      toast.success("File uploaded successfully");
+                      toast.success("Success", { description: "File uploaded successfully" });
                     }}
-                    onUploadError={(err) => toast.error(err)}
+                    onUploadError={(err) => toast.error("Error", { description: err })}
                   />
                 ) : (
                   <div className="text-sm text-muted-foreground bg-muted p-4 rounded-md border text-center">

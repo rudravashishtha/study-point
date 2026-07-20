@@ -579,6 +579,13 @@ E2E tests:
   - Phase 11B: Production hardening including security (CSP, headers, HSTS, env validation), monitoring (Sentry), deployment (docs, CI/CD), accessibility (skip-to-content, ARIA, reduced motion, axe-core), design refinement (consistent border radius, color tokens, shell issues), and rendering/performance optimization (dynamic imports, ISR tuning, cache invalidation, react.cache deduplication, bundle size reduction).
   - Phase 11 sub-phases: 11A.1–2 (PWA), 11A.5–6 (Design), 11B.1 (Security), 11B.2 (Monitoring), 11B.3 (Deployment), 11B.4 (Accessibility), 11B.5 (Rendering/Performance), 11B.5.5 (Production Metrics).
 
+- UX Polish (Phases 1-5): Completed.
+  - Phase 1: Action button spinners — added Loader2 spinners and disabled state to StudentList, TeacherRowActions, AssignTeacherDialog, EditAssignmentDialog; disabled BatchFormDialog Cancel during submission.
+  - Phase 2: Navigation loading indicators — added useTransition-based pending states with animate-pulse icons to admin and student navigation (mirroring teacher nav pattern).
+  - Phase 3: Skeleton loaders — replaced PageSkeleton with DataListSkeleton in 10 list pages; created 14 new loading.tsx files for student sub-routes and missing admin pages.
+  - Phase 4: Loading toasts for bulk operations — added toast.loading() indicators to StudentActivationQueue, TeacherActivationQueue, StudentImportWizard, QuestionImportWizard.
+  - Phase 5: Toast format standardization — AST-based ts-morph codemod converted 105 simple toasts to title+description format across 48 files; manually fixed 8 OPTIONS toasts with { id: toastId }.
+
 ## Phase 0 Stop
 
 Stop here and wait for human approval before application initialization or Phase 1 implementation.
@@ -589,8 +596,15 @@ Stop here and wait for human approval before application initialization or Phase
 
 ```text
 Phase: 12 (Release Readiness)
-Status: Phase 12.1 (Production Validation) complete
+Status: Phase 12.1 (Production Validation) complete; UX Polish (Phases 1-5) complete
 Working tree: Clean
+
+Completed (UX Polish — Phases 1-5):
+- Phase 1: Action button spinners (StudentList, TeacherRowActions, AssignTeacherDialog, EditAssignmentDialog, BatchFormDialog)
+- Phase 2: Navigation loading indicators (admin-navigation, student-navigation via useTransition)
+- Phase 3: Skeleton loaders (10 DataListSkeleton swaps + 14 new loading.tsx files)
+- Phase 4: Loading toasts (StudentActivationQueue, TeacherActivationQueue, StudentImportWizard, QuestionImportWizard)
+- Phase 5: Toast format standardization (105 SIMPLE → TITLE_DESC via ts-morph codemod + 8 OPTIONS manual fixes)
 
 Completed (Phase 12.1 — Production Validation):
 - Production build verifies: 59 routes, all correctly classified (ISR public pages, dynamic authenticated pages)

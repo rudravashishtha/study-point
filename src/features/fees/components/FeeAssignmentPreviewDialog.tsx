@@ -92,11 +92,11 @@ export function FeeAssignmentPreviewDialog({
 
   const handlePreview = async () => {
     if (!selectedFeePlanId || !startsOn) {
-      toast.error("Please select a fee plan and start date");
+      toast.error("Error", { description: "Please select a fee plan and start date" });
       return;
     }
     if (selectedEnrolmentIds.size === 0) {
-      toast.error("Please select at least one enrolment");
+      toast.error("Error", { description: "Please select at least one enrolment" });
       return;
     }
     setLoading(true);
@@ -110,13 +110,13 @@ export function FeeAssignmentPreviewDialog({
       };
       const res = await previewFeeAssignmentAction(input);
       if (!res.success) {
-        toast.error(res.error);
+        toast.error("Error", { description: res.error });
         setLoading(false);
         return;
       }
       setPreviewResult(res.data!);
     } catch {
-      toast.error("Preview failed");
+      toast.error("Error", { description: "Preview failed" });
     }
     setLoading(false);
   };
@@ -126,8 +126,15 @@ export function FeeAssignmentPreviewDialog({
     setShowConfirm(false);
   };
 
-  const formatAmount = (amount: number | { toNumber: () => number }) => {
-    const num = typeof amount === "number" ? amount : amount.toNumber();
+  const formatAmount = (amount: number | string | { toNumber: () => number }) => {
+    let num: number;
+    if (typeof amount === "number") {
+      num = amount;
+    } else if (typeof amount === "string") {
+      num = parseFloat(amount);
+    } else {
+      num = amount.toNumber();
+    }
     return `\u20B9${num.toFixed(2)}`;
   };
 
@@ -155,8 +162,8 @@ export function FeeAssignmentPreviewDialog({
                   Configuration
                 </h3>
 
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Fee Plan *</label>
+                <div className="space-y-3">
+                  <label className="block mb-1.5 text-sm font-medium">Fee Plan *</label>
                   <select
                     value={selectedFeePlanId}
                     onChange={(e) => {
@@ -180,8 +187,8 @@ export function FeeAssignmentPreviewDialog({
                 {selectedFeePlan && (
                   <>
                     <div className="grid grid-cols-2 gap-4">
-                      <div className="space-y-2">
-                        <label className="text-sm font-medium">Start Date *</label>
+                      <div className="space-y-3">
+                        <label className="block mb-1.5 text-sm font-medium">Start Date *</label>
                         <input
                           type="date"
                           value={startsOn}
@@ -192,8 +199,8 @@ export function FeeAssignmentPreviewDialog({
                           className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                         />
                       </div>
-                      <div className="space-y-2">
-                        <label className="text-sm font-medium">End Date</label>
+                      <div className="space-y-3">
+                        <label className="block mb-1.5 text-sm font-medium">End Date</label>
                         <input
                           type="date"
                           value={endsOn}

@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Teacher, PermissionCapability } from "@prisma/client";
 import { assignTeacherAction } from "../../actions/batch-actions";
 import { Button } from "@/components/ui/button";
+import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import {
   Dialog,
@@ -84,7 +85,7 @@ export function AssignTeacherDialog({
 
         <div className="flex-1 overflow-y-auto px-4 py-4 sm:px-6">
           <div className="space-y-6">
-            <div className="space-y-2">
+            <div className="space-y-3">
               <Label>
                 Select Teacher <span className="text-red-500">*</span>
               </Label>
@@ -111,7 +112,7 @@ export function AssignTeacherDialog({
               </Select>
             </div>
 
-            <div className="space-y-2">
+            <div className="space-y-3">
               <Label>
                 Capabilities <span className="text-red-500">*</span>
               </Label>
@@ -138,7 +139,14 @@ export function AssignTeacherDialog({
               !permissions.includes("BATCH_VIEW")
             }
           >
-            {isSubmitting ? "Assigning..." : "Assign Teacher"}
+            {isSubmitting ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Assigning...
+              </>
+            ) : (
+              "Assign Teacher"
+            )}
           </Button>
         </div>
       </DialogContent>

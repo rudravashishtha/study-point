@@ -41,11 +41,9 @@ export function SessionFormDialog({
     execute(
       actionArgs as /* eslint-disable-line @typescript-eslint/no-explicit-any -- Justified: Server action boundary */ any,
       {
-        onError: (err) => toast.error(err),
+        onError: (err) => toast.error("Error", { description: err }),
         onSuccess: () => {
-          toast.success(
-            session ? "Session updated successfully" : "Session created successfully",
-          );
+          toast.success("Success", { description: session ? "Session updated successfully" : "Session created successfully" });
           onOpenChange(false);
           router.refresh();
         },
@@ -75,7 +73,7 @@ export function SessionFormDialog({
 
         <div className="flex-1 overflow-y-auto px-4 py-4 sm:px-6">
           <form id="session-form" onSubmit={handleSubmit} className="space-y-4">
-            <div className="space-y-2">
+            <div className="space-y-3">
               <label htmlFor="name" className="text-sm font-medium">
                 Session Name *
               </label>
@@ -88,7 +86,7 @@ export function SessionFormDialog({
                 placeholder="e.g. 2026-27"
               />
             </div>
-            <div className="space-y-2">
+            <div className="space-y-3">
               <label htmlFor="startsOn" className="text-sm font-medium">
                 Start Date
               </label>
@@ -100,7 +98,7 @@ export function SessionFormDialog({
                 className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
               />
             </div>
-            <div className="space-y-2">
+            <div className="space-y-3">
               <label htmlFor="endsOn" className="text-sm font-medium">
                 End Date
               </label>

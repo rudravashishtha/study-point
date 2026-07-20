@@ -5,7 +5,7 @@ import { useForm, useFieldArray } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { toast } from "sonner";
-import { Plus, Trash2, Clock } from "lucide-react";
+import { Plus, Trash2, Clock, Copy } from "lucide-react";
 import { BatchSchedule } from "@prisma/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -96,14 +96,14 @@ export function BatchScheduleEditor({
         }));
         const result = await updateBatchSchedulesAction(batch.id, cleaned);
         if (!result.success) {
-          toast.error(result.error.message);
+          toast.error("Error", { description: result.error.message });
           return;
         }
-        toast.success("Batch schedules updated successfully");
+        toast.success("Success", { description: "Batch schedules updated successfully" });
         // We reset form values to matched saved data to clear any dirty state
         form.reset(data);
       } catch {
-        toast.error("An unexpected error occurred");
+        toast.error("Error", { description: "An unexpected error occurred" });
       }
     });
   };
@@ -115,7 +115,7 @@ export function BatchScheduleEditor({
         {batch.schedules.length === 0 ? (
           <p className="text-muted-foreground text-sm">No schedules assigned.</p>
         ) : (
-          <div className="space-y-2">
+          <div className="space-y-3">
             {batch.schedules.map((s) => (
               <div
                 key={s.id}
@@ -203,7 +203,32 @@ export function BatchScheduleEditor({
                 key={field.id}
                 className="flex flex-col gap-4 p-4 border rounded-md relative"
               >
-                <div className="absolute right-2 top-2">
+                <div className="absolute right-2 top-2 flex gap-1">
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    className="h-8 w-8"
+                    onClick={() => {
+                      const current = form.getValues(`schedules.${index}`);
+                      append(
+                        {
+                          dayOfWeek: current.dayOfWeek,
+                          startTime: current.startTime,
+                          endTime: current.endTime,
+                          roomOrLocation: current.roomOrLocation ?? "",
+                          liveClassUrl: current.liveClassUrl ?? "",
+                          isActive: current.isActive,
+                        },
+                        { shouldFocus: false },
+                      );
+                    }}
+                    disabled={isPending}
+                    title="Duplicate this schedule"
+                  >
+                    <Copy className="size-4" />
+                    <span className="sr-only">Duplicate</span>
+                  </Button>
                   <Button
                     type="button"
                     variant="ghost"

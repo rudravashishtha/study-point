@@ -3,7 +3,7 @@ import { AuthScreen } from "@/features/auth/components/AuthScreen";
 import { LoginForm } from "@/features/auth/components/LoginForm";
 
 export const metadata: Metadata = {
-  title: "Sign in | Study Point Mathematics",
+  title: "Sign in | Study Point",
 };
 
 export default function LoginPage() {

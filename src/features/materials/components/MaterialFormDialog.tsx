@@ -234,7 +234,7 @@ export function MaterialFormDialog({
 
                 {visibility === "CURRICULUM_TRACK" && (
                   <>
-                    <div className="space-y-2">
+                    <div className="space-y-3">
                       <Label>Academic Session</Label>
                       <Select
                         value={academicSessionId}
@@ -253,7 +253,7 @@ export function MaterialFormDialog({
                         </SelectContent>
                       </Select>
                     </div>
-                    <div className="space-y-2">
+                    <div className="space-y-3">
                       <Label>Curriculum Track</Label>
                       <Select
                         value={curriculumTrackId}

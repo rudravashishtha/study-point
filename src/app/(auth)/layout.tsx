@@ -10,7 +10,7 @@ export default function AuthLayout({ children }: { children: ReactNode }) {
         <div className="w-full max-w-md">{children}</div>
       </main>
       <footer className="py-4 text-center text-xs text-muted-foreground">
-        Study Point Mathematics
+        Study Point
       </footer>
     </div>
   );

@@ -41,11 +41,9 @@ export function ProgrammeFormDialog({
 
       if (!res.success) {
         setError(res.error);
-        toast.error(res.error);
+        toast.error("Error", { description: res.error });
       } else {
-        toast.success(
-          programme ? "Programme updated successfully" : "Programme created successfully",
-        );
+        toast.success("Success", { description: programme ? "Programme updated successfully" : "Programme created successfully" });
         onOpenChange(false);
         router.refresh();
       }
@@ -67,7 +65,7 @@ export function ProgrammeFormDialog({
 
         <div className="flex-1 overflow-y-auto px-4 py-4 sm:px-6">
           <form id="programme-form" onSubmit={handleSubmit} className="space-y-4">
-            <div className="space-y-2">
+            <div className="space-y-3">
               <label htmlFor="boardId" className="text-sm font-medium">
                 Board *{" "}
                 {programme && (
@@ -92,7 +90,7 @@ export function ProgrammeFormDialog({
                 ))}
               </select>
             </div>
-            <div className="space-y-2">
+            <div className="space-y-3">
               <label htmlFor="code" className="text-sm font-medium">
                 Programme Code *{" "}
                 {programme && (
@@ -109,7 +107,7 @@ export function ProgrammeFormDialog({
                 placeholder="e.g. CLASS_10"
               />
             </div>
-            <div className="space-y-2">
+            <div className="space-y-3">
               <label htmlFor="name" className="text-sm font-medium">
                 Programme Name *
               </label>

@@ -54,20 +54,19 @@ export default async function AdminCurriculumSubjectsPage({
         <DataListArchiveFilter />
       </div>
 
-      {subjects.length === 0 ? (
+      <SubjectList subjects={subjects} emptyState={
         <DataListEmpty
           title="No subjects found."
           isFiltered={params.query !== "" || params.archiveState !== "active"}
         />
-      ) : (
-        <>
-          <SubjectList subjects={subjects} />
-          <DataListPagination
-            currentPage={params.page}
-            totalItems={total}
-            pageSize={params.pageSize}
-          />
-        </>
+      } />
+
+      {subjects.length > 0 && (
+        <DataListPagination
+          currentPage={params.page}
+          totalItems={total}
+          pageSize={params.pageSize}
+        />
       )}
     </div>
   );

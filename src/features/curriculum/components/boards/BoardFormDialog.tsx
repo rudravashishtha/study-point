@@ -38,11 +38,9 @@ export function BoardFormDialog({
 
       if (!res.success) {
         setError(res.error);
-        toast.error(res.error);
+        toast.error("Error", { description: res.error });
       } else {
-        toast.success(
-          board ? "Board updated successfully" : "Board created successfully",
-        );
+        toast.success("Success", { description: board ? "Board updated successfully" : "Board created successfully" });
         onOpenChange(false);
         router.refresh();
       }
@@ -64,7 +62,7 @@ export function BoardFormDialog({
 
         <div className="flex-1 overflow-y-auto px-4 py-4 sm:px-6">
           <form id="board-form" onSubmit={handleSubmit} className="space-y-4">
-            <div className="space-y-2">
+            <div className="space-y-3">
               <label htmlFor="code" className="text-sm font-medium">
                 Board Code *{" "}
                 {board && (
@@ -81,7 +79,7 @@ export function BoardFormDialog({
                 placeholder="e.g. CBSE"
               />
             </div>
-            <div className="space-y-2">
+            <div className="space-y-3">
               <label htmlFor="name" className="text-sm font-medium">
                 Board Name *
               </label>

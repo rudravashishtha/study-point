@@ -75,16 +75,16 @@ export function LiveClassForm({
         }
 
         if (result.success) {
-          toast.success("Live class saved successfully.");
+          toast.success("Success", { description: "Live class saved successfully." });
           onSuccess?.();
         } else {
-          toast.error(result.error?.message || "Something went wrong.");
+          toast.error("Error", { description: result.error?.message || "Something went wrong." });
         }
       } catch (err: unknown) {
         if (err instanceof Error) {
-          toast.error(err.message || "An error occurred");
+          toast.error("Error", { description: err.message || "An error occurred" });
         } else {
-          toast.error("An unknown error occurred");
+          toast.error("Error", { description: "An unknown error occurred" });
         }
       }
     });
@@ -92,7 +92,7 @@ export function LiveClassForm({
 
   return (
     <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-      <div className="space-y-2">
+      <div className="space-y-3">
         <Label htmlFor="title">Title</Label>
         <Input
           id="title"
@@ -107,7 +107,7 @@ export function LiveClassForm({
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div className="space-y-2">
+        <div className="space-y-3">
           <Label>Batch</Label>
           <Select
             onValueChange={(v) => form.setValue("batchId", v as string)}
@@ -131,7 +131,7 @@ export function LiveClassForm({
           )}
         </div>
 
-        <div className="space-y-2">
+        <div className="space-y-3">
           <Label>Teacher</Label>
           <Select
             onValueChange={(v) => form.setValue("teacherId", v as string)}
@@ -157,17 +157,17 @@ export function LiveClassForm({
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div className="space-y-2">
+        <div className="space-y-3">
           <Label>Start Time</Label>
           <Input type="datetime-local" {...form.register("scheduledStartTime")} />
         </div>
-        <div className="space-y-2">
+        <div className="space-y-3">
           <Label>End Time</Label>
           <Input type="datetime-local" {...form.register("scheduledEndTime")} />
         </div>
       </div>
 
-      <div className="space-y-2">
+      <div className="space-y-3">
         <Label htmlFor="meetingUrl">Meeting URL (Optional)</Label>
         <Input
           id="meetingUrl"

@@ -38,11 +38,9 @@ export function SubjectFormDialog({
 
       if (!res.success) {
         setError(res.error);
-        toast.error(res.error);
+        toast.error("Error", { description: res.error });
       } else {
-        toast.success(
-          subject ? "Subject updated successfully" : "Subject created successfully",
-        );
+        toast.success("Success", { description: subject ? "Subject updated successfully" : "Subject created successfully" });
         onOpenChange(false);
         router.refresh();
       }
@@ -64,7 +62,7 @@ export function SubjectFormDialog({
 
         <div className="flex-1 overflow-y-auto px-4 py-4 sm:px-6">
           <form id="subject-form" onSubmit={handleSubmit} className="space-y-4">
-            <div className="space-y-2">
+            <div className="space-y-3">
               <label htmlFor="code" className="text-sm font-medium">
                 Subject Code *{" "}
                 {subject && (
@@ -81,7 +79,7 @@ export function SubjectFormDialog({
                 placeholder="e.g. MATH"
               />
             </div>
-            <div className="space-y-2">
+            <div className="space-y-3">
               <label htmlFor="name" className="text-sm font-medium">
                 Subject Name *
               </label>

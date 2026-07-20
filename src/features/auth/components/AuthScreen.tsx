@@ -21,7 +21,7 @@ const THEMES: Record<
   },
   student: {
     title: "Welcome, student",
-    subtitle: "Continue your mathematics journey",
+    subtitle: "Continue your learning journey",
     card: "border-rose-200 bg-rose-50/60",
     accent: "text-rose-600",
   },
@@ -56,7 +56,7 @@ export function AuthScreen({
   return (
     <div className={`rounded-2xl border bg-card p-6 shadow-sm sm:p-8 ${t.card}`}>
       <div className="mb-6">
-        <p className={`text-sm font-medium ${t.accent}`}>Study Point Mathematics</p>
+        <p className={`text-sm font-medium ${t.accent}`}>Study Point</p>
         <h1 className="mt-1 text-2xl font-semibold tracking-tight">{t.title}</h1>
         <p className="mt-1 text-sm text-muted-foreground">{t.subtitle}</p>
       </div>

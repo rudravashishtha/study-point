@@ -49,7 +49,7 @@ export function ImportHistoryPageClient({
     try {
       const res = await fetch(`/api/imports/${jobId}/errors`);
       if (!res.ok) {
-        toast.error("No error report available");
+        toast.error("Error", { description: "No error report available" });
         return;
       }
       const data = await res.json();
@@ -63,7 +63,7 @@ export function ImportHistoryPageClient({
       a.click();
       URL.revokeObjectURL(url);
     } catch {
-      toast.error("Failed to download error report");
+      toast.error("Error", { description: "Failed to download error report" });
     }
   };
 
@@ -71,13 +71,13 @@ export function ImportHistoryPageClient({
     try {
       const res = await fetch("/api/imports/cleanup", { method: "DELETE" });
       if (res.ok) {
-        toast.success("Expired imports cleaned up");
+        toast.success("Success", { description: "Expired imports cleaned up" });
         router.refresh();
       } else {
-        toast.error("Cleanup failed");
+        toast.error("Error", { description: "Cleanup failed" });
       }
     } catch {
-      toast.error("Cleanup failed");
+      toast.error("Error", { description: "Cleanup failed" });
     }
   };
 

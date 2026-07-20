@@ -52,7 +52,7 @@ export function StudentTimetableGrid({
               )}
             </div>
 
-            <div className="space-y-2">
+            <div className="space-y-3">
               {group.schedules.map((s) => (
                 <div
                   key={s.id}

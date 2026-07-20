@@ -35,10 +35,10 @@ export function AgendaView({
     startTransition(async () => {
       const result = await cancelLiveClassAction(id);
       if (result.success) {
-        toast.success("Class cancelled successfully");
+        toast.success("Success", { description: "Class cancelled successfully" });
         setCancelingId(null);
       } else {
-        toast.error(result.error?.message || "Failed to cancel class");
+        toast.error("Error", { description: result.error?.message || "Failed to cancel class" });
       }
     });
   };
@@ -48,7 +48,7 @@ export function AgendaView({
       {sessions.length === 0 ? (
         <p className="text-muted-foreground">No upcoming live classes scheduled.</p>
       ) : (
-        <ul className="space-y-2">
+        <ul className="space-y-3">
           {sessions.map((session) => (
             <li
               key={session.id}

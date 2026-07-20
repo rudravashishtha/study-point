@@ -3,7 +3,7 @@ import { AuthScreen } from "@/features/auth/components/AuthScreen";
 import { ResetPasswordForm } from "@/features/auth/components/ResetPasswordForm";
 
 export const metadata: Metadata = {
-  title: "Set your password | Study Point Mathematics",
+  title: "Set your password | Study Point",
   other: { referrer: "no-referrer" },
 };
 

@@ -1,12 +1,11 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useState, useTransition, useEffect, useRef } from "react";
 import { toast } from "sonner";
 import { Batch } from "@prisma/client";
-import { Search, UserCheck, AlertCircle } from "lucide-react";
+import { Search, UserCheck, AlertCircle, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import {
   Dialog,
   DialogContent,
@@ -15,7 +14,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import {
-  lookupStudentByCodeAction,
+  listActiveStudentsAction,
   resolveStudentBatchMembershipAction,
   createEnrolmentForBatchAction,
   assignEnrolmentToBatchAction,
@@ -26,7 +25,12 @@ type MembershipStatus = {
   enrolment?: { id: string; batchId: string | null; batch?: { name: string } | null };
 };
 
-type FoundStudent = { id: string; studentCode: string; fullName: string };
+type Student = { id: string; studentCode: string; fullName: string };
+
+type ResolvedStudent = {
+  student: Student;
+  membership: MembershipStatus;
+};
 
 export function AddStudentToBatchDialog({
   open,
@@ -38,70 +42,144 @@ export function AddStudentToBatchDialog({
   batch: Batch;
 }) {
   const [isPending, startTransition] = useTransition();
-  const [studentCode, setStudentCode] = useState("");
-  const [foundStudent, setFoundStudent] = useState<FoundStudent | null>(null);
-  const [membership, setMembership] = useState<MembershipStatus | null>(null);
+  const [students, setStudents] = useState<Student[]>([]);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [resolved, setResolved] = useState<ResolvedStudent[] | null>(null);
+  const abortRef = useRef(0);
 
-  const handleSearch = () => {
-    if (!studentCode.trim()) return;
+  useEffect(() => {
+    if (!open) return;
+
+    let cancelled = false;
+    const generation = ++abortRef.current;
+
+    listActiveStudentsAction().then((result) => {
+      if (!cancelled && generation === abortRef.current && result.success) {
+        setStudents(result.data);
+      }
+    });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [open]);
+
+  useEffect(() => {
+    if (!open) return;
+
+    let cancelled = false;
+    const timer = setTimeout(() => {
+      listActiveStudentsAction(searchQuery || undefined).then((result) => {
+        if (!cancelled && result.success) {
+          setStudents(result.data);
+        }
+      });
+    }, 300);
+
+    return () => {
+      cancelled = true;
+      clearTimeout(timer);
+    };
+  }, [searchQuery, open]);
+
+  const toggleStudent = (studentId: string) => {
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(studentId)) {
+        next.delete(studentId);
+      } else {
+        next.add(studentId);
+      }
+      return next;
+    });
+  };
+
+  const toggleAll = () => {
+    if (selectedIds.size === students.length) {
+      setSelectedIds(new Set());
+    } else {
+      setSelectedIds(new Set(students.map((s) => s.id)));
+    }
+  };
+
+  const handleResolve = () => {
+    if (selectedIds.size === 0) return;
 
     startTransition(async () => {
-      setFoundStudent(null);
-      setMembership(null);
+      const results: ResolvedStudent[] = [];
+      const selected = students.filter((s) => selectedIds.has(s.id));
 
-      const lookupResult = await lookupStudentByCodeAction(studentCode.trim());
-      if (!lookupResult.success) {
-        toast.error(lookupResult.error.message || "Student not found");
-        return;
-      }
-
-      const student = lookupResult.data;
-      setFoundStudent(student);
-
-      const membershipResult = await resolveStudentBatchMembershipAction(
-        batch.id,
-        student.id,
-      );
-      if (!membershipResult.success) {
-        toast.error(
-          membershipResult.error.message || "Failed to resolve membership status",
+      for (const student of selected) {
+        const membershipResult = await resolveStudentBatchMembershipAction(
+          batch.id,
+          student.id,
         );
-        return;
+        if (membershipResult.success) {
+          results.push({
+            student,
+            membership: membershipResult.data as MembershipStatus,
+          });
+        }
       }
 
-      setMembership(membershipResult.data as MembershipStatus);
+      setResolved(results);
     });
   };
 
   const handleConfirm = () => {
-    if (!foundStudent || !membership) return;
+    if (!resolved) return;
 
     startTransition(async () => {
-      let result;
-      if (membership.state === "UNENROLLED") {
-        result = await createEnrolmentForBatchAction(batch.id, foundStudent.id);
-      } else if (membership.state === "UNASSIGNED" && membership.enrolment) {
-        result = await assignEnrolmentToBatchAction(batch.id, membership.enrolment.id);
+      let enrolled = 0;
+      let skipped = 0;
+
+      for (const { student, membership } of resolved) {
+        if (membership.state === "ALREADY_IN_BATCH" || membership.state === "ASSIGNED_ELSEWHERE") {
+          skipped++;
+          continue;
+        }
+
+        let result;
+        if (membership.state === "UNENROLLED") {
+          result = await createEnrolmentForBatchAction(batch.id, student.id);
+        } else if (membership.state === "UNASSIGNED" && membership.enrolment) {
+          result = await assignEnrolmentToBatchAction(batch.id, membership.enrolment.id);
+        } else {
+          skipped++;
+          continue;
+        }
+
+        if (result.success) {
+          enrolled++;
+        } else {
+          skipped++;
+        }
+      }
+
+      if (enrolled > 0) {
+        toast.success("Success", {
+          description: `${enrolled} student${enrolled === 1 ? "" : "s"} enrolled successfully${skipped > 0 ? `. ${skipped} skipped.` : ""}`,
+        });
       } else {
-        return; // Should not reach here
+        toast.error("Error", { description: "No students could be enrolled." });
       }
 
-      if (!result.success) {
-        toast.error(result.error.message || "Failed to enrol student");
-        return;
-      }
-
-      toast.success("Student enrolled in batch successfully");
       resetAndClose();
     });
   };
 
   const resetAndClose = () => {
-    setStudentCode("");
-    setFoundStudent(null);
-    setMembership(null);
+    setSearchQuery("");
+    setSelectedIds(new Set());
+    setResolved(null);
+    setStudents([]);
     onOpenChange(false);
   };
+
+  const canEnroll = resolved?.some(
+    (r) => r.membership.state === "UNENROLLED" || r.membership.state === "UNASSIGNED",
+  );
 
   return (
     <Dialog
@@ -111,117 +189,176 @@ export function AddStudentToBatchDialog({
         else onOpenChange(val);
       }}
     >
-      <DialogContent className="sm:max-w-md p-0 flex flex-col overflow-hidden max-h-[90vh]">
+      <DialogContent className="sm:max-w-lg p-0 flex flex-col overflow-hidden max-h-[90vh]">
         <DialogHeader className="px-4 pt-4 pb-2 sm:px-6 sm:pt-6">
-          <DialogTitle>Enrol Student in Batch</DialogTitle>
+          <DialogTitle>Enrol Students in Batch</DialogTitle>
           <DialogDescription>
-            Search for a student by their code to assign them to this batch.
+            {resolved
+              ? "Review the enrolment status for each student."
+              : "Select students to assign them to this batch."}
           </DialogDescription>
         </DialogHeader>
 
-        <div className="flex-1 overflow-y-auto px-4 py-4 sm:px-6 space-y-4">
-          <div className="flex items-end gap-2">
-            <div className="grid gap-2 flex-1">
-              <Label htmlFor="studentCode">Student Code</Label>
+        <div className="flex-1 overflow-hidden flex flex-col px-4 py-4 sm:px-6 gap-4">
+          {/* Search — only visible during selection */}
+          {!resolved && (
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
               <Input
-                id="studentCode"
-                placeholder="e.g. STU-2026-0001"
-                value={studentCode}
-                onChange={(e) => setStudentCode(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter") {
-                    e.preventDefault();
-                    handleSearch();
-                  }
-                }}
+                placeholder="Search by name or code..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="pl-9"
                 disabled={isPending}
               />
             </div>
-            <Button onClick={handleSearch} disabled={isPending || !studentCode.trim()}>
-              <Search className="size-4 mr-2" />
-              Search
-            </Button>
-          </div>
+          )}
 
-          {foundStudent && membership && (
-            <div className="border rounded-md p-4 bg-muted/30 space-y-3">
-              <div>
-                <p className="text-sm font-medium">Student Found</p>
-                <p className="text-lg">{foundStudent.fullName}</p>
-                <p className="text-sm text-muted-foreground">
-                  {foundStudent.studentCode}
-                </p>
-              </div>
+          {/* Selection summary bar */}
+          {!resolved && selectedIds.size > 0 && (
+            <div className="flex items-center justify-between text-sm bg-muted/50 rounded-md px-3 py-2">
+              <span className="font-medium">{selectedIds.size} selected</span>
+              <button
+                type="button"
+                onClick={() => setSelectedIds(new Set())}
+                className="text-muted-foreground hover:text-foreground underline"
+              >
+                Clear
+              </button>
+            </div>
+          )}
 
-              <div className="pt-2 border-t">
-                {membership.state === "ALREADY_IN_BATCH" && (
-                  <div className="flex items-start gap-2 text-green-600">
-                    <UserCheck className="size-5 mt-0.5" />
-                    <div>
-                      <p className="font-medium">Already in this batch</p>
-                      <p className="text-sm">
-                        This student is already enrolled in this batch.
-                      </p>
+          {/* Student list with checkboxes */}
+          {!resolved && (
+            <div className="flex-1 overflow-y-auto border rounded-md min-h-0 max-h-[50vh]">
+              {students.length === 0 ? (
+                <div className="py-8 text-center text-sm text-muted-foreground">
+                  {searchQuery ? "No students match your search." : "No active students found."}
+                </div>
+              ) : (
+                <>
+                  <button
+                    type="button"
+                    onClick={toggleAll}
+                    className="w-full text-left px-4 py-2.5 border-b bg-muted/30 hover:bg-muted/50 transition-colors flex items-center gap-3 text-sm font-medium"
+                  >
+                    <div
+                      className={`size-4 rounded border flex items-center justify-center shrink-0 ${
+                        selectedIds.size === students.length && students.length > 0
+                          ? "bg-primary border-primary text-primary-foreground"
+                          : selectedIds.size > 0
+                            ? "bg-primary border-primary text-primary-foreground"
+                            : "border-muted-foreground/50"
+                      }`}
+                    >
+                      {selectedIds.size === students.length && students.length > 0 ? (
+                        <Check className="size-3" />
+                      ) : selectedIds.size > 0 ? (
+                        <div className="size-1.5 bg-primary-foreground rounded-sm" />
+                      ) : null}
+                    </div>
+                    Select all
+                  </button>
+                  {students.map((student) => (
+                    <button
+                      key={student.id}
+                      type="button"
+                      onClick={() => toggleStudent(student.id)}
+                      disabled={isPending}
+                      className="w-full text-left px-4 py-3 hover:bg-muted/50 transition-colors disabled:opacity-50 flex items-center gap-3 border-b last:border-b-0"
+                    >
+                      <div
+                        className={`size-4 rounded border flex items-center justify-center shrink-0 ${
+                          selectedIds.has(student.id)
+                            ? "bg-primary border-primary text-primary-foreground"
+                            : "border-muted-foreground/50"
+                        }`}
+                      >
+                        {selectedIds.has(student.id) && <Check className="size-3" />}
+                      </div>
+                      <div>
+                        <p className="text-sm font-medium">{student.fullName}</p>
+                        <p className="text-xs text-muted-foreground">{student.studentCode}</p>
+                      </div>
+                    </button>
+                  ))}
+                </>
+              )}
+            </div>
+          )}
+
+          {/* Resolved summary */}
+          {resolved && (
+            <div className="flex-1 overflow-y-auto border rounded-md divide-y min-h-0 max-h-[50vh]">
+              {resolved.length === 0 ? (
+                <div className="py-8 text-center text-sm text-muted-foreground">
+                  No students were resolved.
+                </div>
+              ) : (
+                resolved.map(({ student, membership }) => (
+                  <div
+                    key={student.id}
+                    className="px-4 py-3 flex items-start justify-between gap-3"
+                  >
+                    <div className="min-w-0">
+                      <p className="text-sm font-medium truncate">{student.fullName}</p>
+                      <p className="text-xs text-muted-foreground">{student.studentCode}</p>
+                    </div>
+                    <div className="shrink-0">
+                      {membership.state === "ALREADY_IN_BATCH" && (
+                        <span className="inline-flex items-center gap-1 text-xs font-medium text-green-600">
+                          <UserCheck className="size-3.5" /> Already in batch
+                        </span>
+                      )}
+                      {membership.state === "ASSIGNED_ELSEWHERE" && (
+                        <span className="inline-flex items-center gap-1 text-xs font-medium text-destructive">
+                          <AlertCircle className="size-3.5" />{" "}
+                          {membership.enrolment?.batch?.name || "In another batch"}
+                        </span>
+                      )}
+                      {membership.state === "UNENROLLED" && (
+                        <span className="inline-flex items-center gap-1 text-xs font-medium text-primary">
+                          <Check className="size-3.5" /> Will enrol + assign
+                        </span>
+                      )}
+                      {membership.state === "UNASSIGNED" && (
+                        <span className="inline-flex items-center gap-1 text-xs font-medium text-primary">
+                          <Check className="size-3.5" /> Will assign
+                        </span>
+                      )}
                     </div>
                   </div>
-                )}
-                {membership.state === "ASSIGNED_ELSEWHERE" && (
-                  <div className="flex items-start gap-2 text-destructive">
-                    <AlertCircle className="size-5 mt-0.5" />
-                    <div>
-                      <p className="font-medium">Assigned to another batch</p>
-                      <p className="text-sm">
-                        This student is currently assigned to{" "}
-                        <strong>
-                          {membership.enrolment?.batch?.name || "another batch"}
-                        </strong>
-                        . Cross-batch transfers are not supported in this dialog.
-                      </p>
-                    </div>
-                  </div>
-                )}
-                {membership.state === "UNENROLLED" && (
-                  <div className="text-sm">
-                    <p>
-                      The student is not enrolled in this curriculum track for this
-                      session.
-                    </p>
-                    <p className="mt-1 font-medium text-primary">
-                      They will be enrolled and assigned to this batch.
-                    </p>
-                  </div>
-                )}
-                {membership.state === "UNASSIGNED" && (
-                  <div className="text-sm">
-                    <p>
-                      The student is enrolled in this curriculum track but not assigned to
-                      any batch.
-                    </p>
-                    <p className="mt-1 font-medium text-primary">
-                      Their enrolment will be assigned to this batch.
-                    </p>
-                  </div>
-                )}
-              </div>
+                ))
+              )}
             </div>
           )}
         </div>
 
         <div className="m-0 p-4 sm:p-6 border-t bg-muted/40 flex justify-end gap-2">
-          <Button variant="outline" onClick={resetAndClose} disabled={isPending}>
-            Cancel
-          </Button>
-          <Button
-            onClick={handleConfirm}
-            disabled={
-              isPending ||
-              !membership ||
-              membership.state === "ALREADY_IN_BATCH" ||
-              membership.state === "ASSIGNED_ELSEWHERE"
-            }
-          >
-            {isPending ? "Processing..." : "Confirm Enrolment"}
-          </Button>
+          {resolved ? (
+            <>
+              <Button variant="outline" onClick={() => setResolved(null)} disabled={isPending}>
+                Back
+              </Button>
+              <Button onClick={handleConfirm} disabled={isPending || !canEnroll}>
+                {isPending
+                  ? "Processing..."
+                  : `Confirm (${resolved.filter((r) => r.membership.state === "UNENROLLED" || r.membership.state === "UNASSIGNED").length})`}
+              </Button>
+            </>
+          ) : (
+            <>
+              <Button variant="outline" onClick={resetAndClose} disabled={isPending}>
+                Cancel
+              </Button>
+              <Button
+                onClick={handleResolve}
+                disabled={isPending || selectedIds.size === 0}
+              >
+                {isPending ? "Checking..." : `Enrol Selected (${selectedIds.size})`}
+              </Button>
+            </>
+          )}
         </div>
       </DialogContent>
     </Dialog>

@@ -3,13 +3,11 @@ import { requireAdmin } from "@/lib/auth/permissions";
 import { parseListParams } from "@/lib/url/search-params";
 import { listTracks } from "@/server/services/curriculum/tracks";
 import { listBoards } from "@/server/services/curriculum/boards";
-import { listProgrammes } from "@/server/services/curriculum/programmes";
 import { listSubjects } from "@/server/services/curriculum/subjects";
 import { TrackList } from "@/features/curriculum/components/tracks/TrackList";
 import { DataListSearch } from "@/components/admin/data-list/DataListSearch";
 import { DataListArchiveFilter } from "@/components/admin/data-list/DataListArchiveFilter";
 import { DataListPagination } from "@/components/admin/data-list/DataListPagination";
-import { DataListEmpty } from "@/components/admin/data-list/DataListEmpty";
 import { LayoutTemplate } from "lucide-react";
 import Link from "next/link";
 
@@ -28,7 +26,6 @@ export default async function AdminCurriculumTracksPage({
   const [
     { data: tracks, total },
     { data: boards },
-    { data: programmes },
     { data: subjects },
   ] = await Promise.all([
     listTracks({
@@ -40,14 +37,6 @@ export default async function AdminCurriculumTracksPage({
       sortDir: params.sortDir,
     }),
     listBoards({
-      page: 1,
-      pageSize: 1000,
-      archiveState: "active",
-      query: "",
-      sortField: "name",
-      sortDir: "asc",
-    }),
-    listProgrammes({
       page: 1,
       pageSize: 1000,
       archiveState: "active",
@@ -90,24 +79,18 @@ export default async function AdminCurriculumTracksPage({
         <DataListArchiveFilter />
       </div>
 
-      {tracks.length === 0 && !params.query && params.archiveState === "active" ? (
-        <DataListEmpty title="No tracks found." isFiltered={false} />
-      ) : tracks.length === 0 ? (
-        <DataListEmpty title="No tracks found." isFiltered={true} />
-      ) : (
-        <>
-          <TrackList
-            tracks={tracks}
-            boards={boards}
-            programmes={programmes}
-            subjects={subjects}
-          />
-          <DataListPagination
-            currentPage={params.page}
-            totalItems={total}
-            pageSize={params.pageSize}
-          />
-        </>
+      <TrackList
+        tracks={tracks}
+        boards={boards}
+        subjects={subjects}
+      />
+
+      {tracks.length > 0 && (
+        <DataListPagination
+          currentPage={params.page}
+          totalItems={total}
+          pageSize={params.pageSize}
+        />
       )}
     </div>
   );

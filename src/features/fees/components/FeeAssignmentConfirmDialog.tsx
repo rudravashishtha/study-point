@@ -37,18 +37,16 @@ export function FeeAssignmentConfirmDialog({
     try {
       const res = await confirmFeeAssignmentAction(input);
       if (!res.success) {
-        toast.error(res.error);
+        toast.error("Error", { description: res.error });
         setSubmitting(false);
         return;
       }
       const data = res.data!;
       setResult(data);
-      toast.success(
-        `Created ${data.created}, skipped ${data.skipped}, failed ${data.failed}`,
-      );
+      toast.success("Success", { description: `Created ${data.created}, skipped ${data.skipped}, failed ${data.failed}` });
       router.refresh();
     } catch {
-      toast.error("An unexpected error occurred");
+      toast.error("Error", { description: "An unexpected error occurred" });
       setSubmitting(false);
     }
   };

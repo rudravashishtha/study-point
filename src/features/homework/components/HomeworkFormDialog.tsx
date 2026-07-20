@@ -173,7 +173,7 @@ export function HomeworkFormDialog({
                 General Information
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-2">
+                <div className="space-y-3">
                   <Label htmlFor="title">Title</Label>
                   <Input
                     id="title"
@@ -184,7 +184,7 @@ export function HomeworkFormDialog({
                     maxLength={100}
                   />
                 </div>
-                <div className="space-y-2">
+                <div className="space-y-3">
                   <Label htmlFor="batch">Batch</Label>
                   <Select
                     value={batchId}
@@ -229,7 +229,7 @@ export function HomeworkFormDialog({
                 Scheduling
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-2">
+                <div className="space-y-3">
                   <Label htmlFor="assignedDate">Assigned Date</Label>
                   <Input
                     id="assignedDate"
@@ -239,7 +239,7 @@ export function HomeworkFormDialog({
                     required
                   />
                 </div>
-                <div className="space-y-2">
+                <div className="space-y-3">
                   <Label htmlFor="dueDate">Due Date</Label>
                   <Input
                     id="dueDate"
@@ -263,7 +263,7 @@ export function HomeworkFormDialog({
                 Curriculum Mapping
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-2">
+                <div className="space-y-3">
                   <Label>Chapter (Optional)</Label>
                   <Select
                     value={chapterId}
@@ -280,7 +280,7 @@ export function HomeworkFormDialog({
                     </SelectContent>
                   </Select>
                 </div>
-                <div className="space-y-2">
+                <div className="space-y-3">
                   <Label>Topic (Optional)</Label>
                   <Select
                     value={topicId}
@@ -303,7 +303,7 @@ export function HomeworkFormDialog({
               <h3 className="text-sm font-medium text-muted-foreground border-b pb-2">
                 Attachments
               </h3>
-              <div className="space-y-2">
+              <div className="space-y-3">
                 <Label>File Attachment (Optional)</Label>
                 {homework?.fileAssetId && !fileAssetId && (
                   <div className="text-sm text-muted-foreground mb-2">
@@ -315,9 +315,9 @@ export function HomeworkFormDialog({
                     targetBatchId={batchId}
                     onUploadSuccess={(fid) => {
                       setFileAssetId(fid);
-                      toast.success("File uploaded successfully");
+                      toast.success("Success", { description: "File uploaded successfully" });
                     }}
-                    onUploadError={(err) => toast.error(err)}
+                    onUploadError={(err) => toast.error("Error", { description: err })}
                   />
                 ) : (
                   <div className="text-sm text-muted-foreground bg-muted p-4 rounded-md border text-center">

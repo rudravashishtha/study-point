@@ -79,11 +79,9 @@ export function AnnouncementFormDialog({
 
       if (!res.success) {
         setError(res.error);
-        toast.error(res.error);
+        toast.error("Error", { description: res.error });
       } else {
-        toast.success(
-          announcement ? "Notice updated successfully" : "Notice created successfully",
-        );
+        toast.success("Success", { description: announcement ? "Notice updated successfully" : "Notice created successfully" });
         onOpenChange(false);
         router.refresh();
       }
@@ -118,7 +116,7 @@ export function AnnouncementFormDialog({
                 Notice Details
               </h3>
               <div className="grid grid-cols-1 gap-4">
-                <div className="space-y-2">
+                <div className="space-y-3">
                   <label htmlFor="title" className="text-sm font-medium">
                     Title *
                   </label>
@@ -131,7 +129,7 @@ export function AnnouncementFormDialog({
                     placeholder="e.g. Holiday on Friday"
                   />
                 </div>
-                <div className="space-y-2">
+                <div className="space-y-3">
                   <label htmlFor="content" className="text-sm font-medium">
                     Content *
                   </label>
@@ -151,7 +149,7 @@ export function AnnouncementFormDialog({
                 Audience & Priority
               </h3>
               <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                <div className="space-y-2">
+                <div className="space-y-3">
                   <label htmlFor="audience" className="text-sm font-medium">
                     Audience *
                   </label>
@@ -169,7 +167,7 @@ export function AnnouncementFormDialog({
                   </select>
                 </div>
 
-                <div className="space-y-2">
+                <div className="space-y-3">
                   <label htmlFor="priority" className="text-sm font-medium">
                     Priority
                   </label>
@@ -188,7 +186,7 @@ export function AnnouncementFormDialog({
 
               {audience === "CURRICULUM_TRACK" && (
                 <div className="grid grid-cols-1 gap-4">
-                  <div className="space-y-2">
+                  <div className="space-y-3">
                     <label htmlFor="curriculumTrackId" className="text-sm font-medium">
                       Curriculum Track *
                     </label>
@@ -214,7 +212,7 @@ export function AnnouncementFormDialog({
 
               {audience === "BATCH" && (
                 <div className="grid grid-cols-1 gap-4">
-                  <div className="space-y-2">
+                  <div className="space-y-3">
                     <label htmlFor="batchId" className="text-sm font-medium">
                       Batch *
                     </label>
@@ -245,7 +243,7 @@ export function AnnouncementFormDialog({
                 Settings
               </h3>
               <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                <div className="space-y-2">
+                <div className="space-y-3">
                   <label htmlFor="academicSessionId" className="text-sm font-medium">
                     Academic Session
                   </label>
@@ -264,7 +262,7 @@ export function AnnouncementFormDialog({
                   </select>
                 </div>
 
-                <div className="space-y-2">
+                <div className="space-y-3">
                   <label htmlFor="expiresAt" className="text-sm font-medium">
                     Expires At (optional)
                   </label>

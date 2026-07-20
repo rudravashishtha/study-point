@@ -1,2 +1,2 @@
-import { PageSkeleton } from "@/components/feedback/page-skeleton";
-export default PageSkeleton;
+import { DataListSkeleton } from "@/components/admin/data-list/DataListSkeleton";
+export default DataListSkeleton;

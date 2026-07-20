@@ -27,9 +27,9 @@ export function AnnouncementRowActions({
     startTransition(async () => {
       const res = await actionFn(announcement.id);
       if (!res.success) {
-        toast.error(res.error);
+        toast.error("Error", { description: res.error });
       } else {
-        toast.success(successMessage);
+        toast.success("Success", { description: successMessage });
         router.refresh();
       }
     });

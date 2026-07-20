@@ -118,15 +118,15 @@ export function BatchFormDialog({
           : await createBatchAction(data);
 
         if (!result.success) {
-          toast.error(result.error);
+          toast.error("Error", { description: result.error });
           return;
         }
 
-        toast.success(`Batch ${isEditing ? "updated" : "created"} successfully`);
+        toast.success("Success", { description: `Batch ${isEditing ? "updated" : "created"} successfully` });
         onOpenChange(false);
         router.refresh();
       } catch {
-        toast.error("An unexpected error occurred");
+        toast.error("Error", { description: "An unexpected error occurred" });
       }
     });
   };
@@ -216,7 +216,7 @@ export function BatchFormDialog({
                           <SelectContent>
                             {displaySessions.map((session) => (
                               <SelectItem key={session.id} value={session.id}>
-                                {session.name} {session.archivedAt ? "(Archived)" : ""}
+                                {`${session.name}${session.archivedAt ? " (Archived)" : ""}`}
                               </SelectItem>
                             ))}
                           </SelectContent>
@@ -245,9 +245,7 @@ export function BatchFormDialog({
                           <SelectContent>
                             {displayTracks.map((track) => (
                               <SelectItem key={track.id} value={track.id}>
-                                {track.displayName ||
-                                  `${track.board.code} - ${track.subject.name} - Class ${track.classLevel}`}
-                                {track.archivedAt ? " (Archived)" : ""}
+                                {`${track.displayName || `${track.board.code} - ${track.subject.name} - Class ${track.classLevel}`}${track.archivedAt ? " (Archived)" : ""}`}
                               </SelectItem>
                             ))}
                           </SelectContent>
@@ -359,7 +357,7 @@ export function BatchFormDialog({
         </div>
 
         <div className="m-0 p-4 sm:p-6 border-t bg-muted/40 flex justify-end gap-2">
-          <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
+          <Button type="button" variant="outline" onClick={() => onOpenChange(false)} disabled={isPending}>
             Cancel
           </Button>
           <SubmitButton type="submit" form="batch-form" pending={isPending}>

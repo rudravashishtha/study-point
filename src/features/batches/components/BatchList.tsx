@@ -66,13 +66,13 @@ export function BatchList({
       try {
         const result = await archiveBatchAction(id);
         if (!result.success) {
-          toast.error(result.error);
+          toast.error("Error", { description: result.error });
           return;
         }
-        toast.success("Batch archived successfully");
+        toast.success("Success", { description: "Batch archived successfully" });
         router.refresh();
       } catch {
-        toast.error("Failed to archive batch");
+        toast.error("Error", { description: "Failed to archive batch" });
       }
     });
   };
@@ -82,13 +82,13 @@ export function BatchList({
       try {
         const result = await restoreBatchAction(id);
         if (!result.success) {
-          toast.error(result.error);
+          toast.error("Error", { description: result.error });
           return;
         }
-        toast.success("Batch restored successfully");
+        toast.success("Success", { description: "Batch restored successfully" });
         router.refresh();
       } catch {
-        toast.error("Failed to restore batch");
+        toast.error("Error", { description: "Failed to restore batch" });
       }
     });
   };

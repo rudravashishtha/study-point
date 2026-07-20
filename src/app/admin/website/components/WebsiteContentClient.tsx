@@ -120,7 +120,7 @@ export function WebsiteContentClient(props: Props) {
 function HomepageSectionsTab({
   sections,
 }: {
-  sections: /* eslint-disable-line @typescript-eslint/no-explicit-any -- Justified: Prisma payload type is complex */ /* eslint-disable-line @typescript-eslint/no-explicit-any -- Justified: Prisma payload */ any[];
+  sections:   /* eslint-disable-line @typescript-eslint/no-explicit-any -- Justified: Prisma payload */ any[];
 }) {
   const router = useRouter();
   const defaultSections = [
@@ -140,10 +140,10 @@ function HomepageSectionsTab({
   const handleToggle = async (sectionKey: string, isVisible: boolean) => {
     const result = await updateHomepageSectionAction(sectionKey, { isVisible });
     if (result.success) {
-      toast.success("Section visibility updated");
+      toast.success("Success", { description: "Section visibility updated" });
       router.refresh();
     } else {
-      toast.error(result.error);
+      toast.error("Error", { description: result.error });
     }
   };
 
@@ -198,7 +198,7 @@ const whyChooseUsSchema = z.object({
 function WhyChooseUsTab({
   items,
 }: {
-  items: /* eslint-disable-line @typescript-eslint/no-explicit-any -- Justified: Prisma payload type is complex */ /* eslint-disable-line @typescript-eslint/no-explicit-any -- Justified: Prisma payload */ any[];
+  items:   /* eslint-disable-line @typescript-eslint/no-explicit-any -- Justified: Prisma payload */ any[];
 }) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
@@ -250,17 +250,17 @@ function WhyChooseUsTab({
     if (editing) {
       const r = await updateWhyChooseUsItemAction(editing.id, data);
       if (!r.success) {
-        toast.error(r.error);
+        toast.error("Error", { description: r.error });
         return;
       }
     } else {
       const r = await createWhyChooseUsItemAction(data);
       if (!r.success) {
-        toast.error(r.error);
+        toast.error("Error", { description: r.error });
         return;
       }
     }
-    toast.success(editing ? "Item updated" : "Item created");
+    toast.success("Success", { description: editing ? "Item updated" : "Item created" });
     setOpen(false);
     router.refresh();
   };
@@ -268,10 +268,10 @@ function WhyChooseUsTab({
   const handleDelete = async (id: string) => {
     const r = await deleteWhyChooseUsItemAction(id);
     if (r.success) {
-      toast.success("Deleted");
+      toast.success("Success", { description: "Deleted" });
       router.refresh();
     } else {
-      toast.error(r.error);
+      toast.error("Error", { description: r.error });
     }
   };
 
@@ -414,7 +414,7 @@ const methodologySchema = z.object({
 function MethodologyTab({
   steps,
 }: {
-  steps: /* eslint-disable-line @typescript-eslint/no-explicit-any -- Justified: Prisma payload type is complex */ /* eslint-disable-line @typescript-eslint/no-explicit-any -- Justified: Prisma payload */ any[];
+  steps:   /* eslint-disable-line @typescript-eslint/no-explicit-any -- Justified: Prisma payload */ any[];
 }) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
@@ -465,17 +465,17 @@ function MethodologyTab({
     if (editing) {
       const r = await updateMethodologyStepAction(editing.id, data);
       if (!r.success) {
-        toast.error(r.error);
+        toast.error("Error", { description: r.error });
         return;
       }
     } else {
       const r = await createMethodologyStepAction(data);
       if (!r.success) {
-        toast.error(r.error);
+        toast.error("Error", { description: r.error });
         return;
       }
     }
-    toast.success(editing ? "Updated" : "Created");
+    toast.success("Success", { description: editing ? "Updated" : "Created" });
     setOpen(false);
     router.refresh();
   };
@@ -483,10 +483,10 @@ function MethodologyTab({
   const handleDelete = async (id: string) => {
     const r = await deleteMethodologyStepAction(id);
     if (r.success) {
-      toast.success("Deleted");
+      toast.success("Success", { description: "Deleted" });
       router.refresh();
     } else {
-      toast.error(r.error);
+      toast.error("Error", { description: r.error });
     }
   };
 
@@ -630,7 +630,7 @@ const testimonialSchema = z.object({
 function TestimonialsTab({
   items,
 }: {
-  items: /* eslint-disable-line @typescript-eslint/no-explicit-any -- Justified: Prisma payload type is complex */ /* eslint-disable-line @typescript-eslint/no-explicit-any -- Justified: Prisma payload */ any[];
+  items:   /* eslint-disable-line @typescript-eslint/no-explicit-any -- Justified: Prisma payload */ any[];
 }) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
@@ -696,7 +696,7 @@ function TestimonialsTab({
         studentClass: data.studentClass as ClassLevel | undefined,
       });
       if (!r.success) {
-        toast.error(r.error);
+        toast.error("Error", { description: r.error });
         return;
       }
     } else {
@@ -705,11 +705,11 @@ function TestimonialsTab({
         studentClass: data.studentClass as ClassLevel | undefined,
       });
       if (!r.success) {
-        toast.error(r.error);
+        toast.error("Error", { description: r.error });
         return;
       }
     }
-    toast.success(editing ? "Updated" : "Created");
+    toast.success("Success", { description: editing ? "Updated" : "Created" });
     setOpen(false);
     router.refresh();
   };
@@ -717,10 +717,10 @@ function TestimonialsTab({
   const handleDelete = async (id: string) => {
     const r = await deleteTestimonialAction(id);
     if (r.success) {
-      toast.success("Deleted");
+      toast.success("Success", { description: "Deleted" });
       router.refresh();
     } else {
-      toast.error(r.error);
+      toast.error("Error", { description: r.error });
     }
   };
 
@@ -926,7 +926,7 @@ function TestimonialsTab({
 function GalleryTab({
   items,
 }: {
-  items: /* eslint-disable-line @typescript-eslint/no-explicit-any -- Justified: Prisma payload type is complex */ /* eslint-disable-line @typescript-eslint/no-explicit-any -- Justified: Prisma payload */ any[];
+  items:   /* eslint-disable-line @typescript-eslint/no-explicit-any -- Justified: Prisma payload */ any[];
 }) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
@@ -938,10 +938,10 @@ function GalleryTab({
   const handleDelete = async (id: string) => {
     const r = await deleteGalleryItemAction(id);
     if (r.success) {
-      toast.success("Deleted");
+      toast.success("Success", { description: "Deleted" });
       router.refresh();
     } else {
-      toast.error(r.error);
+      toast.error("Error", { description: r.error });
     }
   };
 
@@ -1031,25 +1031,25 @@ function GalleryEditForm({
   const handleSave = async () => {
     const r = await updateGalleryItemAction(item.id, { caption, category, isPublished });
     if (r.success) {
-      toast.success("Updated");
+      toast.success("Success", { description: "Updated" });
       onDone();
     } else {
-      toast.error(r.error);
+      toast.error("Error", { description: r.error });
     }
   };
   return (
     <div className="space-y-4">
       <div>
-        <label className="text-sm font-medium">Caption</label>
+        <label className="block mb-1.5 text-sm font-medium">Caption</label>
         <Input value={caption} onChange={(e) => setCaption(e.target.value)} />
       </div>
       <div>
-        <label className="text-sm font-medium">Category</label>
+        <label className="block mb-1.5 text-sm font-medium">Category</label>
         <Input value={category} onChange={(e) => setCategory(e.target.value)} />
       </div>
       <div className="flex items-center gap-2">
         <Switch checked={isPublished} onCheckedChange={setIsPublished} />
-        <label className="text-sm font-medium">Published</label>
+        <label className="block mb-1.5 text-sm font-medium">Published</label>
       </div>
       <SubmitButton onClick={handleSave}>Save</SubmitButton>
     </div>
@@ -1069,7 +1069,7 @@ const faqSchema = z.object({
 function FAQTab({
   items,
 }: {
-  items: /* eslint-disable-line @typescript-eslint/no-explicit-any -- Justified: Prisma payload type is complex */ /* eslint-disable-line @typescript-eslint/no-explicit-any -- Justified: Prisma payload */ any[];
+  items:   /* eslint-disable-line @typescript-eslint/no-explicit-any -- Justified: Prisma payload */ any[];
 }) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
@@ -1120,17 +1120,17 @@ function FAQTab({
     if (editing) {
       const r = await updateFAQAction(editing.id, data);
       if (!r.success) {
-        toast.error(r.error);
+        toast.error("Error", { description: r.error });
         return;
       }
     } else {
       const r = await createFAQAction(data);
       if (!r.success) {
-        toast.error(r.error);
+        toast.error("Error", { description: r.error });
         return;
       }
     }
-    toast.success(editing ? "Updated" : "Created");
+    toast.success("Success", { description: editing ? "Updated" : "Created" });
     setOpen(false);
     router.refresh();
   };
@@ -1138,10 +1138,10 @@ function FAQTab({
   const handleDelete = async (id: string) => {
     const r = await deleteFAQAction(id);
     if (r.success) {
-      toast.success("Deleted");
+      toast.success("Success", { description: "Deleted" });
       router.refresh();
     } else {
-      toast.error(r.error);
+      toast.error("Error", { description: r.error });
     }
   };
 
@@ -1276,7 +1276,7 @@ const metricSchema = z.object({
 function MetricsTab({
   items,
 }: {
-  items: /* eslint-disable-line @typescript-eslint/no-explicit-any -- Justified: Prisma payload type is complex */ /* eslint-disable-line @typescript-eslint/no-explicit-any -- Justified: Prisma payload */ any[];
+  items:   /* eslint-disable-line @typescript-eslint/no-explicit-any -- Justified: Prisma payload */ any[];
 }) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
@@ -1314,17 +1314,17 @@ function MetricsTab({
     if (editing) {
       const r = await updatePerformanceMetricAction(editing.id, data);
       if (!r.success) {
-        toast.error(r.error);
+        toast.error("Error", { description: r.error });
         return;
       }
     } else {
       const r = await createPerformanceMetricAction(data);
       if (!r.success) {
-        toast.error(r.error);
+        toast.error("Error", { description: r.error });
         return;
       }
     }
-    toast.success(editing ? "Updated" : "Created");
+    toast.success("Success", { description: editing ? "Updated" : "Created" });
     setOpen(false);
     router.refresh();
   };
@@ -1332,10 +1332,10 @@ function MetricsTab({
   const handleDelete = async (id: string) => {
     const r = await deletePerformanceMetricAction(id);
     if (r.success) {
-      toast.success("Deleted");
+      toast.success("Success", { description: "Deleted" });
       router.refresh();
     } else {
-      toast.error(r.error);
+      toast.error("Error", { description: r.error });
     }
   };
 

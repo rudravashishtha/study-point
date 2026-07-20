@@ -59,18 +59,20 @@ export function StudentActivationQueue({ candidates }: StudentActivationQueuePro
     const ids = [...selected];
     if (ids.length === 0) return;
     setIsBulkPending(true);
+    const toastId = toast.loading(`Inviting ${ids.length} student${ids.length === 1 ? "" : "s"}...`);
     try {
       const result = await bulkInviteStudentsAction(ids);
       if (!result.success) {
-        toast.error("Some invitations failed", { description: result.error });
+        toast.error("Some invitations failed", { description: result.error, id: toastId });
       } else {
-        toast.success(`Invited ${ids.length} student${ids.length === 1 ? "" : "s"}.`);
+        toast.success("Success", { description: `Invited ${ids.length} student${ids.length === 1 ? "" : "s"}.`, id: toastId });
         setSelected(new Set());
       }
     } catch (error: unknown) {
       toast.error("Action Failed", {
         description:
           error instanceof Error ? error.message : "An unexpected error occurred",
+        id: toastId,
       });
     } finally {
       setIsBulkPending(false);
@@ -84,7 +86,7 @@ export function StudentActivationQueue({ candidates }: StudentActivationQueuePro
       if (!result.success) {
         toast.error("Reset failed", { description: result.error });
       } else {
-        toast.success("Invitation reset. You can now correct the email and re-invite.");
+        toast.success("Success", { description: "Invitation reset. You can now correct the email and re-invite." });
       }
     } catch (error: unknown) {
       toast.error("Reset failed", {

@@ -191,7 +191,7 @@ export function TeacherHomeworkFormDialog({
                 Scheduling
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-2">
+                <div className="space-y-3">
                   <Label htmlFor="assignedDate">Assigned Date</Label>
                   <Input
                     id="assignedDate"
@@ -201,7 +201,7 @@ export function TeacherHomeworkFormDialog({
                     required
                   />
                 </div>
-                <div className="space-y-2">
+                <div className="space-y-3">
                   <Label htmlFor="dueDate">Due Date</Label>
                   <Input
                     id="dueDate"
@@ -225,7 +225,7 @@ export function TeacherHomeworkFormDialog({
                 Curriculum Mapping
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-2">
+                <div className="space-y-3">
                   <Label>Chapter (Optional)</Label>
                   <Select
                     value={chapterId}
@@ -255,7 +255,7 @@ export function TeacherHomeworkFormDialog({
                     </SelectContent>
                   </Select>
                 </div>
-                <div className="space-y-2">
+                <div className="space-y-3">
                   <Label>Topic (Optional)</Label>
                   <Select
                     value={topicId}
@@ -291,7 +291,7 @@ export function TeacherHomeworkFormDialog({
               <h3 className="text-sm font-medium text-muted-foreground border-b pb-2">
                 Attachments
               </h3>
-              <div className="space-y-2">
+              <div className="space-y-3">
                 <Label>File Attachment (Optional)</Label>
                 {homework?.fileAssetId && !fileAssetId && (
                   <div className="text-sm text-muted-foreground mb-2">
@@ -302,9 +302,9 @@ export function TeacherHomeworkFormDialog({
                   targetBatchId={batchId}
                   onUploadSuccess={(fid) => {
                     setFileAssetId(fid);
-                    toast.success("File uploaded successfully");
+                    toast.success("Success", { description: "File uploaded successfully" });
                   }}
-                  onUploadError={(err) => toast.error(err)}
+                  onUploadError={(err) => toast.error("Error", { description: err })}
                 />
               </div>
             </section>

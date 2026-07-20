@@ -60,18 +60,20 @@ export function TeacherActivationQueue({ candidates }: TeacherActivationQueuePro
     const ids = [...selected];
     if (ids.length === 0) return;
     setIsBulkPending(true);
+    const toastId = toast.loading(`Inviting ${ids.length} teacher${ids.length === 1 ? "" : "s"}...`);
     try {
       const result = await bulkInviteTeachersAction(ids);
       if (!result.success) {
-        toast.error("Some invitations failed", { description: result.error });
+        toast.error("Some invitations failed", { description: result.error, id: toastId });
       } else {
-        toast.success(`Invited ${ids.length} teacher${ids.length === 1 ? "" : "s"}.`);
+        toast.success("Success", { description: `Invited ${ids.length} teacher${ids.length === 1 ? "" : "s"}.`, id: toastId });
         setSelected(new Set());
       }
     } catch (error: unknown) {
       toast.error("Action Failed", {
         description:
           error instanceof Error ? error.message : "An unexpected error occurred",
+        id: toastId,
       });
     } finally {
       setIsBulkPending(false);
@@ -85,7 +87,7 @@ export function TeacherActivationQueue({ candidates }: TeacherActivationQueuePro
       if (!result.success) {
         toast.error("Invite failed", { description: result.error });
       } else {
-        toast.success("Teacher invited successfully.");
+        toast.success("Success", { description: "Teacher invited successfully." });
       }
     } catch (error: unknown) {
       toast.error("Invite failed", {
@@ -104,7 +106,7 @@ export function TeacherActivationQueue({ candidates }: TeacherActivationQueuePro
       if (!result.success) {
         toast.error("Reset failed", { description: result.error });
       } else {
-        toast.success("Invitation reset. You can now re-invite this teacher.");
+        toast.success("Success", { description: "Invitation reset. You can now re-invite this teacher." });
       }
     } catch (error: unknown) {
       toast.error("Reset failed", {

@@ -43,11 +43,9 @@ export function StudentFormDialog({
 
       if (!res.success) {
         setError(res.error);
-        toast.error(res.error);
+        toast.error("Error", { description: res.error });
       } else {
-        toast.success(
-          student ? "Student updated successfully" : "Student created successfully",
-        );
+        toast.success("Success", { description: student ? "Student updated successfully" : "Student created successfully" });
         onOpenChange(false);
         router.refresh();
       }
@@ -80,7 +78,7 @@ export function StudentFormDialog({
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {student && (
                   <div className="space-y-2 md:col-span-1">
-                    <label className="text-sm font-medium text-muted-foreground">
+                    <label className="block mb-1.5 text-sm font-medium text-muted-foreground">
                       Student Code
                     </label>
                     <div className="text-sm px-3 py-2 bg-muted rounded-md h-10 flex items-center">
@@ -90,7 +88,7 @@ export function StudentFormDialog({
                 )}
                 {student && (
                   <div className="space-y-2 md:col-span-1">
-                    <label className="text-sm font-medium text-muted-foreground">
+                    <label className="block mb-1.5 text-sm font-medium text-muted-foreground">
                       Account Status
                     </label>
                     <div className="text-sm px-3 py-2 bg-muted rounded-md min-h-10 flex flex-col justify-center">
@@ -122,7 +120,7 @@ export function StudentFormDialog({
                 Contact Information
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-2">
+                <div className="space-y-3">
                   <label htmlFor="phone" className="text-sm font-medium">
                     Phone
                   </label>
@@ -134,7 +132,7 @@ export function StudentFormDialog({
                     className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                   />
                 </div>
-                <div className="space-y-2">
+                <div className="space-y-3">
                   <label htmlFor="guardianPhone" className="text-sm font-medium">
                     Guardian Phone
                   </label>
@@ -166,7 +164,7 @@ export function StudentFormDialog({
                 Other Details
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-2">
+                <div className="space-y-3">
                   <label htmlFor="joiningDate" className="text-sm font-medium">
                     Joining Date
                   </label>

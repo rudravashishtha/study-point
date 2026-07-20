@@ -186,7 +186,7 @@ export function TeacherMaterialFormDialog({
                 Curriculum Mapping
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-2">
+                <div className="space-y-3">
                   <Label>Chapter (Optional)</Label>
                   <Select
                     value={chapterId}
@@ -216,7 +216,7 @@ export function TeacherMaterialFormDialog({
                     </SelectContent>
                   </Select>
                 </div>
-                <div className="space-y-2">
+                <div className="space-y-3">
                   <Label>Topic (Optional)</Label>
                   <Select
                     value={topicId}
@@ -277,10 +277,10 @@ export function TeacherMaterialFormDialog({
                         targetBatchId={batchId}
                         onUploadSuccess={(fileAssetId) => {
                           setFileAssetId(fileAssetId);
-                          toast.success("File uploaded successfully");
+                          toast.success("Success", { description: "File uploaded successfully" });
                         }}
                         onUploadError={(error) => {
-                          toast.error(error);
+                          toast.error("Error", { description: error });
                         }}
                       />
                       {fileAssetId && (

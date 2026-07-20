@@ -79,7 +79,7 @@ export function StudentImportWizard() {
     try {
       const res = await fetch("/api/imports/template/student");
       if (!res.ok) {
-        toast.error("Failed to download template");
+        toast.error("Error", { description: "Failed to download template" });
         return;
       }
       const blob = await res.blob();
@@ -90,7 +90,7 @@ export function StudentImportWizard() {
       a.click();
       URL.revokeObjectURL(url);
     } catch {
-      toast.error("Failed to download template");
+      toast.error("Error", { description: "Failed to download template" });
     }
   };
 
@@ -102,12 +102,12 @@ export function StudentImportWizard() {
 
     const ext = selectedFile.name.split(".").pop()?.toLowerCase();
     if (!["xlsx", "xls", "csv"].includes(ext || "")) {
-      toast.error("Unsupported file type. Please upload .xlsx, .xls, or .csv files.");
+      toast.error("Error", { description: "Unsupported file type. Please upload .xlsx, .xls, or .csv files." });
       return;
     }
 
     if (selectedFile.size > MAX_FILE_SIZE) {
-      toast.error("File size exceeds 5 MB limit.");
+      toast.error("Error", { description: "File size exceeds 5 MB limit." });
       return;
     }
 
@@ -133,7 +133,7 @@ export function StudentImportWizard() {
       const data = await res.json();
 
       if (!res.ok) {
-        toast.error(data.error || "Upload failed");
+        toast.error("Error", { description: data.error || "Upload failed" });
         setStep("upload");
         submitLockRef.current = false;
         setImporting(false);
@@ -154,7 +154,7 @@ export function StudentImportWizard() {
         setStep("upload");
       }
     } catch {
-      toast.error("Upload failed. Please try again.");
+      toast.error("Error", { description: "Upload failed. Please try again." });
       setStep("upload");
     } finally {
       submitLockRef.current = false;
@@ -213,6 +213,7 @@ export function StudentImportWizard() {
     setConfirming(true);
     setStep("confirming");
 
+    const toastId = toast.loading("Importing students...");
     try {
       const res = await fetch(`/api/imports/${importJobId}/confirm`, {
         method: "POST",
@@ -220,7 +221,7 @@ export function StudentImportWizard() {
       const data = await res.json();
 
       if (!res.ok) {
-        toast.error(data.error || "Import failed");
+        toast.error("Error", { description: data.error || "Import failed", id: toastId });
         setStep("preview");
         submitLockRef.current = false;
         setConfirming(false);
@@ -239,9 +240,9 @@ export function StudentImportWizard() {
         status: data.summary.status,
       });
       setStep("results");
-      toast.success(`Imported ${data.summary.importedRows} student(s) successfully.`);
+      toast.success("Success", { description: `Imported ${data.summary.importedRows} student(s) successfully.`, id: toastId });
     } catch {
-      toast.error("Import confirmation failed.");
+      toast.error("Error", { description: "Import confirmation failed.", id: toastId });
       setStep("preview");
     } finally {
       submitLockRef.current = false;
@@ -254,7 +255,7 @@ export function StudentImportWizard() {
     try {
       const res = await fetch(`/api/imports/${importJobId}/errors`);
       if (!res.ok) {
-        toast.error("Failed to download error report");
+        toast.error("Error", { description: "Failed to download error report" });
         return;
       }
       const data = await res.json();
@@ -268,7 +269,7 @@ export function StudentImportWizard() {
       a.click();
       URL.revokeObjectURL(url);
     } catch {
-      toast.error("Failed to download error report");
+      toast.error("Error", { description: "Failed to download error report" });
     }
   };
 

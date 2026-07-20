@@ -61,7 +61,7 @@ const settingsSchema = z.object({
 type SettingsValues = z.infer<typeof settingsSchema>;
 
 export function SettingsPageClient(
-  /* eslint-disable-line @typescript-eslint/no-explicit-any -- Justified: settings payload */ {
+    {
     settings,
   }: { settings: any },
 ) {
@@ -102,10 +102,10 @@ export function SettingsPageClient(
       }
       const result = await updateSiteSettingsAction(clean);
       if (result.success) {
-        toast.success("Settings saved");
+        toast.success("Success", { description: "Settings saved" });
         router.refresh();
       } else {
-        toast.error(result.error);
+        toast.error("Error", { description: result.error });
       }
     });
   };
@@ -150,7 +150,7 @@ export function SettingsPageClient(
 }
 
 function InstituteTab(
-  /* eslint-disable-line @typescript-eslint/no-explicit-any -- Justified: prop drilling complex RHF types */ {
+    {
     form,
   }: { form: any },
 ) {
@@ -160,7 +160,7 @@ function InstituteTab(
         control={form.control}
         name="instituteName"
         render={(
-          /* eslint-disable-line @typescript-eslint/no-explicit-any -- Justified: react-hook-form render props are complex */ {
+            {
             field,
           }: any,
         ) => (
@@ -177,7 +177,7 @@ function InstituteTab(
         control={form.control}
         name="tagline"
         render={(
-          /* eslint-disable-line @typescript-eslint/no-explicit-any -- Justified: react-hook-form render props are complex */ {
+            {
             field,
           }: any,
         ) => (
@@ -194,7 +194,7 @@ function InstituteTab(
         control={form.control}
         name="phone"
         render={(
-          /* eslint-disable-line @typescript-eslint/no-explicit-any -- Justified: react-hook-form render props are complex */ {
+            {
             field,
           }: any,
         ) => (
@@ -211,7 +211,7 @@ function InstituteTab(
         control={form.control}
         name="whatsappNumber"
         render={(
-          /* eslint-disable-line @typescript-eslint/no-explicit-any -- Justified: react-hook-form render props are complex */ {
+            {
             field,
           }: any,
         ) => (
@@ -228,7 +228,7 @@ function InstituteTab(
         control={form.control}
         name="email"
         render={(
-          /* eslint-disable-line @typescript-eslint/no-explicit-any -- Justified: react-hook-form render props are complex */ {
+            {
             field,
           }: any,
         ) => (
@@ -245,7 +245,7 @@ function InstituteTab(
         control={form.control}
         name="openingHours"
         render={(
-          /* eslint-disable-line @typescript-eslint/no-explicit-any -- Justified: react-hook-form render props are complex */ {
+            {
             field,
           }: any,
         ) => (
@@ -262,7 +262,7 @@ function InstituteTab(
         control={form.control}
         name="address"
         render={(
-          /* eslint-disable-line @typescript-eslint/no-explicit-any -- Justified: react-hook-form render props are complex */ {
+            {
             field,
           }: any,
         ) => (
@@ -279,7 +279,7 @@ function InstituteTab(
         control={form.control}
         name="landmark"
         render={(
-          /* eslint-disable-line @typescript-eslint/no-explicit-any -- Justified: react-hook-form render props are complex */ {
+            {
             field,
           }: any,
         ) => (
@@ -296,7 +296,7 @@ function InstituteTab(
         control={form.control}
         name="mapUrl"
         render={(
-          /* eslint-disable-line @typescript-eslint/no-explicit-any -- Justified: react-hook-form render props are complex */ {
+            {
             field,
           }: any,
         ) => (
@@ -321,7 +321,7 @@ function InstituteTab(
 }
 
 function HomepageTab(
-  /* eslint-disable-line @typescript-eslint/no-explicit-any -- Justified: prop drilling complex RHF types */ {
+    {
     form,
   }: { form: any },
 ) {
@@ -331,7 +331,7 @@ function HomepageTab(
         control={form.control}
         name="heroHeadline"
         render={(
-          /* eslint-disable-line @typescript-eslint/no-explicit-any -- Justified: react-hook-form render props are complex */ {
+            {
             field,
           }: any,
         ) => (
@@ -348,7 +348,7 @@ function HomepageTab(
         control={form.control}
         name="heroSubheadline"
         render={(
-          /* eslint-disable-line @typescript-eslint/no-explicit-any -- Justified: react-hook-form render props are complex */ {
+            {
             field,
           }: any,
         ) => (
@@ -365,7 +365,7 @@ function HomepageTab(
         control={form.control}
         name="heroCtaText"
         render={(
-          /* eslint-disable-line @typescript-eslint/no-explicit-any -- Justified: react-hook-form render props are complex */ {
+            {
             field,
           }: any,
         ) => (
@@ -382,7 +382,7 @@ function HomepageTab(
         control={form.control}
         name="heroCtaTarget"
         render={(
-          /* eslint-disable-line @typescript-eslint/no-explicit-any -- Justified: react-hook-form render props are complex */ {
+            {
             field,
           }: any,
         ) => (
@@ -400,7 +400,7 @@ function HomepageTab(
 }
 
 function BrandingTab(
-  /* eslint-disable-line @typescript-eslint/no-explicit-any -- Justified: prop drilling complex RHF types */ {
+    {
     form,
   }: { form: any },
 ) {
@@ -410,7 +410,7 @@ function BrandingTab(
         control={form.control}
         name="defaultTitle"
         render={(
-          /* eslint-disable-line @typescript-eslint/no-explicit-any -- Justified: react-hook-form render props are complex */ {
+            {
             field,
           }: any,
         ) => (
@@ -430,7 +430,7 @@ function BrandingTab(
         control={form.control}
         name="defaultDescription"
         render={(
-          /* eslint-disable-line @typescript-eslint/no-explicit-any -- Justified: react-hook-form render props are complex */ {
+            {
             field,
           }: any,
         ) => (
@@ -451,7 +451,7 @@ function BrandingTab(
 }
 
 function AdmissionsTab(
-  /* eslint-disable-line @typescript-eslint/no-explicit-any -- Justified: prop drilling complex RHF types */ {
+    {
     form,
   }: { form: any },
 ) {
@@ -461,7 +461,7 @@ function AdmissionsTab(
         control={form.control}
         name="admissionsOpen"
         render={(
-          /* eslint-disable-line @typescript-eslint/no-explicit-any -- Justified: react-hook-form render props are complex */ {
+            {
             field,
           }: any,
         ) => (
@@ -482,7 +482,7 @@ function AdmissionsTab(
         control={form.control}
         name="feeDisplayEnabled"
         render={(
-          /* eslint-disable-line @typescript-eslint/no-explicit-any -- Justified: react-hook-form render props are complex */ {
+            {
             field,
           }: any,
         ) => (
@@ -504,7 +504,7 @@ function AdmissionsTab(
 }
 
 function ResourcesTab(
-  /* eslint-disable-line @typescript-eslint/no-explicit-any -- Justified: prop drilling complex RHF types */ {
+    {
     form,
   }: { form: any },
 ) {
@@ -514,7 +514,7 @@ function ResourcesTab(
         control={form.control}
         name="resourcesEnabled"
         render={(
-          /* eslint-disable-line @typescript-eslint/no-explicit-any -- Justified: react-hook-form render props are complex */ {
+            {
             field,
           }: any,
         ) => (
@@ -535,7 +535,7 @@ function ResourcesTab(
         control={form.control}
         name="resourcesSearchEnabled"
         render={(
-          /* eslint-disable-line @typescript-eslint/no-explicit-any -- Justified: react-hook-form render props are complex */ {
+            {
             field,
           }: any,
         ) => (

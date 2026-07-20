@@ -26,6 +26,7 @@ describe("AssignTeacherDialog & PermissionSelector", () => {
       qualifications: null,
       photoFileId: null,
       active: true,
+      subjects: [],
     },
     {
       id: "t2",
@@ -36,6 +37,7 @@ describe("AssignTeacherDialog & PermissionSelector", () => {
       qualifications: null,
       photoFileId: null,
       active: false,
+      subjects: [],
     },
   ];
 

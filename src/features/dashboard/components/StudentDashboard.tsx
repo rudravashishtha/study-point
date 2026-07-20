@@ -202,7 +202,7 @@ export function StudentDashboard({
           isEmpty={data.courses.length === 0}
           emptyText="No active courses."
         >
-          <div className="space-y-2">
+          <div className="space-y-3">
             {data.courses.slice(0, 2).map((c: DashboardCourseInfo, i: number) => (
               <div key={i} className="rounded-lg border bg-card p-3 text-sm">
                 <p className="font-medium">
@@ -272,7 +272,7 @@ export function StudentDashboard({
           isEmpty={data.recentMaterials.length === 0}
           emptyText="No materials yet."
         >
-          <ul className="space-y-2">
+          <ul className="space-y-3">
             {data.recentMaterials.slice(0, 3).map((m: DashboardMaterialItem) => (
               <li
                 key={m.id}
@@ -295,7 +295,7 @@ export function StudentDashboard({
           isEmpty={data.homework.items.length === 0}
           emptyText="No homework assigned."
         >
-          <ul className="space-y-2">
+          <ul className="space-y-3">
             {data.homework.items.slice(0, 3).map((h: DashboardHomeworkItem) => (
               <li
                 key={h.id}
@@ -318,7 +318,7 @@ export function StudentDashboard({
           isEmpty={data.tests.items.length === 0}
           emptyText="No tests scheduled."
         >
-          <ul className="space-y-2">
+          <ul className="space-y-3">
             {data.tests.items.slice(0, 3).map((t: DashboardTestItem) => (
               <li
                 key={t.id}
@@ -341,7 +341,7 @@ export function StudentDashboard({
           isEmpty={data.announcements.items.length === 0}
           emptyText="No notices yet."
         >
-          <ul className="space-y-2">
+          <ul className="space-y-3">
             {data.announcements.items.slice(0, 3).map((a: DashboardAnnouncementItem) => (
               <li
                 key={a.id}

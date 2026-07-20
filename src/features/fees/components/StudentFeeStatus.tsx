@@ -129,7 +129,7 @@ export function StudentFeeStatus({ assignments }: { assignments: FeeAssignment[]
               </p>
             </div>
 
-            <div className="space-y-2">
+            <div className="space-y-3">
               {a.dues.map((due) => {
                 const meta = dueStatusMeta[due.status] || dueStatusMeta.PENDING;
                 const canViewReceipt = RECEIPTABLE_STATUSES.has(due.status);

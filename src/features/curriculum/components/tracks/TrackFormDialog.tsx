@@ -4,9 +4,9 @@
 import React, { useTransition, useEffect } from "react";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
-import { useForm, Controller, useWatch } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { CurriculumTrack, Board, Programme, Subject } from "@prisma/client";
+import { CurriculumTrack, Board, Subject } from "@prisma/client";
 import { createCurriculumTrackSchema } from "@/lib/validation/curriculum";
 import {
   createTrackAction,
@@ -22,14 +22,12 @@ type CreateInput = z.infer<typeof createCurriculumTrackSchema>;
 export function TrackFormDialog({
   track,
   boards,
-  programmes,
   subjects,
   open,
   onOpenChange,
 }: {
   track?: CurriculumTrack;
   boards: Board[];
-  programmes: Programme[];
   subjects: Subject[];
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -40,59 +38,28 @@ export function TrackFormDialog({
   const {
     register,
     handleSubmit,
-    control,
-    setValue,
     reset,
     formState: { errors },
   } = useForm<CreateInput>({
     resolver: zodResolver(createCurriculumTrackSchema),
     defaultValues: {
       boardId: track?.boardId || "",
-      programmeId: track?.programmeId || null,
       classLevel: track?.classLevel || "IX",
       subjectId: track?.subjectId || "",
       displayName: track?.displayName || "",
     },
   });
 
-  const selectedBoardId = useWatch({ control, name: "boardId" });
-  const selectedBoard = boards.find((b) => b.id === selectedBoardId);
-  const selectedProgrammeId = useWatch({ control, name: "programmeId" });
-  const selectedClassLevel = useWatch({ control, name: "classLevel" });
-
   useEffect(() => {
     if (open) {
       reset({
         boardId: track?.boardId || "",
-        programmeId: track?.programmeId || null,
         classLevel: track?.classLevel || "IX",
         subjectId: track?.subjectId || "",
         displayName: track?.displayName || "",
       });
     }
   }, [open, track, reset]);
-
-  // UX Guidance logic (authoritative check is on server)
-  useEffect(() => {
-    if (!selectedBoard) return;
-
-    if (selectedBoard.code === "CBSE") {
-      setValue("programmeId", null);
-    } else if (selectedBoard.code === "CISCE") {
-      // Suggest based on class level if changing board to CISCE
-      if (selectedClassLevel === "IX" || selectedClassLevel === "X") {
-        const icse = programmes.find(
-          (p) => p.boardId === selectedBoard.id && p.code === "ICSE",
-        );
-        if (icse && selectedProgrammeId !== icse.id) setValue("programmeId", icse.id);
-      } else {
-        const isc = programmes.find(
-          (p) => p.boardId === selectedBoard.id && p.code === "ISC",
-        );
-        if (isc && selectedProgrammeId !== isc.id) setValue("programmeId", isc.id);
-      }
-    }
-  }, [selectedBoard, selectedClassLevel, programmes, selectedProgrammeId, setValue]);
 
   const onSubmit = (data: CreateInput) => {
     startTransition(async () => {
@@ -101,11 +68,9 @@ export function TrackFormDialog({
         : await createTrackAction(data);
 
       if (!res.success) {
-        toast.error(res.error);
+        toast.error("Error", { description: res.error });
       } else {
-        toast.success(
-          track ? "Track updated successfully" : "Track created successfully",
-        );
+        toast.success("Success", { description: track ? "Track updated successfully" : "Track created successfully" });
         onOpenChange(false);
         router.refresh();
       }
@@ -113,10 +78,6 @@ export function TrackFormDialog({
   };
 
   if (!open) return null;
-
-  const filteredProgrammes = selectedBoardId
-    ? programmes.filter((p) => p.boardId === selectedBoardId)
-    : [];
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -132,8 +93,8 @@ export function TrackFormDialog({
                 Track Details
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">
+                <div className="space-y-3">
+                  <label className="block mb-1.5 text-sm font-medium">
                     Board *{" "}
                     {track && (
                       <span className="text-xs text-muted-foreground">(Permanent)</span>
@@ -160,8 +121,8 @@ export function TrackFormDialog({
                   )}
                 </div>
 
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">
+                <div className="space-y-3">
+                  <label className="block mb-1.5 text-sm font-medium">
                     Class Level *{" "}
                     {track && (
                       <span className="text-xs text-muted-foreground">(Permanent)</span>
@@ -184,41 +145,8 @@ export function TrackFormDialog({
                   )}
                 </div>
 
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">
-                    Programme{" "}
-                    {track && (
-                      <span className="text-xs text-muted-foreground">(Permanent)</span>
-                    )}
-                  </label>
-                  <Controller
-                    control={control}
-                    name="programmeId"
-                    render={({ field }) => (
-                      <select
-                        value={field.value || ""}
-                        onChange={(e) => field.onChange(e.target.value || null)}
-                        disabled={!!track || selectedBoard?.code === "CBSE"}
-                        className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background disabled:opacity-50"
-                      >
-                        <option value="">None</option>
-                        {filteredProgrammes.map((p) => (
-                          <option key={p.id} value={p.id}>
-                            {p.name} ({p.code})
-                          </option>
-                        ))}
-                      </select>
-                    )}
-                  />
-                  {errors.programmeId && (
-                    <p className="text-sm font-medium text-destructive">
-                      {errors.programmeId.message as string}
-                    </p>
-                  )}
-                </div>
-
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">
+                <div className="space-y-3">
+                  <label className="block mb-1.5 text-sm font-medium">
                     Subject *{" "}
                     {track && (
                       <span className="text-xs text-muted-foreground">(Permanent)</span>
@@ -245,8 +173,8 @@ export function TrackFormDialog({
                   )}
                 </div>
 
-                <div className="space-y-2 md:col-span-2">
-                  <label className="text-sm font-medium">Display Name *</label>
+                <div className="space-y-2">
+                  <label className="block mb-1.5 text-sm font-medium">Display Name *</label>
                   <input
                     {...register("displayName")}
                     className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"

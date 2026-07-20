@@ -4,6 +4,7 @@ import { useState } from "react";
 import { PermissionCapability, TeacherAssignment } from "@prisma/client";
 import { updateTeacherPermissionsAction } from "../../actions/batch-actions";
 import { Button } from "@/components/ui/button";
+import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { PermissionSelector } from "./PermissionSelector";
@@ -66,7 +67,7 @@ export function EditAssignmentDialog({
         </DialogHeader>
 
         <div className="flex-1 overflow-y-auto px-4 py-4 sm:px-6">
-          <div className="space-y-2">
+          <div className="space-y-3">
             <Label>
               Capabilities <span className="text-red-500">*</span>
             </Label>
@@ -90,7 +91,14 @@ export function EditAssignmentDialog({
               !permissions.includes("BATCH_VIEW")
             }
           >
-            {isSubmitting ? "Saving..." : "Save Permissions"}
+            {isSubmitting ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Saving...
+              </>
+            ) : (
+              "Save Permissions"
+            )}
           </Button>
         </div>
       </DialogContent>

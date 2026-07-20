@@ -5,7 +5,7 @@ import { SignupForm } from "@/features/auth/components/SignupForm";
 import { serverEnv } from "@/lib/env";
 
 export const metadata: Metadata = {
-  title: "Administrator Setup | Study Point Mathematics",
+  title: "Administrator Setup | Study Point",
 };
 
 export default function SignupPage() {

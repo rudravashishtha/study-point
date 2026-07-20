@@ -21,7 +21,7 @@ export function ReorderControls({ id, isFirst, isLast, onMove }: ReorderControls
     startTransition(async () => {
       const res = await onMove(id, direction);
       if (!res.success) {
-        toast.error(res.error || `Failed to move ${direction.toLowerCase()}`);
+        toast.error("Error", { description: res.error || `Failed to move ${direction.toLowerCase()}` });
       }
     });
   };

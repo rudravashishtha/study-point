@@ -157,9 +157,9 @@ export function PermissionSelector({ value, onChange }: PermissionSelectorProps)
             className="space-y-3 rounded-lg border p-4 shadow-sm bg-card"
           >
             <h4 className="font-semibold text-sm tracking-tight">{group.title}</h4>
-            <div className="space-y-2">
+            <div className="space-y-3">
               {group.capabilities.map((cap, i) => (
-                <div key={i} className="space-y-2">
+                <div key={i} className="space-y-3">
                   {cap.view && (
                     <div className="flex items-center space-x-2">
                       <Checkbox
