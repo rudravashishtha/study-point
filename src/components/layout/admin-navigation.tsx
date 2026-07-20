@@ -16,6 +16,7 @@ import {
   LayoutDashboard,
   Megaphone,
   Settings,
+  ClipboardList,
   Users,
   ChevronDown,
   type LucideIcon,
@@ -67,6 +68,14 @@ export const adminNavigationGroups: NavGroup[] = [
     links: [
       { href: "/admin/students", label: "Students", icon: Users },
       { href: "/admin/students/activate", label: "Activate Accounts", icon: Users },
+      {
+        label: "Student Intake",
+        icon: ClipboardList,
+        subItems: [
+          { href: "/admin/intake-links", label: "Private Links" },
+          { href: "/admin/intake-submissions", label: "Submissions" },
+        ],
+      },
       { href: "/admin/teachers", label: "Teachers", icon: GraduationCap },
       {
         href: "/admin/teachers/activate",

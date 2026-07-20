@@ -48,7 +48,9 @@ model AppUser {
   createdBy String?
   updatedBy String?
 
-  uploadedFiles FileAsset[] @relation("FileAssetUploader")
+  uploadedFiles             FileAsset[]               @relation("FileAssetUploader")
+  createdIntakeLinks        StudentIntakeLink[]       @relation("StudentIntakeLinkCreator")
+  reviewedIntakeSubmissions StudentIntakeSubmission[] @relation("StudentIntakeSubmissionReviewer")
 }
 
 model Student {
@@ -61,23 +63,24 @@ model Student {
   joiningDate   DateTime?
   accountStatus String    @default("none") // none, invited, active, disabled
 
-  appUser           AppUser?
-  enrolments        Enrolment[]
-  announcementReads StudentAnnouncementRead[]
+  appUser                    AppUser?
+  enrolments                 Enrolment[]
+  announcementReads          StudentAnnouncementRead[]
+  convertedIntakeSubmissions StudentIntakeSubmission[]
 
   archivedAt DateTime?
   archivedBy String?
 }
 
 model Teacher {
-  id             String  @id @default(uuid())
+  id             String   @id @default(uuid())
   displayName    String
   phone          String?
   email          String?
   bio            String?
   qualifications String?
   photoFileId    String?
-  active         Boolean @default(true)
+  active         Boolean  @default(true)
   subjects       String[] @default([])
 
   appUser            AppUser?
@@ -194,12 +197,14 @@ model CurriculumTrack {
   archivedAt  DateTime?
   archivedBy  String?
 
-  board      Board       @relation(fields: [boardId], references: [id])
-  programme  Programme?  @relation(fields: [programmeId], references: [id])
-  subject    Subject     @relation(fields: [subjectId], references: [id])
-  chapters   Chapter[]
-  batches    Batch[]
-  enrolments Enrolment[]
+  board                    Board                     @relation(fields: [boardId], references: [id])
+  programme                Programme?                @relation(fields: [programmeId], references: [id])
+  subject                  Subject                   @relation(fields: [subjectId], references: [id])
+  chapters                 Chapter[]
+  batches                  Batch[]
+  enrolments               Enrolment[]
+  studentIntakeLinks       StudentIntakeLink[]
+  studentIntakeSubmissions StudentIntakeSubmission[]
 
   // Actually, Prisma does not natively support partial indexes yet using @@unique with WHERE.
   // We rely on custom migration to enforce:
@@ -273,14 +278,16 @@ model AcademicSession {
   archivedAt DateTime?
   archivedBy String?
 
-  batches            Batch[]
-  enrolments         Enrolment[]
-  uploadReservations FileAsset[]     @relation("FileAssetSession")
-  studyMaterials     StudyMaterial[]
-  homeworks          Homework[]
-  tests              Test[]
-  feePlans           FeePlan[]
-  announcements      Announcement[]
+  batches                  Batch[]
+  enrolments               Enrolment[]
+  studentIntakeLinks       StudentIntakeLink[]
+  studentIntakeSubmissions StudentIntakeSubmission[]
+  uploadReservations       FileAsset[]               @relation("FileAssetSession")
+  studyMaterials           StudyMaterial[]
+  homeworks                Homework[]
+  tests                    Test[]
+  feePlans                 FeePlan[]
+  announcements            Announcement[]
 }
 
 model AuditLog {
@@ -292,6 +299,74 @@ model AuditLog {
   summary     String
   metadata    Json?
   createdAt   DateTime @default(now())
+}
+
+model StudentIntakeLink {
+  id                String    @id @default(uuid())
+  tokenHash         String    @unique
+  label             String
+  academicSessionId String
+  curriculumTrackId String?
+  batchId           String?
+  expiresAt         DateTime?
+  maxSubmissions    Int?
+  submissionCount   Int       @default(0)
+  isActive          Boolean   @default(true)
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+  createdBy         String
+  archivedAt        DateTime?
+  archivedBy        String?
+
+  academicSession AcademicSession           @relation(fields: [academicSessionId], references: [id], onDelete: Restrict)
+  curriculumTrack CurriculumTrack?          @relation(fields: [curriculumTrackId], references: [id], onDelete: Restrict)
+  batch           Batch?                    @relation(fields: [batchId], references: [id], onDelete: Restrict)
+  creator         AppUser                   @relation("StudentIntakeLinkCreator", fields: [createdBy], references: [id], onDelete: Restrict)
+  submissions     StudentIntakeSubmission[]
+
+  @@index([academicSessionId])
+  @@index([curriculumTrackId])
+  @@index([batchId])
+  @@index([createdBy])
+  @@index([isActive, archivedAt])
+  @@index([expiresAt])
+}
+
+model StudentIntakeSubmission {
+  id                 String                        @id @default(uuid())
+  intakeLinkId       String
+  studentName        String
+  phone              String?
+  guardianName       String?
+  guardianPhone      String?
+  email              String?
+  school             String?
+  address            String?
+  message            String?
+  academicSessionId  String
+  curriculumTrackId  String?
+  batchId            String?
+  status             StudentIntakeSubmissionStatus @default(NEW)
+  adminNotes         String?
+  convertedStudentId String?
+  submittedAt        DateTime                      @default(now())
+  reviewedAt         DateTime?
+  reviewedBy         String?
+
+  intakeLink       StudentIntakeLink @relation(fields: [intakeLinkId], references: [id], onDelete: Restrict)
+  academicSession  AcademicSession   @relation(fields: [academicSessionId], references: [id], onDelete: Restrict)
+  curriculumTrack  CurriculumTrack?  @relation(fields: [curriculumTrackId], references: [id], onDelete: Restrict)
+  batch            Batch?            @relation(fields: [batchId], references: [id], onDelete: Restrict)
+  convertedStudent Student?          @relation(fields: [convertedStudentId], references: [id], onDelete: Restrict)
+  reviewer         AppUser?          @relation("StudentIntakeSubmissionReviewer", fields: [reviewedBy], references: [id], onDelete: Restrict)
+
+  @@index([intakeLinkId])
+  @@index([academicSessionId])
+  @@index([curriculumTrackId])
+  @@index([batchId])
+  @@index([status])
+  @@index([submittedAt])
+  @@index([convertedStudentId])
 }
 
 model Batch {
@@ -310,11 +385,13 @@ model Batch {
   archivedAt        DateTime?
   archivedBy        String?
 
-  academicSession    AcademicSession     @relation(fields: [academicSessionId], references: [id])
-  curriculumTrack    CurriculumTrack     @relation(fields: [curriculumTrackId], references: [id])
-  schedules          BatchSchedule[]
-  enrolments         Enrolment[]
-  teacherAssignments TeacherAssignment[]
+  academicSession          AcademicSession           @relation(fields: [academicSessionId], references: [id])
+  curriculumTrack          CurriculumTrack           @relation(fields: [curriculumTrackId], references: [id])
+  schedules                BatchSchedule[]
+  enrolments               Enrolment[]
+  teacherAssignments       TeacherAssignment[]
+  studentIntakeLinks       StudentIntakeLink[]
+  studentIntakeSubmissions StudentIntakeSubmission[]
 
   // Note: We do NOT use @@unique here.
   // We use a custom migration to create: UNIQUE (academicSessionId, curriculumTrackId, name) WHERE archivedAt IS NULL
@@ -661,6 +738,14 @@ enum ImportRowStatus {
   VALID
   WARNING
   ERROR
+}
+
+enum StudentIntakeSubmissionStatus {
+  NEW
+  CONTACTED
+  REVIEWED
+  CONVERTED
+  REJECTED
 }
 
 model FileAsset {
