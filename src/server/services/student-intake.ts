@@ -285,6 +285,55 @@ export async function deleteArchivedIntakeLink(
   }
 }
 
+export async function replaceIntakeLinkToken(
+  id: string,
+  actor: ActorContext,
+): Promise<ServiceResult<{ id: string; rawToken: string }>> {
+  try {
+    const rawToken = generateRawToken();
+    const tokenHash = hashIntakeToken(rawToken);
+
+    const link = await db.$transaction(async (tx) => {
+      const existing = await tx.studentIntakeLink.findUnique({ where: { id } });
+      if (!existing || existing.archivedAt) {
+        return failure("NOT_FOUND", "Active intake link not found.");
+      }
+      if (!existing.isActive) {
+        return failure("INVALID_LIFECYCLE", "Only active intake links can replace URLs.");
+      }
+      if (existing.expiresAt && existing.expiresAt.getTime() < Date.now()) {
+        return failure("LINK_EXPIRED", "Expired intake links cannot replace URLs.");
+      }
+      if (existing.maxSubmissions && existing.submissionCount >= existing.maxSubmissions) {
+        return failure("LINK_CLOSED", "Closed intake links cannot replace URLs.");
+      }
+
+      const updated = await tx.studentIntakeLink.update({
+        where: { id },
+        data: { tokenHash },
+      });
+
+      await createAuditLog(tx, actor, {
+        action: "REPLACE_TOKEN",
+        entityType: "STUDENT_INTAKE_LINK",
+        entityId: id,
+        summary: `Replaced intake link URL for ${existing.label}`,
+        metadata: {
+          label: existing.label,
+          previousUpdatedAt: existing.updatedAt,
+        },
+      });
+
+      return success({ id: updated.id, rawToken });
+    });
+
+    return link;
+  } catch (error) {
+    console.error("replaceIntakeLinkToken error:", error);
+    return failure("INTERNAL_ERROR", "An unexpected error occurred.");
+  }
+}
+
 export async function resolveIntakeLinkByToken(token: string) {
   const tokenHash = hashIntakeToken(token);
   const link = await db.studentIntakeLink.findUnique({

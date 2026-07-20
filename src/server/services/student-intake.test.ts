@@ -29,6 +29,7 @@ import {
   createIntakeLink,
   deleteArchivedIntakeLink,
   hashIntakeToken,
+  replaceIntakeLinkToken,
   resolveIntakeLinkByToken,
   submitIntakeForm,
 } from "./student-intake";
@@ -228,5 +229,60 @@ describe("student intake service", () => {
       error: { code: "DELETE_BLOCKED" },
     });
     expect(tx.studentIntakeLink.delete).not.toHaveBeenCalled();
+  });
+
+  it("replaces an active intake URL without storing the raw token", async () => {
+    const tx = {
+      studentIntakeLink: {
+        findUnique: vi.fn().mockResolvedValue({
+          id: "link-1",
+          label: "Class X",
+          isActive: true,
+          archivedAt: null,
+          expiresAt: null,
+          maxSubmissions: null,
+          submissionCount: 0,
+          updatedAt: new Date(),
+        }),
+        update: vi.fn().mockResolvedValue({ id: "link-1" }),
+      },
+    };
+    vi.mocked(db.$transaction).mockImplementation(async (callback) => callback(tx as never));
+
+    const result = await replaceIntakeLinkToken("link-1", actor);
+
+    expect(result.success).toBe(true);
+    if (!result.success) return;
+    expect(result.data.rawToken).toHaveLength(43);
+    expect(tx.studentIntakeLink.update).toHaveBeenCalledWith({
+      where: { id: "link-1" },
+      data: { tokenHash: hashIntakeToken(result.data.rawToken) },
+    });
+    expect(JSON.stringify(tx.studentIntakeLink.update.mock.calls[0][0])).not.toContain(
+      result.data.rawToken,
+    );
+  });
+
+  it("does not replace URLs for inactive intake links", async () => {
+    const tx = {
+      studentIntakeLink: {
+        findUnique: vi.fn().mockResolvedValue({
+          id: "link-1",
+          label: "Inactive link",
+          isActive: false,
+          archivedAt: null,
+        }),
+        update: vi.fn(),
+      },
+    };
+    vi.mocked(db.$transaction).mockImplementation(async (callback) => callback(tx as never));
+
+    const result = await replaceIntakeLinkToken("link-1", actor);
+
+    expect(result).toMatchObject({
+      success: false,
+      error: { code: "INVALID_LIFECYCLE" },
+    });
+    expect(tx.studentIntakeLink.update).not.toHaveBeenCalled();
   });
 });

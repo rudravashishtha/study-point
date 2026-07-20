@@ -22,7 +22,7 @@ function walkSelectItems(
       if (value) {
         items.push({ value: value, label });
       }
-    } else if (child.type === SelectGroup) {
+    } else {
       walkSelectItems(
         (child.props as { children?: React.ReactNode }).children,
         items,

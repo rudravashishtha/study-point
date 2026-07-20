@@ -2,7 +2,15 @@
 
 import { useState, useTransition, type FormEvent } from "react";
 import type { AcademicSession, Batch, ClassLevel, Prisma } from "@prisma/client";
-import { Archive, Copy, MessageCircle, PauseCircle, Plus, Trash2 } from "lucide-react";
+import {
+  Archive,
+  Copy,
+  MessageCircle,
+  PauseCircle,
+  Plus,
+  RefreshCw,
+  Trash2,
+} from "lucide-react";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 
@@ -14,6 +22,7 @@ import {
   createIntakeLinkAction,
   deleteArchivedIntakeLinkAction,
   deactivateIntakeLinkAction,
+  replaceIntakeLinkTokenAction,
 } from "@/app/admin/intake-links/actions";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 
@@ -64,6 +73,10 @@ export function IntakeLinkManagement({
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [createdUrl, setCreatedUrl] = useState<string | null>(null);
+  const [createdUrlContext, setCreatedUrlContext] = useState<{
+    label: string;
+    isReplacement: boolean;
+  }>({ label: "Private link", isReplacement: false });
   const [deleteTarget, setDeleteTarget] = useState<IntakeLink | null>(null);
 
   function copy(text: string) {
@@ -93,6 +106,7 @@ export function IntakeLinkManagement({
         return;
       }
       setCreatedUrl(result.data.url);
+      setCreatedUrlContext({ label: "Private link", isReplacement: false });
       form.reset();
       toast.success("Private link created");
       router.refresh();
@@ -119,6 +133,22 @@ export function IntakeLinkManagement({
         return;
       }
       toast.success("Link archived");
+      router.refresh();
+    });
+  }
+
+  function replaceUrl(link: IntakeLink) {
+    startTransition(async () => {
+      const result = await replaceIntakeLinkTokenAction(link.id);
+      if (!result.success) {
+        toast.error("Could not replace URL", { description: result.error });
+        return;
+      }
+      setCreatedUrl(result.data.url);
+      setCreatedUrlContext({ label: link.label, isReplacement: true });
+      toast.success("URL replaced", {
+        description: "Copy the new URL now. The previous URL no longer works.",
+      });
       router.refresh();
     });
   }
@@ -215,6 +245,12 @@ export function IntakeLinkManagement({
       {createdUrl && (
         <div className="rounded-md border border-emerald-600/30 bg-emerald-50 p-4 text-sm text-emerald-950">
           <p className="font-medium">Copy this URL now. It will not be shown again.</p>
+          <p className="mt-1 text-emerald-900">
+            {createdUrlContext.label}
+            {createdUrlContext.isReplacement
+              ? ". The previous URL for this link is no longer valid."
+              : "."}
+          </p>
           <div className="mt-3 flex flex-col gap-2 sm:flex-row">
             <Input value={createdUrl} readOnly />
             <Button type="button" variant="outline" onClick={() => copy(createdUrl)}>
@@ -269,6 +305,16 @@ export function IntakeLinkManagement({
                   </Button>
                 ) : (
                   <>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      disabled={isPending || linkStatus(link) !== "Active"}
+                      onClick={() => replaceUrl(link)}
+                    >
+                      <RefreshCw className="mr-2 size-4" />
+                      Replace URL
+                    </Button>
                     <Button
                       type="button"
                       variant="outline"
