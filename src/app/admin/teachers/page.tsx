@@ -1,5 +1,6 @@
 import { requireAdmin } from "@/lib/auth/permissions";
 import { listTeachers, type ListTeachersOptions } from "@/server/services/teachers";
+import { listSubjects } from "@/server/services/curriculum/subjects";
 import { TeacherList } from "@/features/teachers/components/TeacherList";
 import { Button } from "@/components/ui/button";
 import { DataListSearch } from "@/components/admin/data-list/DataListSearch";
@@ -45,6 +46,15 @@ export default async function TeachersPage({
     direction,
   });
 
+  const { data: activeSubjects } = await listSubjects({
+    page: 1,
+    pageSize: 1000,
+    archiveState: "active",
+    query: "",
+    sortField: "name",
+    sortDir: "asc"
+  });
+
   return (
     <div className="space-y-6">
       <PageHeader>
@@ -57,6 +67,7 @@ export default async function TeachersPage({
         <PageHeaderActions>
           <TeacherFormDialog
             mode="create"
+            availableSubjects={activeSubjects}
             trigger={
               <Button>
                 <Plus className="size-4 mr-2" />
@@ -74,7 +85,7 @@ export default async function TeachersPage({
         </DataListFilters>
       </DataListToolbar>
 
-      <TeacherList teachers={items} />
+      <TeacherList teachers={items} availableSubjects={activeSubjects} />
 
       <DataListPagination totalItems={total} pageSize={limit} currentPage={page} />
     </div>

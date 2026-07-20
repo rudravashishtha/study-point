@@ -78,6 +78,7 @@ model Teacher {
   qualifications String?
   photoFileId    String?
   active         Boolean @default(true)
+  subjects       String[] @default([])
 
   appUser            AppUser?
   teacherAssignments TeacherAssignment[]

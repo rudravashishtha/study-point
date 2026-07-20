@@ -42,11 +42,12 @@ describe("TeacherRowActions Provisioning", () => {
     qualifications: null,
     photoFileId: null,
     active: true,
+    subjects: [],
     appUser: null,
   };
 
   it("eligible active unprovisioned Teacher can be invited", () => {
-    render(<TeacherRowActions teacher={baseTeacher} />);
+    render(<TeacherRowActions teacher={baseTeacher} availableSubjects={[]} />);
 
     fireEvent.click(screen.getByRole("button", { name: "Open menu" }));
 
@@ -55,20 +56,20 @@ describe("TeacherRowActions Provisioning", () => {
   });
 
   it("inactive Teacher cannot be invited", () => {
-    render(<TeacherRowActions teacher={{ ...baseTeacher, active: false }} />);
+    render(<TeacherRowActions teacher={{ ...baseTeacher, active: false }} availableSubjects={[]} />);
     fireEvent.click(screen.getByRole("button", { name: "Open menu" }));
     expect(screen.queryByText("Invite Teacher")).not.toBeInTheDocument();
   });
 
   it("Teacher without email cannot be invited", () => {
-    render(<TeacherRowActions teacher={{ ...baseTeacher, email: null }} />);
+    render(<TeacherRowActions teacher={{ ...baseTeacher, email: null }} availableSubjects={[]} />);
     fireEvent.click(screen.getByRole("button", { name: "Open menu" }));
     expect(screen.queryByText("Invite Teacher")).not.toBeInTheDocument();
   });
 
   it("INVITED Teacher shows Reset Invitation option", () => {
     render(
-      <TeacherRowActions teacher={{ ...baseTeacher, appUser: { status: "INVITED" } }} />,
+      <TeacherRowActions teacher={{ ...baseTeacher, appUser: { status: "INVITED" } }} availableSubjects={[]} />,
     );
     fireEvent.click(screen.getByRole("button", { name: "Open menu" }));
     expect(screen.queryByText("Invite Teacher")).not.toBeInTheDocument();
@@ -77,7 +78,7 @@ describe("TeacherRowActions Provisioning", () => {
 
   it("ACTIVE Teacher cannot be invited or reset", () => {
     render(
-      <TeacherRowActions teacher={{ ...baseTeacher, appUser: { status: "ACTIVE" } }} />,
+      <TeacherRowActions teacher={{ ...baseTeacher, appUser: { status: "ACTIVE" } }} availableSubjects={[]} />,
     );
     fireEvent.click(screen.getByRole("button", { name: "Open menu" }));
     expect(screen.queryByText("Invite Teacher")).not.toBeInTheDocument();
@@ -86,7 +87,7 @@ describe("TeacherRowActions Provisioning", () => {
 
   it("DISABLED Teacher cannot be invited or reset", () => {
     render(
-      <TeacherRowActions teacher={{ ...baseTeacher, appUser: { status: "DISABLED" } }} />,
+      <TeacherRowActions teacher={{ ...baseTeacher, appUser: { status: "DISABLED" } }} availableSubjects={[]} />,
     );
     fireEvent.click(screen.getByRole("button", { name: "Open menu" }));
     expect(screen.queryByText("Invite Teacher")).not.toBeInTheDocument();
@@ -98,7 +99,7 @@ describe("TeacherRowActions Provisioning", () => {
       success: true,
       data: undefined,
     });
-    render(<TeacherRowActions teacher={baseTeacher} />);
+    render(<TeacherRowActions teacher={baseTeacher} availableSubjects={[]} />);
 
     fireEvent.click(screen.getByRole("button", { name: "Open menu" }));
     const inviteItem = screen.getByText("Invite Teacher");

@@ -10,6 +10,7 @@ export interface CreateTeacherParams {
   bio?: string | null;
   qualifications?: string | null;
   photoFileId?: string | null;
+  subjects?: string[];
 }
 
 export interface UpdateTeacherParams {
@@ -19,6 +20,7 @@ export interface UpdateTeacherParams {
   bio?: string | null;
   qualifications?: string | null;
   photoFileId?: string | null;
+  subjects?: string[];
   active?: boolean;
 }
 
@@ -32,6 +34,7 @@ export async function createTeacher(actor: ActorContext, params: CreateTeacherPa
         bio: params.bio,
         qualifications: params.qualifications,
         photoFileId: params.photoFileId,
+        subjects: params.subjects || [],
         active: true,
       },
     });

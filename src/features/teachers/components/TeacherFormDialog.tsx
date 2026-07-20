@@ -34,9 +34,14 @@ import {
 import { Teacher } from "@prisma/client";
 import { SubmitButton } from "@/components/ui/submit-button";
 
+import { Checkbox } from "@/components/ui/checkbox";
+import { FormDescription } from "@/components/ui/form";
+import type { Subject } from "@prisma/client";
+
 interface TeacherFormDialogProps {
   mode: "create" | "edit";
   teacher?: Teacher;
+  availableSubjects: Subject[];
   trigger?: React.ReactNode;
   onSuccess?: () => void;
   open?: boolean;
@@ -46,6 +51,7 @@ interface TeacherFormDialogProps {
 export function TeacherFormDialog({
   mode,
   teacher,
+  availableSubjects,
   trigger,
   onSuccess,
   open,
@@ -58,25 +64,26 @@ export function TeacherFormDialog({
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const form = useForm<CreateTeacherInput | UpdateTeacherInput>({
-    resolver: zodResolver(mode === "create" ? createTeacherSchema : updateTeacherSchema),
+  const form = useForm<UpdateTeacherInput>({
+    resolver: zodResolver(mode === "create" ? createTeacherSchema : updateTeacherSchema) as any,
     defaultValues: {
       displayName: teacher?.displayName || "",
       phone: teacher?.phone || "",
       email: teacher?.email || "",
       bio: teacher?.bio || "",
       qualifications: teacher?.qualifications || "",
+      subjects: teacher?.subjects || [],
     },
   });
 
-  const onSubmit = async (values: CreateTeacherInput | UpdateTeacherInput) => {
+  const onSubmit = async (values: UpdateTeacherInput) => {
     setIsSubmitting(true);
 
     try {
       const result =
         mode === "create"
-          ? await createTeacherAction(values)
-          : await updateTeacherAction(teacher!.id, values as UpdateTeacherInput);
+          ? await createTeacherAction(values as CreateTeacherInput)
+          : await updateTeacherAction(teacher!.id, values);
 
       if (!result.success) {
         toast.error("Error", { description: result.error });
@@ -194,6 +201,55 @@ export function TeacherFormDialog({
                             value={field.value || ""}
                           />
                         </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="subjects"
+                    render={() => (
+                      <FormItem>
+                        <div className="mb-4">
+                          <FormLabel>Subjects</FormLabel>
+                          <FormDescription>Select the subjects this teacher can teach.</FormDescription>
+                        </div>
+                        <div className="grid grid-cols-2 gap-2 border p-4 rounded-md max-h-48 overflow-y-auto">
+                          {availableSubjects.map((subject) => (
+                            <FormField
+                              key={subject.id}
+                              control={form.control}
+                              name="subjects"
+                              render={({ field }) => {
+                                return (
+                                  <FormItem
+                                    key={subject.id}
+                                    className="flex flex-row items-start space-x-3 space-y-0"
+                                  >
+                                    <FormControl>
+                                      <Checkbox
+                                        checked={field.value?.includes(subject.name)}
+                                        onCheckedChange={(checked) => {
+                                          const currentValues = field.value || [];
+                                          return checked
+                                            ? field.onChange([...currentValues, subject.name])
+                                            : field.onChange(
+                                                currentValues.filter(
+                                                  (value) => value !== subject.name
+                                                )
+                                              )
+                                        }}
+                                      />
+                                    </FormControl>
+                                    <FormLabel className="font-normal cursor-pointer">
+                                      {subject.name}
+                                    </FormLabel>
+                                  </FormItem>
+                                )
+                              }}
+                            />
+                          ))}
+                        </div>
                         <FormMessage />
                       </FormItem>
                     )}

@@ -7,6 +7,7 @@ export const createTeacherSchema = z.object({
   bio: z.string().max(1000).optional().nullable(),
   qualifications: z.string().max(500).optional().nullable(),
   photoFileId: z.string().uuid().optional().nullable(),
+  subjects: z.array(z.string()).optional().default([]),
 });
 
 export const updateTeacherSchema = createTeacherSchema.extend({

@@ -1,4 +1,4 @@
-import type { Teacher } from "@prisma/client";
+import type { Teacher, Subject } from "@prisma/client";
 import { Badge } from "@/components/ui/badge";
 import {
   Table,
@@ -19,9 +19,10 @@ export type TeacherWithAppUser = Teacher & {
 
 interface TeacherListProps {
   teachers: TeacherWithAppUser[];
+  availableSubjects: Subject[];
 }
 
-export function TeacherList({ teachers }: TeacherListProps) {
+export function TeacherList({ teachers, availableSubjects }: TeacherListProps) {
   if (teachers.length === 0) {
     return (
       <DataListEmpty
@@ -48,7 +49,7 @@ export function TeacherList({ teachers }: TeacherListProps) {
                   {teacher.phone && <p>{teacher.phone}</p>}
                 </div>
               </div>
-              <TeacherRowActions teacher={teacher} />
+              <TeacherRowActions teacher={teacher} availableSubjects={availableSubjects} />
             </div>
 
             <div className="flex flex-wrap items-center gap-2 pt-2 border-t">
@@ -107,7 +108,7 @@ export function TeacherList({ teachers }: TeacherListProps) {
                   </Badge>
                 </TableCell>
                 <TableCell className="text-right">
-                  <TeacherRowActions teacher={teacher} />
+                  <TeacherRowActions teacher={teacher} availableSubjects={availableSubjects} />
                 </TableCell>
               </TableRow>
             ))}

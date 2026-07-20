@@ -3,6 +3,7 @@ import Link from "next/link";
 import { ArrowLeft, BookOpen, AlertTriangle } from "lucide-react";
 import { requireAdmin } from "@/lib/auth/permissions";
 import { getTeacher } from "@/server/services/teachers";
+import { listSubjects } from "@/server/services/curriculum/subjects";
 import { getTeacherBatchAssignments } from "@/server/services/teacher-assignments";
 import { resolveEffectivePermissions } from "@/lib/domain/permissions";
 import { Button } from "@/components/ui/button";
@@ -22,9 +23,17 @@ export default async function TeacherDetailPage({
 
   const { teacherId } = await params;
 
-  const [teacher, allAssignments] = await Promise.all([
+  const [teacher, allAssignments, subjectsResult] = await Promise.all([
     getTeacher(teacherId),
     getTeacherBatchAssignments(teacherId, { includeArchived: true }),
+    listSubjects({
+      page: 1,
+      pageSize: 1000,
+      archiveState: "active",
+      query: "",
+      sortField: "name",
+      sortDir: "asc",
+    }),
   ]);
 
   if (!teacher) {
@@ -33,6 +42,7 @@ export default async function TeacherDetailPage({
 
   const activeAssignments = allAssignments.filter((a) => !a.archivedAt);
   const historicalAssignments = allAssignments.filter((a) => !!a.archivedAt);
+  const activeSubjects = subjectsResult.data;
 
   return (
     <div className="space-y-6">
@@ -60,7 +70,7 @@ export default async function TeacherDetailPage({
           </div>
         </div>
         <div className="flex items-center gap-2">
-          <TeacherRowActions teacher={teacher} />
+          <TeacherRowActions teacher={teacher} availableSubjects={activeSubjects} />
         </div>
       </div>
 
