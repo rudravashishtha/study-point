@@ -25,7 +25,7 @@ export default async function AdminCurriculumBuilderPage({
   await requireAdmin();
   const { trackId } = await params;
   const resolvedParams = await searchParams;
-  const archiveState = (resolvedParams.archiveState as string) || "active";
+  const archiveState = (resolvedParams.archive as string) || "active";
 
   const track = await db.curriculumTrack.findUnique({
     where: { id: trackId },
@@ -92,8 +92,7 @@ export default async function AdminCurriculumBuilderPage({
             Builder: {track.displayName}
           </h1>
           <p className="text-muted-foreground">
-            {track.board.code} {track.programme ? `· ${track.programme.code}` : ""} ·
-            Class {track.classLevel} · {track.subject.name}
+            {track.board.code} · Class {track.classLevel} · {track.subject.name}
           </p>
         </div>
         <div className="ml-auto">
@@ -113,7 +112,6 @@ export default async function AdminCurriculumBuilderPage({
       <ChapterTopicBuilder
         trackId={trackId}
         initialChapters={chapters}
-        archiveState={archiveState}
       />
     </div>
   );

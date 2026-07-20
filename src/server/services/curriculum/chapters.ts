@@ -168,6 +168,56 @@ export async function restoreChapter(actor: ActorContext, id: string) {
   });
 }
 
+export async function deleteChapter(actor: ActorContext, id: string) {
+  return await db.$transaction(async (tx) => {
+    const existing = await tx.chapter.findUnique({ where: { id } });
+    if (!existing) throw new DomainError("NOT_FOUND", "Chapter not found.");
+    if (!existing.archivedAt) {
+      throw new DomainError(
+        "INVALID_LIFECYCLE",
+        "Only archived chapters can be permanently deleted. Archive it first.",
+      );
+    }
+
+    const dependencies = await collectChapterDependencies(tx, id);
+    if (dependencies.length > 0) {
+      throw new DomainError(
+        "DEPENDENCY_EXISTS",
+        `Cannot delete this chapter because it still has: ${dependencies.join(", ")}. Remove or reassign them first.`,
+      );
+    }
+
+    await tx.chapter.delete({ where: { id } });
+
+    await createAuditLog(tx, actor, {
+      action: "DELETE",
+      entityType: "Chapter",
+      entityId: existing.id,
+      summary: `Permanently deleted chapter: ${existing.name}`,
+    });
+
+    return { id };
+  });
+}
+
+async function collectChapterDependencies(
+  tx: Prisma.TransactionClient,
+  chapterId: string,
+): Promise<string[]> {
+  const deps: string[] = [];
+  const topicCount = await tx.topic.count({ where: { chapterId } });
+  if (topicCount > 0) deps.push(`${topicCount} topic(s)`);
+  const questionCount = await tx.question.count({ where: { chapterId } });
+  if (questionCount > 0) deps.push(`${questionCount} question(s)`);
+  const materialCount = await tx.studyMaterial.count({ where: { chapterId } });
+  if (materialCount > 0) deps.push(`${materialCount} study material(s)`);
+  const homeworkCount = await tx.homework.count({ where: { chapterId } });
+  if (homeworkCount > 0) deps.push(`${homeworkCount} homework item(s)`);
+  const testCount = await tx.test.count({ where: { chapterId } });
+  if (testCount > 0) deps.push(`${testCount} test(s)`);
+  return deps;
+}
+
 async function delay(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }

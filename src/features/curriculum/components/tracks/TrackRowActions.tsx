@@ -1,6 +1,6 @@
 "use client";
 
-import { useTransition } from "react";
+import { useState, useTransition } from "react";
 import { toast } from "sonner";
 import { CurriculumTrack } from "@prisma/client";
 import {
@@ -9,6 +9,16 @@ import {
 } from "@/app/admin/curriculum/curriculum-tracks/actions";
 import Link from "next/link";
 import { MoreVertical, Settings, Archive, RotateCcw } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuPortal,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { useRouter } from "next/navigation";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 
 export function TrackRowActions({
   track,
@@ -17,72 +27,70 @@ export function TrackRowActions({
   track: CurriculumTrack;
   onEdit: (track: CurriculumTrack) => void;
 }) {
+  const router = useRouter();
   const [isPending, startTransition] = useTransition();
+  const [archiveConfirmOpen, setArchiveConfirmOpen] = useState(false);
 
   const handleArchive = () => {
-    if (confirm("Are you sure you want to archive this track?")) {
-      startTransition(async () => {
-        const res = await archiveTrackAction(track.id);
-        if (!res.success) toast.error(res.error);
-        else toast.success("Track archived successfully");
-      });
-    }
+    startTransition(async () => {
+      const res = await archiveTrackAction(track.id);
+      if (!res.success) toast.error("Error", { description: res.error });
+      else toast.success("Success", { description: "Track archived successfully" });
+    });
+    setArchiveConfirmOpen(false);
   };
 
   const handleRestore = () => {
     startTransition(async () => {
       const res = await restoreTrackAction(track.id);
-      if (!res.success) toast.error(res.error);
-      else toast.success("Track restored successfully");
+      if (!res.success) toast.error("Error", { description: res.error });
+      else toast.success("Success", { description: "Track restored successfully" });
     });
   };
 
   return (
-    <div className="relative inline-block text-left group">
-      <button className="flex h-8 w-8 items-center justify-center rounded-md hover:bg-muted">
+    <>
+      <DropdownMenu>
+      <DropdownMenuTrigger className="flex h-8 w-8 items-center justify-center rounded-md hover:bg-muted outline-none">
         <MoreVertical className="h-4 w-4" />
-      </button>
-
-      {/* Dropdown Menu */}
-      <div className="absolute right-0 top-8 z-50 hidden w-48 rounded-md border bg-popover text-popover-foreground shadow-md outline-none group-hover:block hover:block">
-        <div className="p-1">
-          <Link
-            href={`/admin/curriculum/curriculum-tracks/${track.id}`}
-            className="flex w-full items-center rounded-sm px-2 py-1.5 text-sm outline-none hover:bg-accent hover:text-accent-foreground cursor-pointer"
-          >
+      </DropdownMenuTrigger>
+      <DropdownMenuPortal>
+        <DropdownMenuContent align="end">
+          <DropdownMenuItem onClick={() => router.push(`/admin/curriculum/curriculum-tracks/${track.id}`)}>
             <Settings className="mr-2 h-4 w-4" />
             Manage Content
-          </Link>
-          <button
-            onClick={() => onEdit(track)}
-            className="flex w-full items-center rounded-sm px-2 py-1.5 text-sm outline-none hover:bg-accent hover:text-accent-foreground cursor-pointer"
-          >
+          </DropdownMenuItem>
+          <DropdownMenuItem onClick={() => onEdit(track)}>
             Edit Name
-          </button>
-
-          <div className="my-1 h-px bg-muted" />
-
+          </DropdownMenuItem>
+          <DropdownMenuSeparator />
           {track.archivedAt ? (
-            <button
-              onClick={handleRestore}
-              disabled={isPending}
-              className="flex w-full items-center rounded-sm px-2 py-1.5 text-sm outline-none hover:bg-accent hover:text-accent-foreground cursor-pointer disabled:opacity-50"
-            >
+            <DropdownMenuItem onClick={handleRestore} disabled={isPending}>
               <RotateCcw className="mr-2 h-4 w-4" />
               Restore
-            </button>
+            </DropdownMenuItem>
           ) : (
-            <button
-              onClick={handleArchive}
+            <DropdownMenuItem
+              onClick={() => setArchiveConfirmOpen(true)}
               disabled={isPending}
-              className="flex w-full items-center rounded-sm px-2 py-1.5 text-sm text-destructive outline-none hover:bg-accent hover:text-accent-foreground cursor-pointer disabled:opacity-50"
+              className="text-destructive focus:text-destructive"
             >
               <Archive className="mr-2 h-4 w-4" />
               Archive
-            </button>
+            </DropdownMenuItem>
           )}
-        </div>
-      </div>
-    </div>
+        </DropdownMenuContent>
+      </DropdownMenuPortal>
+    </DropdownMenu>
+
+      <ConfirmDialog
+        open={archiveConfirmOpen}
+        onOpenChange={setArchiveConfirmOpen}
+        title="Archive track?"
+        description={`Are you sure you want to archive "${track.displayName}"? It can be restored later.`}
+        confirmLabel="Archive"
+        onConfirm={handleArchive}
+      />
+    </>
   );
 }

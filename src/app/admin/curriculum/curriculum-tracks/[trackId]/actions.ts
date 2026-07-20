@@ -8,6 +8,7 @@ import {
   archiveChapter,
   restoreChapter,
   moveChapter,
+  deleteChapter,
 } from "@/server/services/curriculum/chapters";
 import {
   createTopic,
@@ -15,6 +16,7 @@ import {
   archiveTopic,
   restoreTopic,
   moveTopic,
+  deleteTopic,
 } from "@/server/services/curriculum/topics";
 import {
   createChapterSchema,
@@ -154,6 +156,25 @@ export async function moveChapterAction(
   }
 }
 
+export async function deleteChapterAction(trackId: string, chapterId: string) {
+  try {
+    const actor = await getActor();
+    const chapter = await db.chapter.findUnique({
+      where: { id: chapterId, curriculumTrackId: trackId },
+    });
+    if (!chapter) return { success: false, error: "Chapter not found in this track." };
+
+    await deleteChapter(actor, chapterId);
+    revalidatePath(`/admin/curriculum/curriculum-tracks/${trackId}`);
+    return { success: true };
+  } catch (error: unknown) {
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : "Failed to delete chapter",
+    };
+  }
+}
+
 // ==========================================
 // Topics Actions
 // ==========================================
@@ -289,6 +310,31 @@ export async function moveTopicAction(
     return {
       success: false,
       error: error instanceof Error ? error.message : "Failed to move topic",
+    };
+  }
+}
+
+export async function deleteTopicAction(
+  trackId: string,
+  chapterId: string,
+  topicId: string,
+) {
+  try {
+    const actor = await getActor();
+    const topic = await db.topic.findUnique({
+      where: { id: topicId, chapterId: chapterId },
+      include: { chapter: true },
+    });
+    if (!topic || topic.chapter.curriculumTrackId !== trackId)
+      return { success: false, error: "NOT_FOUND" };
+
+    await deleteTopic(actor, topicId);
+    revalidatePath(`/admin/curriculum/curriculum-tracks/${trackId}`);
+    return { success: true };
+  } catch (error: unknown) {
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : "Failed to delete topic",
     };
   }
 }

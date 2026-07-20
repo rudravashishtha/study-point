@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { CurriculumTrack, Board, Programme, Subject } from "@prisma/client";
+import { CurriculumTrack, Board, Subject } from "@prisma/client";
 import { TrackFormDialog } from "./TrackFormDialog";
 import { TrackRowActions } from "./TrackRowActions";
 import {
@@ -22,12 +22,10 @@ type TrackWithRelations = CurriculumTrack & {
 export function TrackList({
   tracks,
   boards,
-  programmes,
   subjects,
 }: {
   tracks: TrackWithRelations[];
   boards: Board[];
-  programmes: Programme[];
   subjects: Subject[];
 }) {
   const [editingTrack, setEditingTrack] = useState<CurriculumTrack | undefined>();
@@ -61,16 +59,15 @@ export function TrackList({
               <TableHead>Name</TableHead>
               <TableHead>Board</TableHead>
               <TableHead>Class</TableHead>
-              <TableHead>Programme</TableHead>
               <TableHead>Subject</TableHead>
               <TableHead>Status</TableHead>
-              <TableHead className="text-right">Actions</TableHead>
+              <TableHead className="w-12">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {tracks.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={7} className="h-24 text-center text-muted-foreground">
+                <TableCell colSpan={6} className="h-24 text-center text-muted-foreground">
                   No curriculum tracks found.
                 </TableCell>
               </TableRow>
@@ -83,9 +80,6 @@ export function TrackList({
                   </TableCell>
                   <TableCell className="text-muted-foreground">
                     {track.classLevel}
-                  </TableCell>
-                  <TableCell className="text-muted-foreground">
-                    {track.programme?.code || "-"}
                   </TableCell>
                   <TableCell className="text-muted-foreground">
                     {track.subject.name}
@@ -101,9 +95,8 @@ export function TrackList({
                       </span>
                     )}
                   </TableCell>
-                  <TableCell className="text-right">
-                    <TrackRowActions track={track} onEdit={handleEdit} />
-                  </TableCell>
+                  <TableCell>
+                    <TrackRowActions track={track} onEdit={handleEdit} /></TableCell>
                 </TableRow>
               ))
             )}
@@ -116,7 +109,6 @@ export function TrackList({
         onOpenChange={setIsDialogOpen}
         track={editingTrack}
         boards={boards}
-        programmes={programmes}
         subjects={subjects}
       />
     </div>

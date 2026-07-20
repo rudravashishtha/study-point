@@ -158,6 +158,54 @@ export async function restoreTopic(actor: ActorContext, id: string) {
   });
 }
 
+export async function deleteTopic(actor: ActorContext, id: string) {
+  return await db.$transaction(async (tx) => {
+    const existing = await tx.topic.findUnique({ where: { id } });
+    if (!existing) throw new DomainError("NOT_FOUND", "Topic not found.");
+    if (!existing.archivedAt) {
+      throw new DomainError(
+        "INVALID_LIFECYCLE",
+        "Only archived topics can be permanently deleted. Archive it first.",
+      );
+    }
+
+    const dependencies = await collectTopicDependencies(tx, id);
+    if (dependencies.length > 0) {
+      throw new DomainError(
+        "DEPENDENCY_EXISTS",
+        `Cannot delete this topic because it still has: ${dependencies.join(", ")}. Remove or reassign them first.`,
+      );
+    }
+
+    await tx.topic.delete({ where: { id } });
+
+    await createAuditLog(tx, actor, {
+      action: "DELETE",
+      entityType: "Topic",
+      entityId: existing.id,
+      summary: `Permanently deleted topic: ${existing.name}`,
+    });
+
+    return { id };
+  });
+}
+
+async function collectTopicDependencies(
+  tx: Prisma.TransactionClient,
+  topicId: string,
+): Promise<string[]> {
+  const deps: string[] = [];
+  const questionCount = await tx.question.count({ where: { topicId } });
+  if (questionCount > 0) deps.push(`${questionCount} question(s)`);
+  const materialCount = await tx.studyMaterial.count({ where: { topicId } });
+  if (materialCount > 0) deps.push(`${materialCount} study material(s)`);
+  const homeworkCount = await tx.homework.count({ where: { topicId } });
+  if (homeworkCount > 0) deps.push(`${homeworkCount} homework item(s)`);
+  const testCount = await tx.test.count({ where: { topicId } });
+  if (testCount > 0) deps.push(`${testCount} test(s)`);
+  return deps;
+}
+
 async function delay(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }

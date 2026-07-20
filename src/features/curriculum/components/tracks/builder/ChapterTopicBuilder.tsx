@@ -9,18 +9,21 @@ import {
   archiveChapterAction,
   restoreChapterAction,
   moveChapterAction,
+  deleteChapterAction,
   createTopicAction,
   updateTopicAction,
   archiveTopicAction,
   restoreTopicAction,
   moveTopicAction,
+  deleteTopicAction,
 } from "@/app/admin/curriculum/curriculum-tracks/[trackId]/actions";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { createChapterSchema, createTopicSchema } from "@/lib/validation/curriculum";
 import { toast } from "sonner";
 import { z } from "zod";
-import { ChevronDown, ChevronRight, Plus, Archive, RotateCcw, Edit2 } from "lucide-react";
+import { ChevronDown, ChevronRight, Plus, Archive, RotateCcw, Edit2, Trash2 } from "lucide-react";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 
 type TopicModel = Topic;
 type ChapterModel = Chapter & { topics: TopicModel[] };
@@ -31,7 +34,6 @@ export function ChapterTopicBuilder({
 }: {
   trackId: string;
   initialChapters: ChapterModel[];
-  archiveState: string;
 }) {
   const [expandedChapters, setExpandedChapters] = useState<Set<string>>(
     new Set(initialChapters.map((c) => c.id)),
@@ -63,37 +65,74 @@ export function ChapterTopicBuilder({
     return moveTopicAction(trackId, chapterId, id, direction);
   };
 
-  const handleArchiveChapter = (id: string) => {
-    if (!confirm("Archive chapter?")) return;
+  const [archiveChapterTarget, setArchiveChapterTarget] = useState<string | null>(null);
+  const [archiveTopicTarget, setArchiveTopicTarget] = useState<{
+    chapterId: string;
+    topicId: string;
+  } | null>(null);
+  const [deleteChapterTarget, setDeleteChapterTarget] = useState<string | null>(null);
+  const [deleteTopicTarget, setDeleteTopicTarget] = useState<{
+    chapterId: string;
+    topicId: string;
+  } | null>(null);
+
+  const handleArchiveChapter = () => {
+    if (!archiveChapterTarget) return;
+    const id = archiveChapterTarget;
     startTransition(async () => {
       const res = await archiveChapterAction(trackId, id);
-      if (!res.success) toast.error(res.error);
-      else toast.success("Chapter archived");
+      if (!res.success) toast.error("Error", { description: res.error });
+      else toast.success("Success", { description: "Chapter archived" });
     });
+    setArchiveChapterTarget(null);
+  };
+
+  const handleDeleteChapter = () => {
+    if (!deleteChapterTarget) return;
+    const id = deleteChapterTarget;
+    startTransition(async () => {
+      const res = await deleteChapterAction(trackId, id);
+      if (!res.success) toast.error("Error", { description: res.error });
+      else toast.success("Success", { description: "Chapter permanently deleted" });
+    });
+    setDeleteChapterTarget(null);
   };
 
   const handleRestoreChapter = (id: string) => {
     startTransition(async () => {
       const res = await restoreChapterAction(trackId, id);
-      if (!res.success) toast.error(res.error);
-      else toast.success("Chapter restored");
+      if (!res.success) toast.error("Error", { description: res.error });
+      else toast.success("Success", { description: "Chapter restored" });
     });
   };
 
-  const handleArchiveTopic = (chapterId: string, id: string) => {
-    if (!confirm("Archive topic?")) return;
+  const handleArchiveTopic = () => {
+    if (!archiveTopicTarget) return;
+    const { chapterId, topicId } = archiveTopicTarget;
     startTransition(async () => {
-      const res = await archiveTopicAction(trackId, chapterId, id);
-      if (!res.success) toast.error(res.error);
-      else toast.success("Topic archived");
+      const res = await archiveTopicAction(trackId, chapterId, topicId);
+      if (!res.success) toast.error("Error", { description: res.error });
+      else toast.success("Success", { description: "Topic archived" });
     });
+    setArchiveTopicTarget(null);
+  };
+
+  const handleDeleteTopic = () => {
+    if (!deleteTopicTarget) return;
+    const { chapterId, topicId } = deleteTopicTarget;
+    startTransition(async () => {
+      const res = await deleteTopicAction(trackId, chapterId, topicId);
+      if (!res.success) toast.error("Error", { description: res.error });
+      else toast.success("Success", { description: "Topic permanently deleted" });
+    });
+    setDeleteTopicTarget(null);
   };
 
   const handleRestoreTopic = (chapterId: string, id: string) => {
     startTransition(async () => {
       const res = await restoreTopicAction(trackId, chapterId, id);
-      if (!res.success) toast.error(res.error);
-      else toast.success("Topic restored");
+      if (!res.success) toast.error("Error", { description: res.error });
+      else toast.success("Success", { description: "Topic restored" });
     });
   };
 
@@ -181,16 +220,25 @@ export function ChapterTopicBuilder({
                     <Edit2 className="h-4 w-4" />
                   </button>
                   {chapter.archivedAt ? (
-                    <button
-                      onClick={() => handleRestoreChapter(chapter.id)}
-                      className="p-1.5 hover:bg-accent rounded-sm text-sm text-green-600"
-                      title="Restore"
-                    >
-                      <RotateCcw className="h-4 w-4" />
-                    </button>
+                    <>
+                      <button
+                        onClick={() => handleRestoreChapter(chapter.id)}
+                        className="p-1.5 hover:bg-accent rounded-sm text-sm text-green-600"
+                        title="Restore"
+                      >
+                        <RotateCcw className="h-4 w-4" />
+                      </button>
+                      <button
+                        onClick={() => setDeleteChapterTarget(chapter.id)}
+                        className="p-1.5 hover:bg-accent rounded-sm text-sm text-destructive"
+                        title="Delete permanently"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </button>
+                    </>
                   ) : (
                     <button
-                      onClick={() => handleArchiveChapter(chapter.id)}
+                      onClick={() => setArchiveChapterTarget(chapter.id)}
                       className="p-1.5 hover:bg-accent rounded-sm text-sm text-destructive"
                       title="Archive"
                     >
@@ -255,16 +303,35 @@ export function ChapterTopicBuilder({
                             <Edit2 className="h-3 w-3" />
                           </button>
                           {topic.archivedAt ? (
-                            <button
-                              onClick={() => handleRestoreTopic(chapter.id, topic.id)}
-                              className="p-1.5 hover:bg-accent rounded-sm text-sm text-green-600"
-                              title="Restore"
-                            >
-                              <RotateCcw className="h-3 w-3" />
-                            </button>
+                            <>
+                              <button
+                                onClick={() => handleRestoreTopic(chapter.id, topic.id)}
+                                className="p-1.5 hover:bg-accent rounded-sm text-sm text-green-600"
+                                title="Restore"
+                              >
+                                <RotateCcw className="h-3 w-3" />
+                              </button>
+                              <button
+                                onClick={() =>
+                                  setDeleteTopicTarget({
+                                    chapterId: chapter.id,
+                                    topicId: topic.id,
+                                  })
+                                }
+                                className="p-1.5 hover:bg-accent rounded-sm text-sm text-destructive"
+                                title="Delete permanently"
+                              >
+                                <Trash2 className="h-3 w-3" />
+                              </button>
+                            </>
                           ) : (
                             <button
-                              onClick={() => handleArchiveTopic(chapter.id, topic.id)}
+                              onClick={() =>
+                                setArchiveTopicTarget({
+                                  chapterId: chapter.id,
+                                  topicId: topic.id,
+                                })
+                              }
                               className="p-1.5 hover:bg-accent rounded-sm text-sm text-destructive"
                               title="Archive"
                             >
@@ -313,6 +380,44 @@ export function ChapterTopicBuilder({
           <span>Add Chapter</span>
         </button>
       )}
+
+      <ConfirmDialog
+        open={!!archiveChapterTarget}
+        onOpenChange={(open) => !open && setArchiveChapterTarget(null)}
+        title="Archive chapter?"
+        description="Are you sure you want to archive this chapter? It can be restored later."
+        confirmLabel="Archive"
+        onConfirm={handleArchiveChapter}
+      />
+
+      <ConfirmDialog
+        open={!!archiveTopicTarget}
+        onOpenChange={(open) => !open && setArchiveTopicTarget(null)}
+        title="Archive topic?"
+        description="Are you sure you want to archive this topic? It can be restored later."
+        confirmLabel="Archive"
+        onConfirm={handleArchiveTopic}
+      />
+
+      <ConfirmDialog
+        open={!!deleteChapterTarget}
+        onOpenChange={(open) => !open && setDeleteChapterTarget(null)}
+        title="Permanently delete chapter?"
+        description="This action cannot be undone. The chapter will be removed forever. This is only allowed if it has no topics, questions, study materials, homework, or tests linked to it."
+        confirmLabel="Delete permanently"
+        confirmVariant="destructive"
+        onConfirm={handleDeleteChapter}
+      />
+
+      <ConfirmDialog
+        open={!!deleteTopicTarget}
+        onOpenChange={(open) => !open && setDeleteTopicTarget(null)}
+        title="Permanently delete topic?"
+        description="This action cannot be undone. The topic will be removed forever. This is only allowed if it has no questions, study materials, homework, or tests linked to it."
+        confirmLabel="Delete permanently"
+        confirmVariant="destructive"
+        onConfirm={handleDeleteTopic}
+      />
     </div>
   );
 }
@@ -342,9 +447,9 @@ function ChapterForm({
         ? await updateChapterAction(trackId, chapter.id, { name: data.name })
         : await createChapterAction(trackId, data);
 
-      if (!res.success) toast.error(res.error);
+      if (!res.success) toast.error("Error", { description: res.error });
       else {
-        toast.success(chapter ? "Chapter updated" : "Chapter created");
+        toast.success("Success", { description: chapter ? "Chapter updated" : "Chapter created" });
         onClose();
       }
     });
@@ -411,9 +516,9 @@ function TopicForm({
         ? await updateTopicAction(trackId, chapterId, topic.id, { name: data.name })
         : await createTopicAction(trackId, chapterId, data);
 
-      if (!res.success) toast.error(res.error);
+      if (!res.success) toast.error("Error", { description: res.error });
       else {
-        toast.success(topic ? "Topic updated" : "Topic created");
+        toast.success("Success", { description: topic ? "Topic updated" : "Topic created" });
         onClose();
       }
     });
