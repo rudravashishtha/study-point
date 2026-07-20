@@ -89,7 +89,7 @@ export async function listBatches(input: ListBatchesInput) {
     where.archivedAt = { not: null };
   }
 
-  const [total, items] = await prisma.$transaction([
+  const [total, items] = await Promise.all([
     prisma.batch.count({ where }),
     prisma.batch.findMany({
       where,

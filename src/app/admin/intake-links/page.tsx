@@ -25,18 +25,19 @@ export default async function AdminIntakeLinksPage({
   const resolvedParams = await searchParams;
   const params = parseListParams(resolvedParams, ["createdAt"] as const, "createdAt");
 
-  const [links, sessionsResult, tracksResult, batchesResult] = await Promise.all([
-    listIntakeLinks({
-      q: params.query,
-      archiveState:
-        params.archiveState === "active"
-          ? "ACTIVE_ONLY"
-          : params.archiveState === "archived"
-            ? "ARCHIVED_ONLY"
-            : "ALL",
-      page: params.page,
-      pageSize: params.pageSize,
-    }),
+  const links = await listIntakeLinks({
+    q: params.query,
+    archiveState:
+      params.archiveState === "active"
+        ? "ACTIVE_ONLY"
+        : params.archiveState === "archived"
+          ? "ARCHIVED_ONLY"
+          : "ALL",
+    page: params.page,
+    pageSize: params.pageSize,
+  });
+
+  const [sessionsResult, tracksResult, batchesResult] = await Promise.all([
     listAcademicSessions({
       page: 1,
       pageSize: 100,

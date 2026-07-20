@@ -38,16 +38,17 @@ export default async function AdminIntakeSubmissionsPage({
   const curriculumTrackId = first(params.curriculumTrackId) || undefined;
   const batchId = first(params.batchId) || undefined;
 
-  const [submissions, sessionsResult, tracksResult, batchesResult] = await Promise.all([
-    listIntakeSubmissions({
-      q,
-      status,
-      academicSessionId,
-      curriculumTrackId,
-      batchId,
-      page: Number.isFinite(page) && page > 0 ? page : 1,
-      pageSize: 20,
-    }),
+  const submissions = await listIntakeSubmissions({
+    q,
+    status,
+    academicSessionId,
+    curriculumTrackId,
+    batchId,
+    page: Number.isFinite(page) && page > 0 ? page : 1,
+    pageSize: 20,
+  });
+
+  const [sessionsResult, tracksResult, batchesResult] = await Promise.all([
     listAcademicSessions({
       page: 1,
       pageSize: 100,
