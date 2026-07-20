@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useActionState, useEffect } from "react";
+import { useState, useTransition } from "react";
 
 import { parsePhoneNumberFromString } from "libphonenumber-js";
 import {
@@ -29,28 +29,34 @@ interface ProfileUser {
 export function ProfilePage({ user }: { user: ProfileUser }) {
   const [editPhoneOpen, setEditPhoneOpen] = useState(false);
   const [editNameOpen, setEditNameOpen] = useState(false);
-  const [phoneState, phoneAction, phoneIsPending] = useActionState(updatePhone, {
-    error: null,
-    success: false,
-  });
-  const [nameState, nameAction, nameIsPending] = useActionState(updateName, {
-    error: null,
-    success: false,
-  });
+  const [phoneError, setPhoneError] = useState<string | null>(null);
+  const [nameError, setNameError] = useState<string | null>(null);
+  const [phonePending, startPhoneTransition] = useTransition();
+  const [namePending, startNameTransition] = useTransition();
 
-  // Close phone dialog on success
-  useEffect(() => {
-    if (phoneState.success) {
-      setEditPhoneOpen(false);
-    }
-  }, [phoneState.success]);
+  const handlePhoneSubmit = (formData: FormData) => {
+    startPhoneTransition(async () => {
+      const result = await updatePhone({ error: null, success: false }, formData);
+      if (result.error) {
+        setPhoneError(result.error);
+      } else {
+        setPhoneError(null);
+        setEditPhoneOpen(false);
+      }
+    });
+  };
 
-  // Close name dialog on success
-  useEffect(() => {
-    if (nameState.success) {
-      setEditNameOpen(false);
-    }
-  }, [nameState.success]);
+  const handleNameSubmit = (formData: FormData) => {
+    startNameTransition(async () => {
+      const result = await updateName({ error: null, success: false }, formData);
+      if (result.error) {
+        setNameError(result.error);
+      } else {
+        setNameError(null);
+        setEditNameOpen(false);
+      }
+    });
+  };
 
   const formattedPhone = user.phone
     ? (parsePhoneNumberFromString(user.phone)?.formatInternational() ?? user.phone)
@@ -194,8 +200,8 @@ export function ProfilePage({ user }: { user: ProfileUser }) {
               +91).
             </DialogDescription>
           </DialogHeader>
-          <form action={phoneAction} className="space-y-4">
-            <div className="space-y-2">
+          <form action={handlePhoneSubmit} className="space-y-4">
+            <div className="space-y-3">
               <Label htmlFor="phone">Phone Number</Label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
@@ -211,16 +217,16 @@ export function ProfilePage({ user }: { user: ProfileUser }) {
                   defaultValue={user.phone ? user.phone.replace(/^\+91\s*/, "") : ""}
                 />
               </div>
-              {phoneState?.error && (
-                <p className="text-sm text-destructive font-medium">{phoneState.error}</p>
+              {phoneError && (
+                <p className="text-sm text-destructive font-medium">{phoneError}</p>
               )}
             </div>
             <DialogFooter className="gap-2 sm:gap-0">
               <DialogClose render={<Button type="button" variant="outline" />}>
                 Cancel
               </DialogClose>
-              <Button type="submit" disabled={phoneIsPending}>
-                {phoneIsPending ? "Saving..." : "Save Changes"}
+              <Button type="submit" disabled={phonePending}>
+                {phonePending ? "Saving..." : "Save Changes"}
               </Button>
             </DialogFooter>
           </form>
@@ -236,8 +242,8 @@ export function ProfilePage({ user }: { user: ProfileUser }) {
               Please enter your full name as you would like it to appear.
             </DialogDescription>
           </DialogHeader>
-          <form action={nameAction} className="space-y-4">
-            <div className="space-y-2">
+          <form action={handleNameSubmit} className="space-y-4">
+            <div className="space-y-3">
               <Label htmlFor="fullName">Full Name</Label>
               <Input
                 id="fullName"
@@ -245,16 +251,16 @@ export function ProfilePage({ user }: { user: ProfileUser }) {
                 placeholder="e.g. John Doe"
                 defaultValue={user.fullName || ""}
               />
-              {nameState?.error && (
-                <p className="text-sm text-destructive font-medium">{nameState.error}</p>
+              {nameError && (
+                <p className="text-sm text-destructive font-medium">{nameError}</p>
               )}
             </div>
             <DialogFooter className="gap-2 sm:gap-0">
               <DialogClose render={<Button type="button" variant="outline" />}>
                 Cancel
               </DialogClose>
-              <Button type="submit" disabled={nameIsPending}>
-                {nameIsPending ? "Saving..." : "Save Changes"}
+              <Button type="submit" disabled={namePending}>
+                {namePending ? "Saving..." : "Save Changes"}
               </Button>
             </DialogFooter>
           </form>
