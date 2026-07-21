@@ -1,6 +1,7 @@
 "use client";
 
 import { CourseCard } from "./CourseCard";
+import type { PublicPaymentPlan } from "./PaymentOptions";
 
 interface CourseGroupProps {
   board: {
@@ -19,17 +20,16 @@ interface CourseGroupProps {
       id: string;
       name: string;
       isActive: boolean;
-      feePlan: {
-        id: string;
-        name: string;
-        showPublicly: boolean;
-        assignedTotalAmount: number | null;
-      } | null;
+      feePlans: PublicPaymentPlan[];
     }>;
   }>;
 }
 
 export function CourseGroup({ board, tracks }: CourseGroupProps) {
+  const showFees = tracks.some((track) =>
+    track.batches.some((batch) => batch.feePlans.length > 0),
+  );
+
   return (
     <section className="py-12 md:py-16" aria-labelledby={`board-${board.code}-heading`}>
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -59,7 +59,7 @@ export function CourseGroup({ board, tracks }: CourseGroupProps) {
                 key={track.id}
                 track={track}
                 batches={track.batches}
-                showFees={true}
+                showFees={showFees}
               />
             ))}
           </div>

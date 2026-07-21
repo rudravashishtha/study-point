@@ -1,4 +1,9 @@
 import { db } from "../../lib/db";
+import {
+  PublicFeePlanSummary,
+  publicFeePlanWhere,
+  toPublicFeePlanSummary,
+} from "./public-fees";
 
 export interface PublicCoursesData {
   groups: Array<{
@@ -18,12 +23,7 @@ export interface PublicCoursesData {
         id: string;
         name: string;
         isActive: boolean;
-        feePlan: {
-          id: string;
-          name: string;
-          showPublicly: boolean;
-          assignedTotalAmount: number | null;
-        } | null;
+        feePlans: PublicFeePlanSummary[];
       }>;
     }>;
   }>;
@@ -67,6 +67,31 @@ export async function getPublicCourses(): Promise<PublicCoursesData> {
 
   const trackIds = tracks.map((t) => t.id);
 
+  const publicFeePlans = feeDisplayEnabled
+    ? await db.feePlan.findMany({
+        where: {
+          ...publicFeePlanWhere,
+          academicSessionId: activeSession.id,
+          curriculumTrackId: { in: trackIds },
+        },
+        select: {
+          id: true,
+          name: true,
+          showPublicly: true,
+          totalAmount: true,
+          frequency: true,
+          batchId: true,
+          curriculumTrackId: true,
+          instalments: {
+            where: { isActive: true },
+            select: { id: true, label: true, amount: true },
+            orderBy: { displayOrder: "asc" },
+          },
+        },
+        orderBy: { createdAt: "asc" },
+      })
+    : [];
+
   const batches = await db.batch.findMany({
     where: {
       curriculumTrackId: { in: trackIds },
@@ -77,39 +102,24 @@ export async function getPublicCourses(): Promise<PublicCoursesData> {
         ? {}
         : { showFeePublicly: false }),
     },
-    include: {
-      feePlans: {
-        where: {
-          showPublicly: feeDisplayEnabled,
-          isActive: feeDisplayEnabled ? true : undefined,
-          archivedAt: feeDisplayEnabled ? null : undefined,
-          ...(feeDisplayEnabled
-            ? {
-                feeAssignments: {
-                  some: {
-                    status: "ACTIVE",
-                    archivedAt: null,
-                  },
-                },
-              }
-            : {}),
-        },
-        include: {
-          feeAssignments: {
-            where: {
-              status: "ACTIVE",
-              archivedAt: null,
-            },
-            include: {
-              feePlan: { select: { id: true, name: true, showPublicly: true } },
-            },
-            orderBy: { createdAt: "asc" },
-          },
-        },
-        orderBy: { createdAt: "asc" },
-      },
-    },
   });
+
+  const feePlansByBatchId = new Map<string, PublicFeePlanSummary[]>();
+  const feePlansByTrackId = new Map<string, PublicFeePlanSummary[]>();
+  for (const plan of publicFeePlans) {
+    const summary = toPublicFeePlanSummary(plan);
+    if (plan.batchId) {
+      feePlansByBatchId.set(plan.batchId, [
+        ...(feePlansByBatchId.get(plan.batchId) ?? []),
+        summary,
+      ]);
+      continue;
+    }
+    feePlansByTrackId.set(plan.curriculumTrackId, [
+      ...(feePlansByTrackId.get(plan.curriculumTrackId) ?? []),
+      summary,
+    ]);
+  }
 
   // Build batch map by curriculumTrackId
   const batchesByTrackId = new Map<string, typeof batches>();
@@ -138,20 +148,14 @@ export async function getPublicCourses(): Promise<PublicCoursesData> {
         : null,
       subject: { id: track.subject.id, name: track.subject.name },
       batches: trackBatches.map((b) => {
-        const feePlan = b.feePlans?.[0];
-        const feeAssignment = feePlan?.feeAssignments?.[0];
         return {
           id: b.id,
           name: b.name,
           isActive: b.isActive,
-          feePlan: feeAssignment?.feePlan
-            ? {
-                id: feeAssignment.feePlan.id,
-                name: feeAssignment.feePlan.name,
-                showPublicly: feeAssignment.feePlan.showPublicly,
-                assignedTotalAmount: Number(feeAssignment.assignedTotalAmount),
-              }
-            : null,
+          feePlans: [
+            ...(feePlansByBatchId.get(b.id) ?? []),
+            ...(feePlansByTrackId.get(track.id) ?? []),
+          ],
         };
       }),
     };

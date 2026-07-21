@@ -2,6 +2,11 @@ import { db } from "../../lib/db";
 import { getSiteSettings } from "./site-settings";
 import { listPublicAnnouncements } from "./announcements";
 import { listPublicResources } from "./study-materials";
+import {
+  PublicFeePlanSummary,
+  publicFeePlanWhere,
+  toPublicFeePlanSummary,
+} from "./public-fees";
 
 export interface PublicHomeData {
   siteSettings: Awaited<ReturnType<typeof getSiteSettings>> extends {
@@ -27,12 +32,7 @@ export interface PublicHomeData {
       classLevel: string;
       subject: { name: string };
     };
-    feePlan: {
-      id: string;
-      name: string;
-      showPublicly: boolean;
-      assignedTotalAmount: number | null;
-    } | null;
+    feePlans: PublicFeePlanSummary[];
   }>;
   announcements: Array<{
     id: string;
@@ -100,31 +100,26 @@ async function getPublicBatches() {
 
   const feePlans = await db.feePlan.findMany({
     where: {
+      ...publicFeePlanWhere,
       batch: {
         academicSessionId: activeSession.id,
         archivedAt: null,
         isActive: true,
         showFeePublicly: true,
       },
-      showPublicly: true,
-      feeAssignments: {
-        some: {
-          status: "ACTIVE",
-          archivedAt: null,
-        },
-      },
     },
     include: {
+      instalments: {
+        where: { isActive: true },
+        select: { id: true, label: true, amount: true },
+        orderBy: { displayOrder: "asc" },
+      },
       batch: {
         include: {
           curriculumTrack: {
             include: { subject: { select: { name: true } } },
           },
         },
-      },
-      feeAssignments: {
-        where: { status: "ACTIVE", archivedAt: null },
-        orderBy: { createdAt: "asc" },
       },
     },
     orderBy: { batch: { name: "asc" } },
@@ -141,7 +136,6 @@ async function getPublicBatches() {
 
   return Array.from(batchMap.entries()).map(([, fps]) => {
     const batch = fps[0].batch!;
-    const fp = fps[0];
     return {
       id: batch.id,
       name: batch.name,
@@ -151,14 +145,7 @@ async function getPublicBatches() {
         classLevel: batch.curriculumTrack.classLevel,
         subject: { name: batch.curriculumTrack.subject.name },
       },
-      feePlan: fp.feeAssignments[0]
-        ? {
-            id: fp.id,
-            name: fp.name,
-            showPublicly: fp.showPublicly,
-            assignedTotalAmount: Number(fp.feeAssignments[0].assignedTotalAmount),
-          }
-        : null,
+      feePlans: fps.map(toPublicFeePlanSummary),
     };
   });
 }

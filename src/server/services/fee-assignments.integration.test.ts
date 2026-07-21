@@ -661,4 +661,27 @@ describe.skipIf(!isTestConfigured)("Fee Assignment Service Integration", () => {
     if (!res.success) return;
     expect(res.data.assignments).toHaveLength(0);
   });
+
+  it("24. unassigned public fee plans do not appear in student fee status", async () => {
+    const publicPlan = await db.feePlan.create({
+      data: {
+        academicSessionId: session.id,
+        curriculumTrackId: feePlan.curriculumTrackId,
+        batchId: batch.id,
+        name: "Public Admissions Fee",
+        totalAmount: new Prisma.Decimal(42000),
+        frequency: "YEARLY",
+        showPublicly: true,
+        isActive: true,
+      },
+    });
+
+    const res = await listStudentFeeDues(studentActor1);
+
+    expect(res.success).toBe(true);
+    if (!res.success) return;
+    expect(res.data.assignments.map((assignment) => assignment.feePlanId)).not.toContain(
+      publicPlan.id,
+    );
+  });
 });

@@ -2,6 +2,7 @@
 
 import { ChevronRight } from "lucide-react";
 import Link from "next/link";
+import { PaymentOptions, type PublicPaymentPlan } from "./PaymentOptions";
 
 interface CourseCardProps {
   track: {
@@ -14,12 +15,7 @@ interface CourseCardProps {
   batches: Array<{
     id: string;
     name: string;
-    feePlan?: {
-      id: string;
-      name: string;
-      assignedTotalAmount: number | null;
-      showPublicly: boolean;
-    } | null;
+    feePlans: PublicPaymentPlan[];
   }>;
   showFees: boolean;
 }
@@ -29,8 +25,11 @@ export function CourseCard({ track, batches, showFees }: CourseCardProps) {
   const classLevel = track.classLevel ?? "Class";
   const displayName = track.displayName ?? `${classLevel} ${subjectName}`;
 
-  const activeBatches = batches.filter((b) => b.feePlan?.showPublicly !== false);
-  const feeAmount = activeBatches[0]?.feePlan?.assignedTotalAmount;
+  const visibleFeePlans = Array.from(
+    new Map(
+      batches.flatMap((batch) => batch.feePlans).map((plan) => [plan.id, plan]),
+    ).values(),
+  );
 
   return (
     <article className="group rounded-2xl border border-border/60 bg-surface-elevated p-5 sm:p-6 shadow-sm transition-all hover:border-brand-glow/30 hover:shadow-md flex flex-col h-full">
@@ -46,21 +45,16 @@ export function CourseCard({ track, batches, showFees }: CourseCardProps) {
       </div>
 
       <p className="text-sm text-muted-foreground mb-4">
-        {subjectName} — {activeBatches.length} batch{activeBatches.length !== 1 ? "es" : ""} available
+        {subjectName} — {batches.length} batch{batches.length !== 1 ? "es" : ""} available
       </p>
 
       <div className="flex-1" />
 
-      <div className="flex items-center gap-4 pt-4 border-t border-border/50">
-        {showFees && (
-          <div className="min-w-0">
-            <p className="text-xs text-muted-foreground">Fee</p>
-            <p className="text-sm font-semibold text-foreground truncate">
-              {feeAmount ? `₹${feeAmount.toLocaleString()}` : "Contact for details"}
-            </p>
-          </div>
-        )}
-        <div className="ml-auto">
+      <div className="space-y-4 pt-4 border-t border-border/50">
+        {showFees && visibleFeePlans.length > 0 ? (
+          <PaymentOptions plans={visibleFeePlans} />
+        ) : null}
+        <div>
           <Link
             href="/admissions"
             className="inline-flex items-center gap-1.5 rounded-full bg-primary px-5 py-2 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90"

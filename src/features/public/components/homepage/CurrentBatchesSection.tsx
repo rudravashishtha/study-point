@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { ArrowRight, BookOpen } from "lucide-react";
 import { motion } from "motion/react";
+import { PaymentOptions, type PublicPaymentPlan } from "../PaymentOptions";
 
 interface BatchData {
   id: string;
@@ -13,12 +14,7 @@ interface BatchData {
     classLevel: string;
     subject: { name: string };
   };
-  feePlan: {
-    id: string;
-    name: string;
-    showPublicly: boolean;
-    assignedTotalAmount: number | null;
-  } | null;
+  feePlans: PublicPaymentPlan[];
 }
 
 export function CurrentBatchesSection({
@@ -76,21 +72,9 @@ export function CurrentBatchesSection({
               </p>
 
               <div className="mt-auto space-y-3">
-                {batch.feePlan?.assignedTotalAmount ? (
-                  <div className="rounded-lg bg-primary/5 px-3 py-2">
-                    <span className="text-xs text-muted-foreground">Fee</span>
-                    <p className="text-lg font-bold text-foreground">
-                      ₹{batch.feePlan.assignedTotalAmount.toLocaleString()}
-                    </p>
-                  </div>
-                ) : (
-                  <div className="rounded-lg bg-muted/50 px-3 py-2">
-                    <span className="text-xs text-muted-foreground">Fee</span>
-                    <p className="text-sm font-medium text-foreground">
-                      Contact for details
-                    </p>
-                  </div>
-                )}
+                {batch.feePlans.length > 0 ? (
+                  <PaymentOptions plans={batch.feePlans} />
+                ) : null}
 
                 <Link
                   href="/admissions"
