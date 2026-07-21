@@ -182,10 +182,8 @@ export function PublicFooter({ settings }: PublicFooterProps) {
                 </div>
               )}
               {mapUrl && (
-                <a
-                  href={mapUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
+                <Link
+                  href="/contact"
                   className="inline-flex items-center gap-1 text-sm text-primary hover:underline"
                 >
                   <svg
@@ -203,7 +201,7 @@ export function PublicFooter({ settings }: PublicFooterProps) {
                     <circle cx="12" cy="10" r="3" />
                   </svg>
                   <span>View on Map</span>
-                </a>
+                </Link>
               )}
               {openingHours && (
                 <p className="text-sm text-muted-foreground">

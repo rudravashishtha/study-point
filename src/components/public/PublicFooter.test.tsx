@@ -56,11 +56,11 @@ describe("PublicFooter", () => {
     expect(screen.getByText("Near Near City Mall")).toBeInTheDocument();
   });
 
-  it("5. renders map link", () => {
+  it("5. sends map enquiries to the contact page", () => {
     render(<PublicFooter settings={defaultSettings} />);
     const mapLink = screen.getByRole("link", { name: /View on Map/i });
     expect(mapLink).toBeInTheDocument();
-    expect(mapLink).toHaveAttribute("href", "https://maps.example.com");
+    expect(mapLink).toHaveAttribute("href", "/contact");
   });
 
   it("6. renders opening hours", () => {
