@@ -6,7 +6,7 @@ import { db } from "@/lib/db";
 import { BookOpen, ClipboardCheck, ArrowRight } from "lucide-react";
 
 export const metadata: Metadata = {
-  title: "Teacher Dashboard | Study Point Mathematics",
+  title: "Teacher Dashboard | Study Point",
 };
 
 export default async function TeacherPage() {

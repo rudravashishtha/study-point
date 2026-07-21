@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 export const metadata: Metadata = {
-  title: "Session expired | Study Point Mathematics",
+  title: "Session expired | Study Point",
 };
 
 export default function SessionExpiredPage() {

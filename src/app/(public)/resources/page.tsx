@@ -8,7 +8,7 @@ export const revalidate = 3600;
 export const metadata: Metadata = {
   title: "Free Study Resources | Study Point",
   description:
-    "Download free mathematics study materials, formula sheets, and practice resources for Classes IX–XII. No sign-up required.",
+    "Download free study materials, formula sheets, and practice resources for Classes IX-XII. No sign-up required.",
   alternates: { canonical: "/resources" },
   openGraph: { url: "/resources" },
 };

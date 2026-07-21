@@ -7,7 +7,7 @@ export default async function manifest(): Promise<MetadataRoute.Manifest> {
   const description =
     settingsResult.success && settingsResult.data.defaultDescription
       ? settingsResult.data.defaultDescription
-      : "A premium mathematics institute coaching students in Classes IX, X, XI, and XII.";
+      : "A trusted coaching institute for Classes IX-XII, focused on structured learning, personal guidance, and steady academic growth.";
 
   return {
     name,

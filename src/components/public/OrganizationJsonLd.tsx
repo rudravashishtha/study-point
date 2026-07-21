@@ -18,7 +18,7 @@ function buildOrganizationJsonLd(settings?: OrganizationJsonLdProps["settings"])
   const sameAs =
     settings?.socialLinks && Object.values(settings.socialLinks).length > 0
       ? Object.values(settings.socialLinks)
-      : [siteConfig.links.twitter, siteConfig.links.github];
+      : [];
 
   return {
     "@context": "https://schema.org",
